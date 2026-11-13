@@ -14,26 +14,26 @@
   min-inline-size: 0;
 }
 
-[data-widget='helm-widget'] > [data-ui='layout'] {
-  block-size: 100%;
-  gap: var(--sa-rhythm-gap);
-  row-gap: 0;
-  width: fit-content;
-}
-
 @container dashboard-header (max-width: 485px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
     justify-content: center;
     min-inline-size: 100%;
   }
-
-  [data-widget='helm-widget'] > [data-ui='layout'] {
-    flex-wrap: nowrap;
-    width: fit-content;
-  }
 }
 
-[data-widget='helm-command-menu'] > span {
+[data-widget='helm-menu'] {
+  min-inline-size: 10rem;
+}
+
+[data-widget='helm-menu'] > [data-widget='helm-menu-title'] {
+  color: var(--sa-text-primary);
+  font-weight: var(--sa-ui-font-weight-strong);
+  justify-self: center;
+  margin-block-end: var(--sa-rhythm-gap);
+}
+
+[data-widget='helm-menu'] > [data-widget='helm-menu-status'] {
   color: var(--sa-text-secondary);
+  margin-block-start: var(--sa-rhythm-gap);
 }

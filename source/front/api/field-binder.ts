@@ -15,7 +15,8 @@ A renamed source document is renamed locally at the next Sync. Failed
 preparation retains the previous complete snapshot. A shared origin Web Lock
 serializes preparation against local load/open; duplicate invocation on one
 instance shares the pending pass. Source changes are checked once after
-copying, never chased in an unbounded loop.
+copying, never chased in an unbounded loop. A source with nothing published
+is an empty Binder, not a failure: Sync completes and copies nothing.
 Cleanup follows retained status -> inventory -> document references. Extra
 bytes or cleanup warnings do not invalidate a confirmed complete snapshot.
 
@@ -32,6 +33,7 @@ FieldBinderSnapshot  Read-only reader/preparation state.
 ├ syncedAt           Successful local copy time.
 ├ verifiedAt         Source currency was checked at this time.
 ├ updateAvailable    The source differs, or the snapshot skipped an entry.
+├ unpublished        The last Sync found nothing published at the source.
 ├ error              Last load/preparation failure copy.
 └ cleanupError       Cleanup failure after a confirmed commit.
 FieldBinder          Local access and explicit complete preparation.
@@ -55,6 +57,7 @@ import type {
   NodeMetadata
 } from '@core/stdx'
 import { createStore } from '@solid-js/store'
+import type { SetStoreFunction } from '@solid-js/store'
 import { FieldBinderMetadata } from './field-binder-inventory.ts'
 import type {
   FieldBinderEntry,
@@ -75,6 +78,7 @@ export type FieldBinderSnapshot = {
   readonly syncedAt?: When
   readonly verifiedAt?: When
   readonly updateAvailable: boolean
+  readonly unpublished: boolean
   readonly error?: string
   readonly cleanupError?: string
 }
@@ -84,13 +88,8 @@ export class FieldBinder {
   readonly #local: ApiDocumentStoreContract
   readonly #server: ApiDocumentStoreContract
   readonly #source: FieldBinderSource
-  readonly #state = createStore<FieldBinderSnapshot>({
-    entries: [],
-    loading: false,
-    syncing: false,
-    available: false,
-    updateAvailable: false
-  })
+  readonly #store: FieldBinderSnapshot
+  readonly #setStore: SetStoreFunction<FieldBinderSnapshot>
   #loading: Promise<void> | undefined
   #syncing: Promise<void> | undefined
 
@@ -102,10 +101,20 @@ export class FieldBinder {
     this.#local = local
     this.#server = server
     this.#source = source
+    const [store, setStore] = createStore<FieldBinderSnapshot>({
+      entries: [],
+      loading: false,
+      syncing: false,
+      available: false,
+      updateAvailable: false,
+      unpublished: false
+    })
+    this.#store = store
+    this.#setStore = setStore
   }
 
   get store(): FieldBinderSnapshot {
-    return this.#state[0]
+    return this.#store
   }
 
   /** Begin the local load for the application root's lifetime; a failure surfaces unhandled. */
@@ -158,22 +167,22 @@ export class FieldBinder {
     if (state.syncing) return 'Syncing Field Binder…'
     if (state.error) {
       return state.available
-        ? 'Available offline · Last sync failed'
-        : 'Not downloaded · Last sync failed'
+        ? 'Available offline · Sync failed'
+        : 'Not downloaded · Sync failed'
     }
-    if (!state.available) return 'Not downloaded'
+    if (!state.available) return state.unpublished ? 'Nothing published yet' : 'Not downloaded'
     if (state.updateAvailable) return 'Available offline · Update available'
     if (state.verifiedAt) return `Verified current at ${new Date(state.verifiedAt).toLocaleString()}`
     return `Available offline · Last copied ${new Date(state.syncedAt!).toLocaleString()}`
   }
 
   async #load(): Promise<void> {
-    this.#state[1]({ loading: true, error: undefined })
+    this.#setStore({ loading: true, error: undefined })
     try {
       await navigator.locks.request(PREPARATION_LOCK, { mode: 'shared' }, async () => {
         const snapshot = await this.#snapshot()
         if (snapshot) this.#adopt(snapshot)
-        else {this.#state[1]({
+        else {this.#setStore({
             entries: [],
             available: false,
             syncedAt: undefined,
@@ -181,20 +190,23 @@ export class FieldBinder {
           })}
       })
     } catch (error) {
-      this.#state[1]({ entries: [], available: false, error: errorCopy(error), verifiedAt: undefined })
+      this.#setStore({ entries: [], available: false, error: errorCopy(error), verifiedAt: undefined })
       if (!(error instanceof ApiError) && !(error instanceof ValidatorError)) throw error
     } finally {
-      this.#state[1]({ loading: false })
+      this.#setStore({ loading: false })
     }
   }
 
   async #prepare(progress?: (value: FieldBinderProgress) => void): Promise<void> {
-    this.#state[1]({ syncing: true, error: undefined, cleanupError: undefined, verifiedAt: undefined })
+    this.#setStore({ syncing: true, error: undefined, cleanupError: undefined, verifiedAt: undefined })
     try {
       await navigator.locks.request(PREPARATION_LOCK, async () => {
         const publication = await this.#source.publication()
+        // Nothing published is the empty Binder: nothing to copy, nothing failed.
+        this.#setStore({ unpublished: publication === undefined })
         if (!publication) {
-          throw new ApiError('The source has no published Field Binder to download.', 404)
+          this.#setStore({ updateAvailable: this.store.available })
+          return
         }
         const namespace = await this.#local.namespace.create(
           FieldBinderMetadata.catalog.namespace.name,
@@ -269,18 +281,18 @@ export class FieldBinder {
         try {
           await this.#cleanup(bucket.id, statusDocument)
         } catch (error) {
-          this.#state[1]({ cleanupError: `Binder prepared; cleanup failed: ${errorCopy(error)}` })
+          this.#setStore({ cleanupError: `Binder prepared; cleanup failed: ${errorCopy(error)}` })
         }
         const latest = await this.#source.publication()
         const current = skipped === 0 && latest !== undefined
           && FieldBinderMetadata.address(latest.document.id) === snapshot.status.sourcePublication
-        this.#state[1]({ updateAvailable: !current, verifiedAt: current ? when() : undefined })
+        this.#setStore({ updateAvailable: !current, verifiedAt: current ? when() : undefined })
       })
     } catch (error) {
-      this.#state[1]({ error: errorCopy(error) })
+      this.#setStore({ error: errorCopy(error) })
       throw error
     } finally {
-      this.#state[1]({ syncing: false })
+      this.#setStore({ syncing: false })
     }
   }
 
@@ -360,7 +372,7 @@ export class FieldBinder {
   #adopt(snapshot: PreparedSnapshot): void {
     const unchanged = this.store.syncedAt === snapshot.status.syncedAt
     const skipped = snapshot.held.length < snapshot.publication.inventory.entries.length
-    this.#state[1]({
+    this.#setStore({
       entries: [...snapshot.held],
       available: true,
       syncedAt: snapshot.status.syncedAt,

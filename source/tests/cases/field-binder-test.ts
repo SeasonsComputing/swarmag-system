@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Field Binder source and preparation tests                                    ║
-║ Verify publish before delivery, skipped entries as updates, and rename.      ║
+║ Verify an empty source, publish before delivery, skipped entries, rename.    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -111,6 +111,16 @@ const deliver = async (task: UploadTask): Promise<void> => {
 
 /** The ids of the entries a reader holds. */
 const held = (binder: FieldBinder): readonly string[] => binder.store.entries.map(entry => entry.id)
+
+// Runs first: nothing has been published yet.
+Deno.test('a sync with nothing published completes empty, without a failure', async () => {
+  const binder = new FieldBinder(Local, Server, Source)
+  await binder.sync()
+  assertEquals(binder.store.error, undefined)
+  assertEquals(binder.store.available, false)
+  assertEquals(binder.store.unpublished, true)
+  assertEquals(binder.status(), 'Nothing published yet')
+})
 
 Deno.test('Save publishes the entry before delivery; placing hands it to the drain', async () => {
   const { task, entry } = await add('manual.pdf', '%PDF-manual')

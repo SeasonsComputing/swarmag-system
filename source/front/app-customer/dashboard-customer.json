@@ -2,17 +2,45 @@
   "settings": {},
   "header": {
     "widgets": [
-      { "type": "BrandWidget", "settings": { "shape": "landscape" } },
+      {
+        "type": "BrandWidget",
+        "settings": {
+          "shape": "landscape"
+        }
+      },
       {
         "type": "HelmWidget",
         "settings": {
           "shape": "compact",
-          "actions": [
-            { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "visible" },
-            { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
-            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "visible" }
-          ],
-          "themes": ["dark", "light"]
+          "toolbar": {
+            "items": [
+              {
+                "command": "@theme",
+                "label": "Theme",
+                "icon": "moon"
+              },
+              {
+                "label": "Customer",
+                "icon": "dots-vertical",
+                "items": [
+                  {
+                    "command": "/about",
+                    "label": "About",
+                    "icon": "info-circled"
+                  },
+                  {
+                    "command": "/logout",
+                    "label": "Logout",
+                    "icon": "exit"
+                  }
+                ]
+              }
+            ]
+          },
+          "themes": [
+            "dark",
+            "light"
+          ]
         }
       }
     ]

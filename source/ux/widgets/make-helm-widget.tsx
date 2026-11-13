@@ -1,19 +1,20 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Helm widget maker                                                            ║
-║ Bound navigation, inline command menus, and task popover triggers.           ║
+║ Bound toolbar commands, titled menus, and the Tasks menu.                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Binds application behavior without importing application APIs. Icon-only
-commands and configured menus remain inline; labelled commands collect in the
-existing overflow. Popovers are mutually exclusive and commands close before
+Binds application behavior without importing application APIs. The toolbar
+renders its items inline and in order: a command as its icon, named and titled
+by its label; a menu as its icon, the trigger of a popover headed by its label,
+then its commands and status lines. The @tasks item is a menu whose
+items are the current reports; it is disabled while none exist and closes when
+the last one clears. Popovers are mutually exclusive and commands close before
 execution. Status readers and disabled predicates stay reactive. Expected
 command failures belong to the operation; unexpected async rejections are
 observed and raised as programming errors, never converted into task reports.
-The task list owns report presentation; Helm owns its trigger and popover.
-The configured Tasks trigger stays visible and is disabled when reports are empty.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -22,7 +23,7 @@ makeHelmWidget  Bind commands/status and return a dashboard widget component.
 
 import { isNonEmptyString, notValid } from '@core/std'
 import type { Dictionary } from '@core/std'
-import { createEffect, createMemo, createSignal, For, Show } from '@solid-js'
+import { createEffect, createMemo, createSignal, For } from '@solid-js'
 import type { WidgetComponent } from '@ux/shell/dashboard/widget-contract.ts'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
@@ -30,8 +31,8 @@ import { UiActionButton, UiLayout, UiPopover } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { BackgroundTaskList } from './background-task-list.tsx'
 import { HelmButton, HelmButtonGlyph } from './helm-button.tsx'
-import { readHelmActions } from './helm-widget-contract.ts'
-import type { HelmBindings, HelmCommand, HelmMenu } from './helm-widget-contract.ts'
+import { readHelmToolbar } from './helm-widget-contract.ts'
+import type { HelmBindings, HelmCommand, HelmMenuItem, HelmToolbarItem } from './helm-widget-contract.ts'
 
 import './helm-widget.css'
 
@@ -42,31 +43,29 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
 ): UiComponent => {
   const navigate = useShellNavigate()
   const [theme, setTheme] = createSignal(document.documentElement.dataset.theme ?? '')
-  const [taskView, setTaskView] = createSignal(false)
   let navigation!: HTMLElement
-  const [open, setOpen] = createSignal<HelmMenu | HelmCommand | 'overflow' | undefined>()
-  const changeOpen = (surface: HelmMenu | HelmCommand | 'overflow', value: boolean): void => {
-    if (value) {
-      setTaskView(false)
-      setOpen(surface)
-    } else if (open() === surface) setOpen(undefined)
+  const [open, setOpen] = createSignal<HelmToolbarItem | undefined>()
+  const changeOpen = (surface: HelmToolbarItem, value: boolean): void => {
+    if (value) setOpen(surface)
+    else if (open() === surface) setOpen(undefined)
   }
+  const hasReports = () => Object.keys(BackgroundTasks.store).length > 0
+  const isTasks = (item: HelmToolbarItem): boolean => 'command' in item && item.command === '@tasks'
   createEffect(() => {
     const surface = open()
-    if (surface === undefined || surface === 'overflow' || !('command' in surface)) return
-    if (surface.command !== '@tasks' || Object.keys(BackgroundTasks.store).length > 0) return
+    if (surface === undefined || !isTasks(surface) || hasReports()) return
     setOpen(undefined)
     queueMicrotask(() => {
       const target = navigation.querySelector<HTMLButtonElement>('button:not([disabled])') ?? navigation
       target.focus()
     })
   })
-  const actions = createMemo(() => readHelmActions(props.settings.actions, bindings))
+  const toolbar = createMemo(() => readHelmToolbar(props.settings.toolbar, bindings))
   const themes = createMemo(() => {
-    const hasTheme = actions().some(action =>
-      'items' in action
-        ? action.items.some(item => 'command' in item && item.command === '@theme')
-        : action.command === '@theme'
+    const isTheme = (item: HelmToolbarItem | HelmMenuItem) =>
+      'command' in item && item.command === '@theme'
+    const hasTheme = toolbar().items.some(item =>
+      'items' in item ? item.items.some(isTheme) : isTheme(item)
     )
     if (!hasTheme) return []
     const value = props.settings.themes
@@ -75,17 +74,8 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
     }
     return value
   })
-  const inline = () =>
-    actions().filter(action =>
-      'items' in action || action.labelMode === 'hidden' || action.command === '@tasks'
-    )
-  const overflow = () =>
-    actions().filter((action): action is HelmCommand =>
-      !('items' in action) && action.labelMode !== 'hidden' && action.command !== '@tasks'
-    )
   const disabled = (action: HelmCommand) => bindings.commands?.[action.command]?.disabled?.() ?? false
   const icon = (action: HelmCommand) => {
-    if (action.command === '@tasks') return 'update'
     if (action.command !== '@theme') return action.icon
     return theme() === 'dark' ? 'moon' : theme() === 'light' ? 'sun' : 'color-wheel'
   }
@@ -110,93 +100,76 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
       })
     })
   }
-  const menuCommandButton = (action: HelmCommand): UiComponent => (
-    <UiActionButton
-      density='dense'
-      icon={icon(action)}
-      label={action.label}
-      labelMode='visible'
-      align='start'
-      disabled={disabled(action)}
-      onClick={() => execute(action)}
-    />
-  )
-  const tasksPopover = (action: HelmCommand): UiComponent => (
+  const menuItem = (item: HelmMenuItem): UiComponent => {
+    if ('status' in item) {
+      return <span data-widget='helm-menu-status'>{bindings.status![item.status]()}</span>
+    }
+    return (
+      <UiActionButton
+        density='dense'
+        icon={icon(item)}
+        label={item.label}
+        labelMode='visible'
+        align='start'
+        disabled={disabled(item)}
+        onClick={() => execute(item)}
+      />
+    )
+  }
+  const menu = (surface: HelmToolbarItem, spec: HelmMenuSpec): UiComponent => (
     <UiPopover
-      trigger={<HelmButtonGlyph label={action.label} icon='update' />}
+      trigger={<HelmButtonGlyph label={surface.label} icon={spec.icon} />}
       triggerVariant='ghost'
-      disabled={Object.keys(BackgroundTasks.store).length === 0}
-      open={open() === action}
-      onOpenChange={value => changeOpen(action, value)}
+      disabled={spec.disabled()}
+      open={open() === surface}
+      onOpenChange={value => changeOpen(surface, value)}
     >
-      <BackgroundTaskList />
+      <UiLayout variant='block-fit' gap='tight' data-widget='helm-menu'>
+        <span data-widget='helm-menu-title'>{surface.label}</span>
+        {spec.content()}
+      </UiLayout>
     </UiPopover>
   )
 
   return (
     <nav ref={navigation} tabIndex={-1} aria-label='Primary actions' data-widget='helm-widget'>
       <UiLayout variant='inline-fit'>
-        <For each={inline()}>
-          {action =>
-            'items' in action
-              ? (
-                <UiPopover
-                  trigger={<HelmButtonGlyph label={action.label} icon={action.icon} />}
-                  triggerVariant='ghost'
-                  open={open() === action}
-                  onOpenChange={value => changeOpen(action, value)}
-                >
-                  <Show
-                    when={taskView()}
-                    fallback={
-                      <UiLayout variant='block-fit' data-widget='helm-command-menu'>
-                        <For each={action.items}>
-                          {item =>
-                            'status' in item
-                              ? <span>{bindings.status![item.status]()}</span>
-                              : item.command === '@tasks'
-                              ? (
-                                <UiActionButton
-                                  icon='update'
-                                  label={item.label}
-                                  labelMode='visible'
-                                  disabled={Object.keys(BackgroundTasks.store).length === 0}
-                                  onClick={() => setTaskView(true)}
-                                />
-                              )
-                              : menuCommandButton(item)}
-                        </For>
-                      </UiLayout>
-                    }
-                  >
-                    <BackgroundTaskList />
-                  </Show>
-                </UiPopover>
-              )
-              : action.command === '@tasks'
-              ? tasksPopover(action)
+        <For each={toolbar().items}>
+          {item =>
+            'items' in item
+              ? menu(item, {
+                icon: item.icon,
+                disabled: () => false,
+                content: () => <For each={item.items}>{child => menuItem(child)}</For>
+              })
+              : isTasks(item)
+              ? menu(item, {
+                icon: 'update',
+                disabled: () => !hasReports(),
+                content: () => <BackgroundTaskList />
+              })
               : (
                 <HelmButton
-                  icon={icon(action)}
-                  label={action.label}
-                  disabled={disabled(action)}
-                  onClick={() => execute(action)}
+                  icon={icon(item)}
+                  label={item.label}
+                  title={item.label}
+                  disabled={disabled(item)}
+                  onClick={() => execute(item)}
                 />
               )}
         </For>
-        <Show when={overflow().length > 0}>
-          <UiPopover
-            trigger={<HelmButtonGlyph label='More actions' icon='dots-vertical' />}
-            triggerVariant='ghost'
-            open={open() === 'overflow'}
-            onOpenChange={value => changeOpen('overflow', value)}
-          >
-            <UiLayout variant='block-fit' data-widget='helm-command-menu'>
-              <For each={overflow()}>{action => menuCommandButton(action)}</For>
-            </UiLayout>
-          </UiPopover>
-        </Show>
       </UiLayout>
     </nav>
   )
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// IMPLEMENTATION
+// ────────────────────────────────────────────────────────────────────────────
+
+/** What a menu popover shows: its trigger glyph, its disabled state, and its items. */
+type HelmMenuSpec = {
+  icon: string
+  disabled: () => boolean
+  content: () => UiComponent
 }

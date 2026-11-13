@@ -71,7 +71,7 @@ async function browserHarness() {
       disabled,
       execute: async () => {
         calls++
-        closedOnExecute = !document.querySelector('[data-widget="helm-command-menu"]')
+        closedOnExecute = !document.querySelector('[data-widget="helm-menu"]')
         BackgroundTasks.clear('@sync')
         if (mode === 'unexpected') throw new Error('Unexpected Sync programming failure')
         if (mode === 'expected') BackgroundTasks.publish('@sync', {
@@ -81,15 +81,17 @@ async function browserHarness() {
     } }, status: { ready: status }
   })
   const [settings, setSettings] = createSignal({
-    actions: [
+    toolbar: { items: [
       { label: 'Backpack', icon: 'backpack', items: [
         { command: '/binder', label: 'Binder', icon: 'backpack' },
         { command: '@sync', label: 'Sync', icon: 'update' }, { status: 'ready' }
       ] },
-      { command: '/about', label: 'About', icon: 'info-circled' },
-      { command: '@theme', label: 'Theme', icon: 'moon', labelMode: 'hidden' },
-      { command: '@tasks', label: 'Tasks', icon: 'update', labelMode: 'hidden' }
-    ], themes: ['dark', 'light']
+      { command: '@theme', label: 'Theme', icon: 'moon' },
+      { command: '@tasks', label: 'Tasks', icon: 'update' },
+      { label: 'Main', icon: 'hamburger-menu', items: [
+        { command: '/about', label: 'About', icon: 'info-circled' }
+      ] }
+    ] }, themes: ['dark', 'light']
   })
   const session = {
     init() { events.push('session'); onCleanup(() => events.push('session-cleanup')) },
@@ -144,9 +146,9 @@ async function browserHarness() {
     dispose: () => globalThis.__disposeApplication(),
     remount: () => bootstrap(application, mount),
     defaultMount: () => bootstrap({ ...application, shells: [{ ...application.shells[0],
-      component: () => createComponent(HelmWidget, { settings: { actions: [
-        { command: '@theme', label: 'Theme', icon: 'moon', labelMode: 'hidden' }
-      ], themes: ['dark', 'light'] } }) }] }),
+      component: () => createComponent(HelmWidget, { settings: { toolbar: { items: [
+        { command: '@theme', label: 'Theme', icon: 'moon' }
+      ] }, themes: ['dark', 'light'] } }) }] }),
     settings: setSettings
   }
   await bootstrap(application, mount)
@@ -190,6 +192,11 @@ try {
   assert.deepEqual(await page.evaluate(() => Harness.events), ['session', 'mount'])
   assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true }).isDisabled(), true)
   const toolbar = page.locator('[data-widget="helm-widget"]')
+  assert.deepEqual(await toolbar.locator('[data-widget="helm-button-glyph"]').evaluateAll(glyphs =>
+    glyphs.map(glyph => glyph.getAttribute('aria-label'))), ['Backpack', 'Theme', 'Tasks', 'Main'])
+  assert.equal(await toolbar.getByRole('button', { name: 'About', exact: true }).count(), 0)
+  assert.equal(await page.getByRole('button', { name: 'Theme', exact: true }).getAttribute('title'),
+    'Theme')
   const assertFrameless = async () => {
     const styles = await toolbar.locator('button').evaluateAll(buttons => buttons.flatMap(button => {
       const frame = button.querySelector('[data-ui="action-button-frame"]')
@@ -231,13 +238,13 @@ try {
   }
   await assertFrameless()
   assert.deepEqual(await targetSize('Tasks'), actionSize)
-  for (const name of ['Backpack', 'More actions']) assert.deepEqual(await targetSize(name), actionSize)
+  for (const name of ['Backpack', 'Main']) assert.deepEqual(await targetSize(name), actionSize)
   assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true })
     .evaluate(element => Number(getComputedStyle(element).opacity) < 1), true)
   await page.getByRole('button', { name: 'Tasks', exact: true }).hover()
   assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true })
     .evaluate(element => getComputedStyle(element).boxShadow), 'none')
-  for (const name of ['Theme', 'Backpack', 'More actions']) await assertHoverGlow(name)
+  for (const name of ['Theme', 'Backpack', 'Main']) await assertHoverGlow(name)
   await page.getByRole('button', { name: 'Theme', exact: true }).focus()
   await page.keyboard.press('Shift')
   assert.equal(await page.getByRole('button', { name: 'Theme', exact: true })
@@ -247,6 +254,11 @@ try {
   await page.getByRole('button', { name: 'Backpack', exact: true }).focus()
   await page.keyboard.press('Enter')
   await page.getByRole('button', { name: 'Sync', exact: true }).waitFor()
+  const openMenu = page.locator('[data-widget="helm-menu"]')
+  assert.equal(await openMenu.locator(':scope > *').first().textContent(), 'Backpack')
+  assert.deepEqual(await openMenu.locator(':scope > *').evaluateAll(items => items.map(item =>
+    item.dataset.widget ?? item.dataset.ui ?? item.tagName.toLowerCase())),
+  ['helm-menu-title', 'action-button', 'action-button', 'helm-menu-status'])
   assert.equal(await page.getByText('Ready offline', { exact: true }).getAttribute('tabindex'), null)
   await page.evaluate(() => Harness.setStatus('Prepared on device'))
   await page.getByText('Prepared on device', { exact: true }).waitFor()
@@ -267,6 +279,9 @@ try {
   await assertHoverGlow('Tasks')
   await page.getByRole('button', { name: 'Tasks', exact: true }).click()
   await page.getByText('Unable to reach the server', { exact: true }).waitFor()
+  assert.equal(await page.locator('[data-widget="helm-menu-title"]').textContent(), 'Tasks')
+  assert.equal(await page.locator('[data-widget="background-task-list"] p:not([role="alert"])')
+    .count(), 0)
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'Backpack', exact: true }).click()
   await page.getByRole('button', { name: 'Sync', exact: true }).click()
@@ -298,21 +313,23 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark')
   for (const theme of ['dark', 'light']) {
     await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
-    for (const name of ['Theme', 'Tasks', 'Backpack', 'More actions']) await assertHoverGlow(name)
+    for (const name of ['Theme', 'Tasks', 'Backpack', 'Main']) await assertHoverGlow(name)
   }
   await page.setViewportSize({ width: 360, height: 740 })
   await toolbar.evaluate(element => Promise.all(element.getAnimations({ subtree: true })
-    .map(animation => animation.finished)))
+    .map(animation => animation.finished.catch(() => {}))))
   const narrowSize = await targetSize('Theme')
-  for (const name of ['Theme', 'Tasks', 'Backpack', 'More actions']) {
+  for (const name of ['Theme', 'Tasks', 'Backpack', 'Main']) {
     assert.deepEqual(await targetSize(name), narrowSize)
   }
-  await page.getByRole('button', { name: 'More actions', exact: true }).click()
+  assert.equal(await toolbar.evaluate(element => [...element.querySelectorAll('button')].every(
+    button => button.getBoundingClientRect().right <= innerWidth)), true)
+  await page.getByRole('button', { name: 'Main', exact: true }).click()
   await page.getByRole('button', { name: 'About', exact: true }).waitFor()
   await page.getByRole('button', { name: 'About', exact: true }).click()
   await page.waitForURL('**/about')
   await page.goBack()
-  await page.getByRole('button', { name: 'More actions', exact: true }).click()
+  await page.getByRole('button', { name: 'Main', exact: true }).click()
   await page.getByRole('button', { name: 'Backpack', exact: true }).click()
   await page.getByRole('button', { name: 'Sync', exact: true }).waitFor()
   assert.equal(await page.locator('[data-ui="popover"]').count(), 1)
@@ -363,7 +380,8 @@ try {
   await page.evaluate(() => Harness.dispose())
   assert.deepEqual(errors, [])
   console.log('PASS: root lifecycle, default widget, reactive status/disabled, failure ownership, ' +
-    'dismissal, retry, counts, keyboard focus, theme, routes, and narrow overflow')
+    'dismissal, retry, counts, keyboard focus, theme, routes, toolbar order, menu titles, ' +
+    'and narrow stacking')
 } finally {
   if (browser) await browser.close()
   await server.close()

@@ -44,6 +44,11 @@
   color: var(--sa-color-primary);
 }
 
+/* An open menu's trigger stays in place; UiButton raises expanded buttons. */
+[data-widget='helm-widget'] [data-ui='button']:has([data-widget='helm-button-glyph'])[data-expanded] {
+  transform: none;
+}
+
 [data-widget='helm-button'][data-ui='button'][disabled],
 [data-widget='helm-widget'] [data-ui='button']:has([data-widget='helm-button-glyph'])[disabled] {
   box-shadow: none;

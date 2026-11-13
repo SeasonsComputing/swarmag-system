@@ -9,11 +9,12 @@ PURPOSE
 Renders transient reports independently without combining units or inventing
 progress for unknown work. Only non-blocking failures can be dismissed here;
 operations own clearing other reports and all retry/cancel execution.
-Helm owns the trigger and popover. This list has no navigation responsibility.
+The list is the items of the Helm's Tasks menu: Helm owns the trigger, the
+popover, and its title. This list has no navigation responsibility.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-BackgroundTaskList  Reactive task presentation inside the Helm task popover.
+BackgroundTaskList  Reactive task reports, the items of the Helm's Tasks menu.
 */
 
 import { For, Show } from '@solid-js'
@@ -26,9 +27,6 @@ import './background-task-list.css'
 /** Each report retains its own units, phase, and exit responsibility. */
 export const BackgroundTaskList = (): UiComponent => (
   <UiLayout data-widget='background-task-list' gap='tight'>
-    <strong>Tasks</strong>
-    <p>Delivery and preparation run while this app is open. Leaving may interrupt pending work.</p>
-    <p>Durably captured attachments remain on this device until delivery can resume.</p>
     <UiList>
       <For each={Object.keys(BackgroundTasks.store)}>
         {key => {
