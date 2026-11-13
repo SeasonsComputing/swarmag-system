@@ -6,10 +6,12 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Edits source inventory metadata and chosen files independently of the local
-reader. Uses the stock non-domain Manager, one Detail Step, and ordinary source
-publication. Save does not prepare the reader. Cleanup problems remain visible
-without turning a confirmed publication into an apparently failed Save.
+Edits the source collection independently of the local reader. Uses the stock
+non-domain Manager, one Detail Step, and ordinary source publication. Save
+does not prepare the reader. A row reads its entry's server document: its name,
+or Pending, dimmed, until the document is delivered. Rows re-read when the
+Binder drain's remaining count changes; there is no polling. Cleanup problems
+remain visible without turning a confirmed publication into a failed Save.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -21,17 +23,19 @@ FieldBinderManager       Remote-source collection and metadata editor.
 import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 import { FieldBinderMetadata } from '@front/api/field-binder-inventory.ts'
-import type { FieldBinderEntry } from '@front/api/field-binder-inventory.ts'
-import { createEffect, onCleanup } from '@solid-js'
+import type { FieldBinderEntry, FieldBinderUploadSource } from '@front/api/field-binder-inventory.ts'
+import { createEffect, createMemo, on, onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { ManagerContract } from '@ux/shell/workbench/manager-contract.ts'
 import { Manager } from '@ux/shell/workbench/manager.tsx'
-import { UiWindow } from '@ux/ui'
+import { UiBadge, UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { DocumentDrain } from '../document-drain.ts'
 import { createFieldBinderState } from './field-binder-state.ts'
 import type { FieldBinderDraft, FieldBinderState } from './field-binder-state.ts'
 import { FieldBinderStepDetail } from './field-binder-step-detail.tsx'
+import './field-binder-manager.css'
 
 /** The one report key for this Manager's source failures. */
 const SOURCE_FAILURE_KEY = 'field-binder-source-feedback'
@@ -49,6 +53,24 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     queryKey: ['field-binder-source'],
     queryFn: async () => await source.publication() ?? null
   }))
+  const documents = createQuery(() => ({
+    queryKey: ['field-binder-source', 'documents', query.data?.document.id.document ?? null],
+    queryFn: async () => {
+      const entries = query.data?.inventory.entries ?? []
+      return new Map(
+        await Promise.all(entries.map(async entry => [entry.id, await source.document(entry)] as const))
+      )
+    }
+  }))
+  // Delivery shows when the Binder drain's remaining count changes; a running pass is no change,
+  // and there is no polling.
+  const remaining = createMemo<number | undefined>(previous => {
+    const task = api.BackgroundTasks.store[DocumentDrain.taskKeys.binder]
+    if (task?.phase === 'running') return previous
+    return task?.remaining?.count ?? 0
+  }, undefined)
+  createEffect(on(remaining, () => void documents.refetch(), { defer: true }))
+  const documentOf = (entry: FieldBinderEntry) => documents.data?.get(entry.id)
   let editor: FieldBinderState
   createEffect(() => {
     const error = source.warning()
@@ -62,10 +84,13 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     listColumns: [{
       label: 'Document',
       render: entry => (
-        <PanelRowIdentity
-          title={entry.description}
-          subtitle={entry.url ? new URL(entry.url).host : 'Uploaded'}
-        />
+        <span data-app='field-binder-row' data-app-pending={documentOf(entry) ? undefined : ''}>
+          <PanelRowIdentity
+            title={entry.description}
+            subtitle={documentOf(entry)?.name ?? 'Pending'}
+            annotation={<UiBadge>{SOURCE_LABELS[entry.upload.source]}</UiBadge>}
+          />
+        </span>
       )
     }],
     list: () => [...(query.data?.inventory.entries ?? [])],
@@ -73,6 +98,7 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     listError: () => query.error,
     refresh: async () => {
       await query.refetch()
+      await documents.refetch()
     },
     create: draft => editor.save(draft),
     update: (_entry, draft) => editor.save(draft),
@@ -109,7 +135,8 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
       const state = createFieldBinderState(
         source,
         item,
-        query.data ? FieldBinderMetadata.address(query.data.document.id) : undefined
+        query.data ? FieldBinderMetadata.address(query.data.document.id) : undefined,
+        item ? documentOf(item) : undefined
       )
       editor = state
       onCleanup(() => {
@@ -131,6 +158,13 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     }
   }
   return <Manager provider={provider} onCancel={props.onCancel} />
+}
+
+/** How each entry's document arrived, as its row's pill says it. */
+const SOURCE_LABELS: { [Source in FieldBinderUploadSource]: string } = {
+  upload: 'Uploaded',
+  library: 'Library',
+  url: 'URL'
 }
 
 /** Open a source document in a new window, reporting expected failures and surfacing the rest. */

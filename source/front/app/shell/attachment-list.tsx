@@ -6,16 +6,18 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Picker and document actions for a note draft.
+Picker and document actions for a note draft. A chosen file's row appears at
+once: attach starts its upload task and returns the row without waiting for any
+transfer, so the list is busy only while it adds the rows.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AttachmentListProps  Draft inputs and staging callback.
+AttachmentListProps  Draft inputs and upload callback.
 ├ attachments        Current note attachments.
 ├ onChange           Replace the draft attachments.
-├ attach             Stage a chosen file.
+├ attach             Start a chosen file's upload task; return its row.
 ├ kinds              Accepted attachment kinds.
-└ busy               Report staging to the note Save gate.
+└ busy               Report row capture to the note Save gate.
 AttachmentList       Render the attachment collection.
 */
 
@@ -69,7 +71,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
     setError('')
     try {
       for (const file of files) {
-        // Recognition also runs before staging so a host restriction never stores refused bytes.
+        // Recognition runs before the upload task starts so a host restriction never stores bytes.
         const recognized = AttachmentFormats.recognize(file)
         if (!props.kinds.includes(recognized.kind)) notValid('This attachment kind is not accepted.')
         const attachment = await props.attach(file)

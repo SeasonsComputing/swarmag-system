@@ -109,13 +109,13 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
         create: draft => api.Customers.create(scope.toCreate(draft)),
         update: (customer, draft) =>
           api.Customers.update(scope.adapter, scope.toUpdate(customer.id, draft)),
-        place: async (owner, draft) => ({
+        address: async (owner, draft) => ({
           ...draft,
-          notes: await api.Attachments.Customers.place(owner, draft.notes),
+          notes: await api.Attachments.Customers.address(owner, draft.notes),
           sites: await Promise.all(
             draft.sites.map(async site => ({
               ...site,
-              notes: await api.Attachments.Customers.place(owner, site.notes)
+              notes: await api.Attachments.Customers.address(owner, site.notes)
             }))
           )
         }),

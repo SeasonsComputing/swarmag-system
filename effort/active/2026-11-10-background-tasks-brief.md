@@ -103,6 +103,10 @@ retain their own reporting and rethrow/stop rules.
 
 ## First consumer: Admin attachment delivery
 
+_[Superseded by the Upload Tasks brief (`effort/active/2026-11-12-upload-tasks-brief.md`),
+Decision 2: "owns the attachment pair only". `DocumentDrain` runs one loop per pair, each with
+its own lock name and task key.]_
+
 `DocumentDrain` calls `api.AttachmentsUploads.drain()`. It retains the existing one-minute
 schedule, capped retry backoff, prepared-session predicate, and Web Lock. It owns the attachment
 pair only; Field Binder's app-owned delivery/preparation binding is separate. No global drain

@@ -9,7 +9,7 @@ import { Config } from '@core/cfg/config.ts'
 import { DocumentStore } from '@core/cli/docstore-client.ts'
 import { Uploads } from '@core/cli/docstore-uploads.ts'
 import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider.ts'
-import { ValidatorError } from '@core/std'
+import { id, ValidatorError } from '@core/std'
 import { ApiError } from '@core/stdx'
 import type { DocumentId } from '@core/stdx'
 import { assert, assertEquals, assertRejects, assertStrictEquals } from '@std/assert'
@@ -333,4 +333,16 @@ Deno.test('independent upload pairs preserve files and isolate identical logical
   await assertRejects(() => Server.document.get(otherPlaced.id), ApiError)
   assertEquals((await Delivery.get(first.id)).name, 'raw.bin')
   assertEquals((await Other.get(second.id)).count, 6)
+})
+
+Deno.test('a supplied id stages under that id; staging it again returns the same document', async () => {
+  const minted = id()
+  const first = await Delivery.stage(new File(['supplied'], 'supplied.txt'), { id: minted })
+  assertEquals(first.id.document, minted)
+  assert(Delivery.isStaged(first.id))
+  const again = await Delivery.stage(new File(['other bytes'], 'other.txt'), { id: minted })
+  assertEquals(again, first)
+  assertEquals(await (await Inbox.document.read(first.id)).text(), 'supplied')
+  const minted2 = (await Delivery.stage(new File(['plain'], 'plain.txt'))).id.document
+  assert(minted2 !== minted)
 })

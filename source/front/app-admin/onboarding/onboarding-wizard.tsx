@@ -41,13 +41,13 @@ export const OnboardingWizard = (props: OnboardingWizardProps): UiComponent => {
   const save = makeAttachmentSave({
     create: (draft: CustomerDraft) => api.Customers.create(scope.toCreate(draft)),
     update: (record, draft) => api.Customers.update(scope.adapter, scope.toUpdate(record.id, draft)),
-    place: async (owner, draft) => ({
+    address: async (owner, draft) => ({
       ...draft,
-      notes: await api.Attachments.Customers.place(owner, draft.notes),
+      notes: await api.Attachments.Customers.address(owner, draft.notes),
       sites: await Promise.all(
         draft.sites.map(async site => ({
           ...site,
-          notes: await api.Attachments.Customers.place(owner, site.notes)
+          notes: await api.Attachments.Customers.address(owner, site.notes)
         }))
       )
     }),

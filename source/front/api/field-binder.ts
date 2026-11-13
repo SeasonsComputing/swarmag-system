@@ -7,11 +7,15 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Reads only the injected local mirror. Explicit Sync captures one source
-publication, copies and verifies all files, then creates .status.json as the
-commit point. Failed preparation retains the previous complete snapshot.
-A shared origin Web Lock serializes preparation against local load/open;
-duplicate invocation on one instance shares the pending pass. Source changes
-are checked once after copying, never chased in an unbounded loop.
+publication, copies and verifies the files already delivered to the server,
+then creates .status.json as the commit point. An entry whose document has not
+arrived is skipped; the reader lists and verifies only the entries it holds, and
+a snapshot that skipped one reports an update available, after a reload too.
+A renamed source document is renamed locally at the next Sync. Failed
+preparation retains the previous complete snapshot. A shared origin Web Lock
+serializes preparation against local load/open; duplicate invocation on one
+instance shares the pending pass. Source changes are checked once after
+copying, never chased in an unbounded loop.
 Cleanup follows retained status -> inventory -> document references. Extra
 bytes or cleanup warnings do not invalidate a confirmed complete snapshot.
 
@@ -21,13 +25,13 @@ FieldBinderProgress  One bounded preparation's document counts.
 ├ completed          Verified documents.
 └ total              Captured document count.
 FieldBinderSnapshot  Read-only reader/preparation state.
-├ entries            Last complete local membership.
+├ entries            Last complete local membership: the entries it holds.
 ├ loading            Local validation is pending.
 ├ syncing            Explicit preparation is pending.
 ├ available          A complete local snapshot exists.
 ├ syncedAt           Successful local copy time.
 ├ verifiedAt         Source currency was checked at this time.
-├ updateAvailable    Last check observed a different source.
+├ updateAvailable    The source differs, or the snapshot skipped an entry.
 ├ error              Last load/preparation failure copy.
 └ cleanupError       Cleanup failure after a confirmed commit.
 FieldBinder          Local access and explicit complete preparation.
@@ -137,7 +141,7 @@ export class FieldBinder {
       const snapshot = await this.#snapshot()
       if (!snapshot) throw new ApiError('The Field Binder is not downloaded.', 404)
       this.#adopt(snapshot)
-      const current = snapshot.publication.inventory.entries.find(item => item.id === entry.id)
+      const current = snapshot.held.find(item => item.id === entry.id)
       if (!current || current.documentAddress !== entry.documentAddress) {
         throw new ApiError(
           'This local Binder entry changed. Select it again from the current collection.',
@@ -206,9 +210,16 @@ export class FieldBinder {
         ]
         let completed = 0
         progress?.({ completed, total: references.length })
+        let skipped = 0
         for (const reference of references) {
           const document = FieldBinderMetadata.id(reference)
-          const metadata = await this.#server.document.get(document)
+          const metadata = await this.#delivered(document)
+          if (metadata === undefined) {
+            // Not delivered yet: skipped, so this snapshot is not current.
+            skipped++
+            progress?.({ completed: ++completed, total: references.length })
+            continue
+          }
           if (metadata.name.startsWith('.')) {
             throw new ApiError('A published Binder entry references reserved metadata.', 409)
           }
@@ -216,7 +227,14 @@ export class FieldBinder {
           if (body.size !== metadata.count) {
             throw new ApiError('A source Binder file is incomplete.', 409)
           }
-          await this.#local.document.create(bucket.id, metadata.name, body, document.document)
+          const local = await this.#local.document.create(
+            bucket.id,
+            metadata.name,
+            body,
+            document.document
+          )
+          // A copy already held keeps its old name; a renamed source renames it here.
+          if (local.name !== metadata.name) await this.#local.document.update(document, metadata.name)
           const copied = await this.#local.document.get(document)
           if (copied.count !== metadata.count) {
             throw new ApiError('A copied Binder file has the wrong size.', 409)
@@ -254,7 +272,7 @@ export class FieldBinder {
           this.#state[1]({ cleanupError: `Binder prepared; cleanup failed: ${errorCopy(error)}` })
         }
         const latest = await this.#source.publication()
-        const current = latest !== undefined
+        const current = skipped === 0 && latest !== undefined
           && FieldBinderMetadata.address(latest.document.id) === snapshot.status.sourcePublication
         this.#state[1]({ updateAvailable: !current, verifiedAt: current ? when() : undefined })
       })
@@ -285,8 +303,8 @@ export class FieldBinder {
           await (await this.#local.document.read(document.id)).text(),
           'status'
         ))
-        const publication = await this.#readInventory(FieldBinderMetadata.id(status.inventoryAddress))
-        return { status, publication }
+        const prepared = await this.#readInventory(FieldBinderMetadata.id(status.inventoryAddress))
+        return { status, ...prepared }
       } catch (error) {
         if (!(error instanceof ApiError) && !(error instanceof ValidatorError)) throw error
         failure ??= error
@@ -296,7 +314,10 @@ export class FieldBinder {
     return undefined
   }
 
-  async #readInventory(document: DocumentId): Promise<FieldBinderPublication> {
+  /** Read a local inventory and verify the entries it holds; an absent document was skipped. */
+  async #readInventory(
+    document: DocumentId
+  ): Promise<{ publication: FieldBinderPublication; held: readonly FieldBinderEntry[] }> {
     const metadata = await this.#local.document.get(document)
     if (metadata.name !== FieldBinderMetadata.catalog.inventoryName) {
       throw new ApiError('The prepared Binder status does not select an inventory.', 409)
@@ -305,10 +326,26 @@ export class FieldBinder {
     const inventory = FieldBinderMetadata.readInventory(
       FieldBinderMetadata.readJson(await body.text(), 'inventory')
     )
-    for (const reference of new StringSet(inventory.entries.map(entry => entry.documentAddress))) {
-      await this.#verifyLocal(FieldBinderMetadata.id(reference))
+    const held: FieldBinderEntry[] = []
+    for (const entry of inventory.entries) {
+      try {
+        await this.#verifyLocal(FieldBinderMetadata.id(entry.documentAddress))
+        held.push(entry)
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 404) throw error
+      }
     }
-    return { document: metadata, body, inventory }
+    return { publication: { document: metadata, body, inventory }, held }
+  }
+
+  /** The server's metadata for a delivered document; undefined while it has not arrived. */
+  async #delivered(document: DocumentId): Promise<NodeMetadata<DocumentId> | undefined> {
+    try {
+      return await this.#server.document.get(document)
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return undefined
+      throw error
+    }
   }
 
   async #verifyLocal(document: DocumentId): Promise<void> {
@@ -322,11 +359,12 @@ export class FieldBinder {
 
   #adopt(snapshot: PreparedSnapshot): void {
     const unchanged = this.store.syncedAt === snapshot.status.syncedAt
+    const skipped = snapshot.held.length < snapshot.publication.inventory.entries.length
     this.#state[1]({
-      entries: [...snapshot.publication.inventory.entries],
+      entries: [...snapshot.held],
       available: true,
       syncedAt: snapshot.status.syncedAt,
-      ...(unchanged ? {} : { verifiedAt: undefined, updateAvailable: false })
+      ...(unchanged ? {} : { verifiedAt: undefined, updateAvailable: skipped })
     })
   }
 
@@ -383,6 +421,11 @@ export class FieldBinder {
 
 const PREPARATION_LOCK = 'field-binder-preparation'
 
-type PreparedSnapshot = { status: FieldBinderStatus; publication: FieldBinderPublication }
+/** A selected snapshot: its status, its inventory, and the entries whose documents it holds. */
+type PreparedSnapshot = {
+  status: FieldBinderStatus
+  publication: FieldBinderPublication
+  held: readonly FieldBinderEntry[]
+}
 
 const errorCopy = (error: unknown): string => error instanceof Error ? error.message : String(error)

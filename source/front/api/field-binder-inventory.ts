@@ -6,19 +6,26 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates feature JSON at its boundary. Entry identity survives replacement;
-references are complete id-form document addresses, never names or links.
+Validates feature JSON at its boundary. An entry's document is never replaced,
+and its name lives only on the document; the entry records how the document
+arrived. References are complete id-form document addresses, never names or
+links; a minted id gives the placed address before the document exists.
 Publication and status candidates use creation time and UUID ordering rather
 than ambiguous name resolution or local-copy timestamps.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+FIELD_BINDER_SOURCES    How a Binder document arrives.
+FieldBinderUploadSource One arrival source.
+FieldBinderUpload       How the entry's document arrived.
+├ source                Upload, Library, or URL.
+├ kind                  The document's attachment kind.
+├ url                   Source URL, for source 'url'.
+└ record                Library topic and record, for source 'library'.
 FieldBinderEntry        Inventory entry; extends Instance identity.
-├ description           Required display description.
-├ url                   Optional HTTP/HTTPS source metadata.
-├ documentAddress       Complete id-form file reference.
-├ createdAt             Entry creation timestamp.
-└ updatedAt             Entry update timestamp.
+├ description           Required display title.
+├ documentAddress       Complete id-form placed reference.
+└ upload                How the document arrived.
 FieldBinderInventory    Published membership.
 ├ schemaVersion         Supported inventory version.
 └ entries               Published entry references.
@@ -35,6 +42,7 @@ FieldBinderMetadata     Inventory, status, and reference operations for the Bind
 ├ catalog               Fixed namespace, collection bucket, and reserved filenames.
 ├ id                    Reference to identity, required to be in the collection.
 ├ address               Store-produced identity to its id-form reference.
+├ placed                Minted document id to its placed reference.
 ├ collection            The collection's own id-form address.
 ├ readEntry             Validate one entry's metadata.
 ├ readInventory         Validate schema, published references, and unique ids.
@@ -44,6 +52,7 @@ FieldBinderMetadata     Inventory, status, and reference operations for the Bind
 */
 
 import {
+  isConstEnum,
   isDictionary,
   isId,
   isNonEmptyString,
@@ -53,9 +62,13 @@ import {
   StringSet,
   toId
 } from '@core/std'
-import type { Instance, When } from '@core/std'
+import type { Id, Instance, When } from '@core/std'
 import { DocumentAddresses } from '@core/stdx'
 import type { DocumentId, NodeMetadata } from '@core/stdx'
+import { ATTACHMENT_KINDS } from '@domain/abstractions/common.ts'
+import type { AttachmentKind } from '@domain/abstractions/common.ts'
+import { LIBRARY_TOPICS } from './attachments.ts'
+import type { LibraryTopic } from './attachments.ts'
 
 /** Feature-owned logical organization, independent of native storage roots. */
 const catalog = {
@@ -77,13 +90,23 @@ const id = (reference: string): DocumentId => {
   return document
 }
 
+/** How a Binder document arrives. */
+export const FIELD_BINDER_SOURCES = ['upload', 'library', 'url'] as const
+export type FieldBinderUploadSource = (typeof FIELD_BINDER_SOURCES)[number]
+
+/** How the entry's document arrived; read-only once the document is delivered. */
+export type FieldBinderUpload = {
+  source: FieldBinderUploadSource
+  kind: AttachmentKind
+  url?: string
+  record?: { topic: LibraryTopic; id: Id }
+}
+
 /** Metadata references a document without owning its upload lifecycle. */
 export type FieldBinderEntry = Instance & {
   description: string
-  url?: string
   documentAddress: string
-  createdAt: When
-  updatedAt: When
+  upload: FieldBinderUpload
 }
 
 /** One immutable source publication; references define membership. */
@@ -111,23 +134,38 @@ const readEntry = (value: unknown): FieldBinderEntry => {
   if (!isNonEmptyString(value.description)) return notValid('Field Binder description is required.')
   if (!isNonEmptyString(value.documentAddress)) return notValid('Field Binder document is required.')
   DocumentAddresses.id(value.documentAddress)
-  if (!isWhen(value.createdAt) || !isWhen(value.updatedAt)) {
-    return notValid('Field Binder entry timestamps must be valid timestamps.')
-  }
-  if (Date.parse(value.updatedAt) < Date.parse(value.createdAt)) {
-    return notValid('Field Binder update precedes creation.')
-  }
-  if (value.url !== undefined && !isUrl(value.url, ['http', 'https'])) {
-    return notValid('Field Binder source URL must use HTTP or HTTPS.')
-  }
   return {
     id: value.id,
     description: value.description,
     documentAddress: value.documentAddress,
-    createdAt: value.createdAt,
-    updatedAt: value.updatedAt,
-    ...(value.url === undefined ? {} : { url: value.url })
+    upload: readFieldBinderUpload(value.upload)
   }
+}
+
+/** Validate how a document arrived: a URL only from a URL, a record only from the Library. */
+const readFieldBinderUpload = (value: unknown): FieldBinderUpload => {
+  if (!isDictionary(value)) return notValid('Field Binder upload must be an object.')
+  if (!isConstEnum(value.source, FIELD_BINDER_SOURCES)) {
+    return notValid('Field Binder upload source must be upload, library, or url.')
+  }
+  if (!isConstEnum(value.kind, ATTACHMENT_KINDS)) return notValid('Field Binder upload kind is unknown.')
+  const upload: FieldBinderUpload = { source: value.source, kind: value.kind }
+  if (value.source === 'url') {
+    if (!isUrl(value.url, ['http', 'https'])) {
+      return notValid('Field Binder source URL must use HTTP or HTTPS.')
+    }
+    return { ...upload, url: value.url }
+  }
+  if (value.url !== undefined) return notValid('Only a URL upload has a source URL.')
+  if (value.source === 'library') {
+    const record = value.record
+    if (!isDictionary(record) || !isConstEnum(record.topic, LIBRARY_TOPICS) || !isId(record.id)) {
+      return notValid('A Library upload requires its topic and record.')
+    }
+    return { ...upload, record: { topic: record.topic, id: record.id } }
+  }
+  if (value.record !== undefined) return notValid('Only a Library upload has a record.')
+  return upload
 }
 
 /** Validate schema and membership independently of document-directory presence. */
@@ -198,6 +236,14 @@ const compare = (
   return left.id.document < right.id.document ? -1 : left.id.document > right.id.document ? 1 : 0
 }
 
+/** The placed reference a minted document id will have in the collection. */
+const placed = (document: Id): string =>
+  DocumentAddresses.format([
+    { id: catalog.namespace.id },
+    { id: catalog.bucket.id },
+    { id: document }
+  ])
+
 /** The collection's own id-form address, for resolving its bucket. */
 const collection = (): string =>
   DocumentAddresses.format([{ id: catalog.namespace.id }, { id: catalog.bucket.id }])
@@ -207,6 +253,7 @@ export const FieldBinderMetadata = {
   catalog,
   id,
   address,
+  placed,
   collection,
   readEntry,
   readInventory,

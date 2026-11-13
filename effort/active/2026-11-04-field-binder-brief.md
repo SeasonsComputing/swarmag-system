@@ -91,6 +91,10 @@ clear validation copy. Ordinary uploaded names such as `inventory.json` and `sta
 valid. The existing single logical collection bucket is retained; separate Documents/Metadata
 buckets and the earlier `$` prefix alternative are not selected.
 
+_[Superseded by the Upload Tasks brief (`effort/active/2026-11-12-upload-tasks-brief.md`), Field
+Binder entry: the entry shape, "Entry id survives file replacement", and "filename remains the
+uploaded file's name".]_
+
 The inventory shape is:
 
 ```ts
@@ -125,6 +129,9 @@ comparing source timestamps with timestamps manufactured during local copying.
 
 ## Field Binder Manager
 
+_[Superseded by the Upload Tasks brief, Field Binder Manager: "Add stages a chosen file",
+"replaces the file under the same entry id", and the one-step Choose File presentation.]_
+
 Admin manages the source: Add stages a chosen file, edits description and optional source URL,
 then saves an inventory entry. Edit changes metadata or replaces the file under the same entry id.
 Remove confirms and removes the inventory reference. Existing AttachmentFormats supplies accepted
@@ -148,6 +155,9 @@ Upload delivery, inventory publication, and local preparation are distinct opera
 Save does not modify the local reader or silently sync it. Binder consumes its own existing
 Uploads instance; no upload abstraction, new transaction engine, or conflict-resolution subsystem
 is introduced. Save follows this publication sequence:
+
+_[Superseded by the Upload Tasks brief: steps 1–2 and "Save requires signal and delivery". Save
+publishes the entry once and waits for no transfer; the upload task places after Save.]_
 
 1. Place staged files in FieldBinderInbox through the binder Uploads instance. Retain entry ids
    and staged references for retries; never create a second entry merely because delivery retries.
@@ -327,7 +337,8 @@ environment and authorization. Consumer verification checks Lister on screen whe
   Open, the viewer's download, and Choose File, and the binder has one way in, the same as every
   document. The fetch's failure state went with it. A fetch can return later as another way to
   stage a file, without changing the binder.
-- **2026-11-11, one Field Binder.** With upload the only way in, an entry no longer needed a Detail
+- _[Reversed by the Upload Tasks brief: the Source toggle returns as Upload, Library, URL.]_
+  **2026-11-11, one Field Binder.** With upload the only way in, an entry no longer needed a Detail
   of its own: the `Manager` workbench and its Source toggle (URL, Upload, Chemical) were withdrawn,
   and the viewer, a `Lister`, became the Field Binder, editable where an app makes it so.
 - **2026-11-11, straight to the server.** Taking the binder through `Attachments`' staging and

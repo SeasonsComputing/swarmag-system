@@ -95,9 +95,9 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
       save = makeAttachmentSave<Chemical, ChemicalDraft>({
         create: draft => api.Chemicals.create(scope.toCreate(draft)),
         update: (item, draft) => api.Chemicals.update(scope.adapter, scope.toUpdate(item.id, draft)),
-        place: async (owner, draft) => ({
+        address: async (owner, draft) => ({
           ...draft,
-          notes: await api.Attachments.Chemicals.place(owner, draft.notes)
+          notes: await api.Attachments.Chemicals.address(owner, draft.notes)
         }),
         reconcile: draft => state.setNotes(draft.notes)
       })

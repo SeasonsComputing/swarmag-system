@@ -784,8 +784,11 @@ not itself register routes or commands; each app supplies its own registration a
 - **Management edits the source.** Admin's Field Binder Manager maintains FieldBinderServer's
   collection and inventory. It does not edit the local reader's mirror.
 - **Preparation exposes a complete Binder.** Application-triggered sync captures a source
-  inventory, obtains its referenced files, and makes the snapshot readable only after completeness
-  is verified. Failure retains the previous complete mirror; an incomplete first copy is unavailable.
+  inventory, copies the entries whose documents are on the server, and makes the snapshot readable
+  only after the copies are verified. An entry whose document has not arrived is skipped, and a
+  sync that skipped one is not current: it reports an update available, and the next sync takes
+  what has arrived. Failure retains the previous complete mirror; an incomplete first copy is
+  unavailable.
   Inventory and device status are docstore JSON, with no new database table or kernel snapshot API.
   Published inventory references define source membership. A local status document selects the
   complete prepared inventory; files copied before that commit do not become reader entries.
@@ -812,16 +815,21 @@ their destinations, references, and save ordering; the core class has no applica
 feature, scheduling, or UI dependencies. Its logical operations are independent of the providers'
 physical root mappings.
 
-- **Choosing a file stages it durably.** Uploads stores the supplied file's name, bytes, and
-  content type in the fixed bucket of its private `Staging` namespace. The consumer holds the
-  store-produced identity in its draft reference.
+- **Choosing a file stages it durably.** The consumer mints the document id when the document is
+  chosen and stages with it, the only id `stage` accepts. Uploads stores the supplied file's name,
+  bytes, and content type in the fixed bucket of its private `Staging` namespace, in one write.
+  Staging progress belongs to the consumer's read of the file; an interrupted read stages nothing.
 - **Placement copies into the consumer's bucket.** The consumer creates its destination through
   the docstore and supplies its bucket identity. Uploads copies the staged document under the
   same document UUID and returns its destination identity. Repeated placement is idempotent.
   The staged source remains available for recovery from interrupted reference writes.
-- **Save owns commitment.** The consumer coordinates its reference writes and placement; these
-  operations are not one transaction. Placement makes a document eligible for delivery. The drain
-  does not inspect records or decide whether their references are committed.
+- **Save writes placed references; the upload task places after Save.** The minted id makes the
+  placed address known before the document exists, so Save writes it and waits for no transfer.
+  Each chosen document has an upload task that stages it, then places it once both the stage and
+  the consumer's Save have succeeded. Placement is the handoff: it makes a document eligible for
+  delivery, so it waits for Save, and Cancel before Save leaves nothing placed. A document that
+  never arrives is not found. The drain does not inspect records or decide whether their
+  references are committed.
 - **Discard removes staging only.** Uploads rejects discard of a placed document. The editor owns
   which staged selections it can discard; a staged document that a write may reference is
   retained. Reclamation of unreferenced documents is a separate responsibility.
@@ -838,10 +846,11 @@ physical root mappings.
 - **The device does no content processing.** Photos are not scaled. Consumers own accepted
   formats and content-type normalization; Uploads preserves the supplied content.
 - **Each app owns delivery scheduling.** Uploads runs explicit passes and owns no timers.
-  - **Admin:** its root starts `DocumentDrain` for AttachmentsUploads, under a prepared session
-    and a Web Lock that excludes other tabs. Each pass settles before the next is scheduled;
-    expected delivery failures back off and unexpected failures stop the loop. Binder delivery
-    and preparation have their own application-bound invocation; they do not share this inbox.
+  - **Admin:** its root starts `DocumentDrain`, one loop per pair (AttachmentsUploads and
+    FieldBinderUploads), each under a prepared session, its own Web Lock that excludes other tabs,
+    and its own task key. Each pass settles before the next is scheduled; expected delivery
+    failures back off and unexpected failures stop that loop. Binder preparation has its own
+    application-bound invocation.
   - **Ops:** the job upload, beside the log upload (§9.3). Photos travel with the job clone and
     drain at base, a deliberate act that qualifies the connection first, on wi-fi by default, since
     the data plan is the worker's.
@@ -861,9 +870,12 @@ owned by the per-target storage contract (architecture-devops §14), not the att
 - **A topic per type that carries notes** creates its catalog bucket and places staged documents
   through Uploads. A composition without an id (a `Note`, a `CustomerSite`, an `Answer`) uses its
   owning record's bucket. Names are labels at every level, for people and the CLI.
-- **Attachment Save preserves recovery references.** The host writes its record, places its
-  staged documents, and reconciles the record's references to the placed addresses. Cancel before
-  any write attempt discards that editor's staging; after an attempted write, staging remains.
+- **Attachment Save writes placed addresses once.** Choosing a file adds its row at once and starts
+  its upload task. On an update, or in a Library topic, Save writes the record with the placed
+  addresses. On a create in an owner-bucket topic, Save writes the record without the new
+  attachments, then updates it with their placed addresses. The upload task places after Save,
+  and nothing rewrites the record after Save. Cancel before any write attempt discards that
+  editor's staging; after an attempted write, staging remains.
   Removing an attachment drops its reference rather than deleting possibly referenced bytes.
 - **Attachment access delegates to Uploads.** Links and sizes follow the document between inbox
   and server. The attachment catalog selects destinations; it does not own delivery scheduling.

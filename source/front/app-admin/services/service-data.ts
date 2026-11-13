@@ -45,9 +45,9 @@ export const createServiceSave = (
       ...await api.Services.update(scope.adapter, scope.toUpdate(record.id, readServiceFields(draft))),
       requiredAssetTypes: [...draft.requiredAssetTypes]
     }),
-    place: async (owner, draft) => ({
+    address: async (owner, draft) => ({
       ...draft,
-      notes: await api.Attachments.Services.place(owner, draft.notes)
+      notes: await api.Attachments.Services.address(owner, draft.notes)
     }),
     reconcile,
     complete: (record, draft) =>

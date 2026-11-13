@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Attachment feature tests                                                     ║
-║ Verify recognition, placement, links, cancellation, and interrupted saves.   ║
+║ Verify recognition, upload tasks, placement after Save, links, and cancel.   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -15,7 +15,9 @@ import { ApiError, DocumentAddresses } from '@core/stdx'
 import type { Attachment, Note } from '@domain/abstractions/common.ts'
 import { AttachmentFormats } from '@front/api/attachment-formats.ts'
 import { Attachments as AttachmentsClass } from '@front/api/attachments.ts'
+import { UploadTask } from '@front/api/upload-task.ts'
 import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert'
+import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 import {
   IDBCursor,
   IDBCursorWithValue,
@@ -91,7 +93,7 @@ const Server = new DocumentStore(new IndexedDbDocumentProvider('ATTACHMENTS_TEST
 const Delivery = new Uploads(Inbox, Server)
 const Attachments = new AttachmentsClass(Delivery, Inbox)
 
-Deno.test('attachment recognition goes by extension through the format table', async () => {
+Deno.test('attachment recognition goes by extension through the format table', () => {
   const cases: [string, string, string][] = [
     ['photo.JPG', 'image/jpeg', 'photo'],
     ['photo.jpeg', 'image/jpeg', 'photo'],
@@ -117,50 +119,79 @@ Deno.test('attachment recognition goes by extension through the format table', a
   }
   assert(!AttachmentFormats.accept(['map']).includes('image/jpeg'))
   assertEquals(AttachmentFormats.accept(['video']), '')
-  await assertRejects(
+  assertThrows(
     () => Attachments.stage(new File(['%PDF-'], 'file.pdf'), ['photo']),
     ValidatorError
   )
 })
 
-Deno.test('durable staging and idempotent placement preserve reference metadata', async () => {
-  const staged = await Attachments.stage(new File(['%PDF-body'], 'order.pdf', { type: 'text/html' }))
-  assert(persistenceRequests > 0)
-  const source = DocumentAddresses.id(staged.documentAddress)
-  const reopened = new DocumentStore(
-    new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'),
-    {
-      linkLifetime: 5
+/** Wait until a chosen document's upload task has cleared or failed. */
+const settled = async (attachment: Attachment): Promise<void> => {
+  const key = `upload:${DocumentAddresses.id(attachment.documentAddress).document}`
+  for (let tries = 0; tries < 500; tries++) {
+    const task = BackgroundTasks.store[key]
+    if (task === undefined || task.phase === 'failed') return
+    await new Promise(resolve => setTimeout(resolve, 2))
+  }
+  throw new Error(`Upload task ${key} did not settle.`)
+}
+
+/** Whether a minted document id is still in this inbox's staging. */
+const isStaging = async (attachment: Attachment): Promise<boolean> => {
+  const minted = DocumentAddresses.id(attachment.documentAddress).document
+  for (const namespace of await Inbox.namespace.list()) {
+    if (namespace.name !== 'Staging') continue
+    for (const bucket of await Inbox.bucket.list(namespace.id)) {
+      const documents = await Inbox.document.list(bucket.id)
+      if (documents.some(document => document.id.document === minted)) return true
     }
-  )
-  assertEquals(await (await reopened.document.read(source)).text(), '%PDF-body')
-  assertEquals((await reopened.document.read(source)).type, 'application/pdf')
+  }
+  return false
+}
+
+/** A note holding one attachment. */
+const noteOf = (attachment: Attachment): Note => ({
+  content: 'Note',
+  createdAt: attachment.uploadedAt,
+  attachments: [attachment]
+})
+
+Deno.test('a chosen file is a staged row at once; Save gives it the placed address', async () => {
+  const row = Attachments.stage(new File(['%PDF-body'], 'order.pdf', { type: 'text/html' }))
+  const pending = DocumentAddresses.id(row.documentAddress)
+  assertEquals(row.contentType, 'application/pdf')
+  assert(Delivery.isStaged(pending))
+  assertEquals(row.documentAddress, Delivery.stagedAddress(pending.document))
   const owner = id()
-  const notes: Note[] = [{ content: 'Order', createdAt: staged.uploadedAt, attachments: [staged] }]
-  const placed = await Attachments.Customers.place(owner, notes)
+  const placed = Attachments.Customers.address(owner, [noteOf(row)])
   const reference = placed[0].attachments[0]
   const target = DocumentAddresses.id(reference.documentAddress)
   assertEquals(target.bucket, owner)
-  assertEquals(target.document, source.document)
-  assert(target.namespace !== source.namespace)
-  assertEquals(await Attachments.Customers.place(owner, notes), placed)
-  assertEquals(await Attachments.Customers.place(owner, placed), placed)
-  assertEquals(reference.uploadedAt, staged.uploadedAt)
+  assertEquals(target.document, pending.document)
+  assertEquals(Attachments.Customers.address(owner, placed), placed)
+  assertEquals(Attachments.Customers.address(undefined, [noteOf(row)])[0].attachments, [])
+  const library = Attachments.Chemicals.address(undefined, [noteOf(row)])[0].attachments[0]
+  assertEquals(DocumentAddresses.id(library.documentAddress).document, pending.document)
+  Attachments.reset([pending.document])
+  Attachments.Customers.address(owner, [noteOf(row)])
+  await new Promise(resolve => setTimeout(resolve, 20))
+  await assertRejects(() => Inbox.document.get(target), ApiError)
+  Attachments.release([pending.document])
+  await settled(row)
+  assert(persistenceRequests > 0)
+  const stored = await Inbox.document.get(target)
+  assertEquals(stored.name, 'order.pdf')
+  assertEquals(stored.count, 9)
+  assertEquals((await Inbox.document.read(target)).type, 'application/pdf')
   assertEquals(await Attachments.size(reference), 9)
-  assertEquals((await Inbox.document.get(source)).count, 9)
-  const renamed = { ...reference, filename: 'new-name.pdf' }
-  assertEquals(await Attachments.size(renamed), 9)
-  assertEquals((await Inbox.document.get(target)).name, 'order.pdf')
-  await assertRejects(() => Attachments.discard([reference]), ValidatorError)
+  assertEquals(await (await Attachments.file(reference)).text(), '%PDF-body')
 })
 
 Deno.test('links use inbox first, server on not-found, and propagate other failures', async () => {
-  const staged = await Attachments.stage(new File(['hello'], 'hello.txt'))
-  const placed = (await Attachments.Users.place(id(), [{
-    content: 'Hello',
-    createdAt: staged.uploadedAt,
-    attachments: [staged]
-  }]))[0].attachments[0]
+  const row = Attachments.stage(new File(['hello'], 'hello.txt'))
+  const placed = Attachments.Users.address(id(), [noteOf(row)])[0].attachments[0]
+  Attachments.release([DocumentAddresses.id(row.documentAddress).document])
+  await settled(row)
   const node = DocumentAddresses.id(placed.documentAddress)
   const first = await Attachments.link(placed)
   assertEquals(await (await fetch(first.url)).text(), 'hello')
@@ -186,134 +217,117 @@ Deno.test('links use inbox first, server on not-found, and propagate other failu
   await new Promise(resolve => setTimeout(resolve, 15))
 })
 
-/** Minimal record persisted by the failure-injection scenarios. */
+/** Minimal record persisted by the save scenarios. */
 type TestRecord = { id: Id; notes: readonly Note[] }
 /** The form owns only its notes. */
 type TestDraft = { notes: readonly Note[] }
 
-Deno.test('failed completion retries the same record and reconciles final references', async () => {
+/** A save over the Customers topic that records every write. */
+const customerSave = (writes: TestDraft[], failUpdate = () => false) => {
   let record: TestRecord | undefined
-  let creates = 0
-  let fail = true
-  let editor: TestDraft = { notes: [] }
+  let reconciled: TestDraft | undefined
   const save = makeAttachmentSave<TestRecord, TestDraft>({
     create: draft => {
-      creates++
+      writes.push(draft)
       record = { id: id(), ...draft }
       return Promise.resolve(record)
     },
     update: (owner, draft) => {
+      if (failUpdate()) return Promise.reject(new Error('Injected update failure'))
+      writes.push(draft)
       record = { ...owner, ...draft }
       return Promise.resolve(record)
     },
-    place: async (owner, draft) => {
-      if (fail) throw new Error('Injected placement interruption')
-      return { notes: await Attachments.Customers.place(owner, draft.notes) }
-    },
-    reconcile: draft => {
-      editor = draft
-    }
-  }, Attachments)
-  const attachment = await save.stage(new File(['%PDF-'], 'retry.pdf'))
-  editor = { notes: [{ content: 'Retry', createdAt: attachment.uploadedAt, attachments: [attachment] }] }
-  await assertRejects(() => save.create(editor), Error, 'Injected placement interruption')
-  const persistedId = record!.id
-  await save.discard()
-  assertEquals((await Inbox.document.get(DocumentAddresses.id(attachment.documentAddress))).count, 5)
-  fail = false
-  const saved = await save.create(editor)
-  assertEquals(creates, 1)
-  assertEquals(saved.id, persistedId)
-  assertEquals(saved.notes, editor.notes)
-  assert(saved.notes[0].attachments[0].documentAddress !== attachment.documentAddress)
-  assertEquals(record!.notes, editor.notes)
-})
-
-Deno.test('cancel deletes only this editor staging before a write attempt', async () => {
-  const spec = {
-    create: (_draft: TestDraft): Promise<TestRecord> => Promise.reject(new Error('Write refused')),
-    update: (_record: TestRecord, _draft: TestDraft): Promise<TestRecord> =>
-      Promise.reject(new Error('Write refused')),
-    place: (_owner: Id, draft: TestDraft): Promise<TestDraft> => Promise.resolve(draft),
-    reconcile: (_draft: TestDraft): void => {}
-  }
-  const save = makeAttachmentSave(spec, Attachments)
-  const file = await save.stage(new File(['cancel'], 'cancel.txt'))
-  const other = await Attachments.stage(new File(['keep'], 'keep.txt'))
-  await save.discard()
-  await assertRejects(() => Inbox.document.get(DocumentAddresses.id(file.documentAddress)), ApiError)
-  assertEquals(await Attachments.size(other), 4)
-  const attempted = makeAttachmentSave(spec, Attachments)
-  const retained = await attempted.stage(new File(['retain'], 'retain.txt'))
-  await assertRejects(() => attempted.create({ notes: [] }), Error, 'Write refused')
-  await attempted.discard()
-  assertEquals(await Attachments.size(retained), 6)
-})
-
-Deno.test('final-reference write failure retains staging and retry converges', async () => {
-  let stored: TestRecord | undefined
-  let failFinalWrite = true
-  let reconciled: TestDraft | undefined
-  const save = makeAttachmentSave<TestRecord, TestDraft>({
-    create: draft => {
-      stored = { id: id(), ...draft }
-      return Promise.resolve(stored)
-    },
-    update: (record, draft) => {
-      if (failFinalWrite && draft.notes[0].attachments[0].documentAddress !== original.documentAddress) {
-        return Promise.reject(new Error('Injected final-reference write failure'))
-      }
-      stored = { ...record, ...draft }
-      return Promise.resolve(stored)
-    },
-    place: async (owner, draft) => ({ notes: await Attachments.Customers.place(owner, draft.notes) }),
+    address: (owner, draft) =>
+      Promise.resolve({ notes: Attachments.Customers.address(owner, draft.notes) }),
     reconcile: draft => {
       reconciled = draft
     }
   }, Attachments)
-  const original = await save.stage(new File(['%PDF-body'], 'partial.pdf'))
-  const draft = {
-    notes: [{ content: 'Partial', createdAt: original.uploadedAt, attachments: [original] }]
-  }
-  await assertRejects(() => save.create(draft), Error, 'Injected final-reference write failure')
-  assertEquals(stored!.notes, draft.notes)
-  assertEquals(reconciled, undefined)
-  await save.discard()
-  assertEquals(await Attachments.size(original), 9)
-  const firstPlacement = await Attachments.Customers.place(stored!.id, draft.notes)
-  const target = DocumentAddresses.id(firstPlacement[0].attachments[0].documentAddress)
-  failFinalWrite = false
-  const saved = await save.create(draft)
-  assertEquals(saved.notes, reconciled!.notes)
-  assertEquals(saved.notes, firstPlacement)
-  const namespaces = await Inbox.namespace.list()
-  const ns = namespaces.find(value => value.id.namespace === target.namespace)!
-  const buckets = await Inbox.bucket.list(ns.id)
-  const bucket = buckets.find(value => value.id.bucket === target.bucket)!
-  assertEquals((await Inbox.document.list(bucket.id)).length, 1)
+  return { save, record: () => record, reconciled: () => reconciled }
+}
+
+Deno.test('a create leaves out new owner attachments, then adds them; placing follows', async () => {
+  const writes: TestDraft[] = []
+  const { save, reconciled } = customerSave(writes)
+  const row = await save.stage(new File(['%PDF-'], 'create.pdf'))
+  const saved = await save.create({ notes: [noteOf(row)] })
+  assertEquals(writes.length, 2)
+  assertEquals(writes[0].notes[0].attachments, [])
+  const placed = saved.notes[0].attachments[0]
+  assertEquals(DocumentAddresses.id(placed.documentAddress).bucket, saved.id)
+  assertEquals(reconciled()!.notes, saved.notes)
+  await settled(row)
+  assertEquals((await Inbox.document.get(DocumentAddresses.id(placed.documentAddress))).count, 5)
 })
 
-Deno.test('closing while staging is pending discards only the late unsaved document', async () => {
-  let release: (() => void) | undefined
-  const waiting = new Promise<void>(resolve => {
-    release = resolve
-  })
-  const attachments = {
-    stage: async (file: File): Promise<Attachment> => {
-      await waiting
-      return Attachments.stage(file)
-    },
-    discard: (staged: readonly Attachment[]) => Attachments.discard(staged)
+Deno.test('an update writes placed addresses once', async () => {
+  const writes: TestDraft[] = []
+  const { save } = customerSave(writes)
+  const existing = { id: id(), notes: [] }
+  const row = await save.stage(new File(['%PDF-'], 'update.pdf'))
+  const saved = await save.update(existing, { notes: [noteOf(row)] })
+  assertEquals(writes.length, 1)
+  assertEquals(DocumentAddresses.id(saved.notes[0].attachments[0].documentAddress).bucket, existing.id)
+  await settled(row)
+})
+
+Deno.test('a failed completion retries the same record and places once', async () => {
+  const writes: TestDraft[] = []
+  let fail = true
+  const { save, record } = customerSave(writes, () => fail)
+  const row = await save.stage(new File(['%PDF-'], 'retry.pdf'))
+  const draft = { notes: [noteOf(row)] }
+  await assertRejects(() => save.create(draft), Error, 'Injected update failure')
+  const persisted = record()!.id
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert(await isStaging(row))
+  fail = false
+  const saved = await save.create(draft)
+  assertEquals(saved.id, persisted)
+  assertEquals(writes.length, 2)
+  await settled(row)
+  const target = DocumentAddresses.id(saved.notes[0].attachments[0].documentAddress)
+  assertEquals((await Inbox.document.get(target)).count, 5)
+})
+
+Deno.test('cancel before a write discards staging; after an attempt staging remains', async () => {
+  const spec = {
+    create: (_draft: TestDraft): Promise<TestRecord> => Promise.reject(new Error('Write refused')),
+    update: (_record: TestRecord, _draft: TestDraft): Promise<TestRecord> =>
+      Promise.reject(new Error('Write refused')),
+    address: (_owner: Id | undefined, draft: TestDraft): Promise<TestDraft> => Promise.resolve(draft),
+    reconcile: (_draft: TestDraft): void => {}
   }
-  const save = makeAttachmentSave<TestRecord, TestDraft>({
-    create: draft => Promise.resolve({ id: id(), ...draft }),
-    update: (record, draft) => Promise.resolve({ ...record, ...draft }),
-    place: (_owner, draft) => Promise.resolve(draft),
-    reconcile: () => {}
-  }, attachments)
-  const pending = save.stage(new File(['late'], 'late.txt'))
+  const save = makeAttachmentSave(spec, Attachments)
+  const cancelled = await save.stage(new File(['cancel'], 'cancel.txt'))
   await save.discard()
-  release!()
-  const late = await pending
-  await assertRejects(() => Inbox.document.get(DocumentAddresses.id(late.documentAddress)), ApiError)
+  assert(!(await isStaging(cancelled)))
+  const key = `upload:${DocumentAddresses.id(cancelled.documentAddress).document}`
+  assertEquals(BackgroundTasks.store[key], undefined)
+  const attempted = makeAttachmentSave(spec, Attachments)
+  const retained = await attempted.stage(new File(['retain'], 'retain.txt'))
+  await assertRejects(() => attempted.create({ notes: [noteOf(retained)] }), Error, 'Write refused')
+  await attempted.discard()
+  assert(await isStaging(retained))
+})
+
+Deno.test('cancel ends the task at once; the staged copy is discarded when the read completes', async () => {
+  let finish = (): void => {}
+  const reading = new Promise<void>(resolve => finish = resolve)
+  const task = new UploadTask(Delivery, 'slow.txt', async report => {
+    report(0, 4)
+    await reading
+    return new File(['slow'], 'slow.txt')
+  })
+  const key = `upload:${task.id}`
+  assertEquals(BackgroundTasks.store[key]?.blocksExit, true)
+  const abandoning = task.abandon(true)
+  assertEquals(BackgroundTasks.store[key], undefined)
+  finish()
+  await abandoning
+  assertEquals(BackgroundTasks.store[key], undefined)
+  const staged = await task.staged
+  assertEquals(staged?.id.document, task.id)
+  await assertRejects(() => Inbox.document.get(staged!.id))
 })

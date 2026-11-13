@@ -618,9 +618,10 @@ and `session-coordinator.ts`.
 task, with optional `attachmentKinds`. It edits Content and the note's attachments, and preserves
 existing timestamps. It never persists. Its host's `makeAttachmentSave` delegate owns the upload
 tasks and record writes. When the placed address is known at choice (every update, and New in a
-Library topic), Save writes it once and the task places after Save. A new record in an owner-bucket
-topic keeps create, place, reconcile. The topic selects the destination and delegates document
-placement to Uploads; the editor does not schedule delivery.
+Library topic), Save writes it once and the task places after Save. On a create in an owner-bucket
+topic, Save writes the record without the new attachments, then updates it with their placed
+addresses. The topic selects the destination and delegates document placement to Uploads; the
+editor does not schedule delivery.
 
 #### 10.1.3 Stays in the app
 

@@ -94,9 +94,9 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
       save = makeAttachmentSave<Asset, AssetDraft>({
         create: draft => api.Assets.create(scope.toCreate(draft)),
         update: (item, draft) => api.Assets.update(scope.adapter, scope.toUpdate(item.id, draft)),
-        place: async (owner, draft) => ({
+        address: async (owner, draft) => ({
           ...draft,
-          notes: await api.Attachments.Assets.place(owner, draft.notes)
+          notes: await api.Attachments.Assets.address(owner, draft.notes)
         }),
         reconcile: draft => state.setNotes(draft.notes)
       })

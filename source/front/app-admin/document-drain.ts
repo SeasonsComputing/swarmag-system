@@ -1,34 +1,50 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Admin document drain                                                         ║
-║ Single-tab attachment reports with unchanged bounded retry pacing.           ║
+║ One single-tab delivery loop per upload pair, with bounded retry pacing.     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Drains placed inbox documents while Admin is open. Schedules after each pass
-settles; a Web Lock excludes other tabs. Only expected drain failures back off.
-Unexpected errors are reported and stop the schedule. Reports describe this
-device inbox; completion rechecks readiness before publishing. Session clearing
-removes reports without stopping the loop. A missed lock releases local exit
-responsibility. Counts are unknown during a pass and after aggregate failure.
+Drains placed inbox documents while Admin is open, one loop per upload pair:
+attachments and the Field Binder. Each loop has its own Web Lock, which excludes
+other tabs, its own task key, and its own pacing; it schedules after each pass
+settles. Only expected drain failures back off. Unexpected errors are reported
+and stop that loop. Reports describe this device inbox; completion rechecks
+readiness before publishing. Session clearing removes reports without stopping
+a loop. A missed lock releases local exit responsibility. Counts are unknown
+during a pass and after aggregate failure.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-DocumentDrain  Admin's document upload loop.
-└ start        Run the first pass and schedule subsequent passes.
+DocumentDrain  Admin's document delivery loops.
+├ taskKeys     Each loop's report key.
+└ start        Run each loop's first pass and schedule the next.
 */
 
+import type { Uploads } from '@core/cli/docstore-uploads.ts'
 import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 
-/** Admin's document upload loop, started once at application mount. */
+/** Admin's document delivery loops, started once at application mount. */
 let started = false
 export const DocumentDrain = {
+  taskKeys: { attachments: 'attachment-delivery', binder: 'field-binder-delivery' },
   async start(): Promise<void> {
     if (started) return
     started = true
-    await drainDocuments()
+    await Promise.all([
+      new DrainLoop(api.AttachmentsUploads, {
+        lock: 'document-drain',
+        key: DocumentDrain.taskKeys.attachments,
+        label: 'Attachment delivery'
+      }).run(),
+      new DrainLoop(api.FieldBinderUploads, {
+        lock: 'field-binder-drain',
+        key: DocumentDrain.taskKeys.binder,
+        label: 'Field Binder delivery'
+      }).run()
+    ])
   }
 }
 
@@ -36,66 +52,73 @@ export const DocumentDrain = {
 // IMPLEMENTATION
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Stable report identity for this attachment pair. */
-const ATTACHMENT_TASK_KEY = 'attachment-delivery'
-const ATTACHMENT_TASK_LABEL = 'Attachment delivery'
-
 /** Existing pass interval and capped expected-failure delay. */
 const DRAIN_INTERVAL = 60_000
 const MAX_DRAIN_DELAY = 15 * DRAIN_INTERVAL
 
-/**
- * Run one lock-protected pass, report local responsibility, and schedule the next.
- * Expected failures back off; unexpected failures are reported and stop the loop.
- */
-let drainDelay = DRAIN_INTERVAL
-async function drainDocuments(): Promise<void> {
-  try {
-    await navigator.locks.request('document-drain', { ifAvailable: true }, async lock => {
-      if (!lock || !api.SessionState.isPrepared()) {
-        api.BackgroundTasks.clear(ATTACHMENT_TASK_KEY)
-        return
-      }
-      api.BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
-        label: ATTACHMENT_TASK_LABEL,
-        phase: 'running',
-        blocksExit: true
-      })
-      try {
-        const result = await api.AttachmentsUploads.drain()
-        drainDelay = DRAIN_INTERVAL
-        if (!api.SessionState.isPrepared()) return
-        if (result.remaining === 0) api.BackgroundTasks.clear(ATTACHMENT_TASK_KEY)
-        else {
-          api.BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
-            label: ATTACHMENT_TASK_LABEL,
-            phase: 'waiting',
-            blocksExit: true,
-            remaining: { count: result.remaining, unit: 'documents' }
-          })
-        }
-      } catch (error) {
-        if (!(error instanceof AggregateError) && !(error instanceof ApiError)) throw error
-        reportFailure(error)
-        drainDelay = Math.min(drainDelay * 2, MAX_DRAIN_DELAY)
-      }
-    })
-  } catch (error) {
-    reportFailure(error)
-    throw error
-  }
-  setTimeout(() => drainDocuments(), drainDelay)
-}
+/** One loop's lock name, report key, and report label. */
+type DrainIdentity = { lock: string; key: string; label: string }
 
-/** Publich failures to tasks. */
-const reportFailure = (error: unknown): void => {
-  if (!api.SessionState.isPrepared()) return
-  api.BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
-    label: ATTACHMENT_TASK_LABEL,
-    phase: 'failed',
-    blocksExit: true,
-    error: error instanceof Error && error.message.trim()
-      ? error.message
-      : 'Attachment delivery failed. Pending documents remain on this device.'
-  })
+/** One pair's delivery loop and its pacing. */
+class DrainLoop {
+  readonly #uploads: Uploads
+  readonly #identity: DrainIdentity
+  #delay = DRAIN_INTERVAL
+
+  constructor(uploads: Uploads, identity: DrainIdentity) {
+    this.#uploads = uploads
+    this.#identity = identity
+  }
+
+  /**
+   * Run one lock-protected pass, report local responsibility, and schedule the next.
+   * Expected failures back off; unexpected failures are reported and stop the loop.
+   */
+  async run(): Promise<void> {
+    const { lock, key, label } = this.#identity
+    try {
+      await navigator.locks.request(lock, { ifAvailable: true }, async held => {
+        if (!held || !api.SessionState.isPrepared()) {
+          api.BackgroundTasks.clear(key)
+          return
+        }
+        api.BackgroundTasks.publish(key, { label, phase: 'running', blocksExit: true })
+        try {
+          const result = await this.#uploads.drain()
+          this.#delay = DRAIN_INTERVAL
+          if (!api.SessionState.isPrepared()) return
+          if (result.remaining === 0) api.BackgroundTasks.clear(key)
+          else {
+            api.BackgroundTasks.publish(key, {
+              label,
+              phase: 'waiting',
+              blocksExit: true,
+              remaining: { count: result.remaining, unit: 'documents' }
+            })
+          }
+        } catch (error) {
+          if (!(error instanceof AggregateError) && !(error instanceof ApiError)) throw error
+          this.#report(error)
+          this.#delay = Math.min(this.#delay * 2, MAX_DRAIN_DELAY)
+        }
+      })
+    } catch (error) {
+      this.#report(error)
+      throw error
+    }
+    setTimeout(() => this.run(), this.#delay)
+  }
+
+  /** Publish a failure to the loop's task. */
+  #report(error: unknown): void {
+    if (!api.SessionState.isPrepared()) return
+    api.BackgroundTasks.publish(this.#identity.key, {
+      label: this.#identity.label,
+      phase: 'failed',
+      blocksExit: true,
+      error: error instanceof Error && error.message.trim()
+        ? error.message
+        : `${this.#identity.label} failed. Pending documents remain on this device.`
+    })
+  }
 }

@@ -1,46 +1,62 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Field Binder editor state                                                    ║
-║ One editor's metadata draft, durable selections, and retry identity.         ║
+║ One editor's entry draft, its chosen document's upload task, and identity.   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Owns description, optional source URL, and a selected document reference. The
-entry id is minted once per editor, including retries. File choice stages
-immediately through the existing Binder Uploads instance. Late completions
-remain editor-owned after Close; staging is discarded only before a write
-attempt. This is plain draft state, not a persisted editor or upload engine.
+Owns one entry's description, how its document arrives, and, on Edit, the
+document's name. The entry id is minted once per editor, including retries. Add
+chooses one document by Upload, Library, or URL; choosing starts its upload
+task, and only the latest choice is kept. Save publishes the entry once and
+waits for no transfer, then releases the task, which places the document for
+the drain. Edit never replaces the document: once delivered, a changed name
+renames it, and until then the source URL stays editable. Closing before any
+write attempt discards the chosen document's staging.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-FieldBinderDraft   Editor-owned save projection.
-├ id               Stable entry identity.
-├ description      Editable description.
-├ url              Editable source URL.
-├ documentAddress  Selected or published file reference.
-└ createdAt        Original entry creation time.
-FieldBinderState   One retained editor lifetime.
-├ description      Required description reader.
-├ setDescription   Edit the description.
-├ url              Optional URL reader.
-├ setUrl           Edit the URL.
-├ documentAddress  Current file reference.
-├ fileName         Filename chosen in this editor.
-├ pending          Capture is still running.
-├ draft            Owned-field projection for dirty checks.
-├ choose           Capture and adopt only the latest choice.
-├ save             Publish through the source with stable identity.
-└ discard          Close and discard pre-write staging only.
-createFieldBinderState Open an editor against its source publication baseline.
+FieldBinderDraft    Editor-owned save projection.
+├ id                Stable entry identity.
+├ description       Editable title.
+├ documentAddress   The document's placed reference.
+├ upload            How the document arrives.
+└ name              The document's name.
+FieldBinderState    One retained editor lifetime.
+├ adding            Add, not Edit.
+├ description       Required description reader.
+├ setDescription    Edit the description.
+├ source            How Add takes the document.
+├ setSource         Switch Upload, Library, or URL.
+├ url               Source URL reader.
+├ setUrl            Edit the source URL.
+├ name              The document's name.
+├ setName           Edit the name of a delivered document.
+├ kind              The chosen document's kind.
+├ delivered         The document is on the server.
+├ uploadedAt        The server document's creation time.
+├ draft             Owned-field projection for dirty checks.
+├ choose            Start the chosen document's upload task.
+├ save              Publish through the source with stable identity.
+└ discard           Close: end an unreleased task.
+createFieldBinderState Open an editor against its publication baseline.
 */
 
-import { id, notValid, when } from '@core/std'
+import { id, notValid } from '@core/std'
 import type { Id, When } from '@core/std'
-import type { DocumentId } from '@core/stdx'
+import type { DocumentId, NodeMetadata } from '@core/stdx'
+import type { AttachmentKind } from '@domain/abstractions/common.ts'
+import { AttachmentFormats } from '@front/api/attachment-formats.ts'
+import type { LibraryTopic } from '@front/api/attachments.ts'
 import { FieldBinderMetadata } from '@front/api/field-binder-inventory.ts'
-import type { FieldBinderEntry } from '@front/api/field-binder-inventory.ts'
+import type {
+  FieldBinderEntry,
+  FieldBinderUpload,
+  FieldBinderUploadSource
+} from '@front/api/field-binder-inventory.ts'
 import type { FieldBinderSource } from '@front/api/field-binder-source.ts'
+import type { UploadRead, UploadTask } from '@front/api/upload-task.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 
@@ -48,99 +64,133 @@ import type { Accessor, Setter } from '@solid-js'
 export type FieldBinderDraft = {
   id: Id
   description: string
-  url: string
   documentAddress: string
-  createdAt: When
+  upload: FieldBinderUpload
+  name: string
 }
 
 /** One retained editor lifetime, independent of its mounted Step. */
 export type FieldBinderState = {
+  adding: boolean
   description: Accessor<string>
   setDescription: Setter<string>
+  source: Accessor<FieldBinderUploadSource>
+  setSource: (source: FieldBinderUploadSource) => void
   url: Accessor<string>
   setUrl: Setter<string>
-  documentAddress: Accessor<string>
-  fileName: Accessor<string>
-  pending: Accessor<boolean>
+  name: Accessor<string>
+  setName: Setter<string>
+  kind: Accessor<AttachmentKind | undefined>
+  delivered: boolean
+  uploadedAt: When | undefined
   draft: () => FieldBinderDraft
-  choose: (file: File) => Promise<void>
+  choose: (name: string, read: UploadRead, record?: { topic: LibraryTopic; id: Id }) => void
   save: (draft: FieldBinderDraft) => Promise<FieldBinderEntry>
   discard: () => Promise<void>
 }
 
-/** Bind one editor to its captured publication and existing source service. */
+/**
+ * Bind one editor to its captured publication and the source service.
+ * @param document On Edit, the entry's server document; undefined while it is pending.
+ */
 export const createFieldBinderState = (
   source: FieldBinderSource,
   item: FieldBinderEntry | null,
-  baseline: string | undefined
+  baseline: string | undefined,
+  document?: NodeMetadata<DocumentId>
 ): FieldBinderState => {
   const entryId = item?.id ?? id()
-  const createdAt = item?.createdAt ?? when()
   const [description, setDescription] = createSignal(item?.description ?? '')
-  const [url, setUrl] = createSignal(item?.url ?? '')
-  const [documentAddress, setDocumentAddress] = createSignal(item?.documentAddress ?? '')
-  const [fileName, setFileName] = createSignal('')
-  const [pendingCount, setPendingCount] = createSignal(0)
-  const staged: DocumentId[] = []
+  const [uploadSource, setUploadSource] = createSignal(item?.upload.source ?? 'upload')
+  const [url, setUrl] = createSignal(item?.upload.url ?? '')
+  const [name, setName] = createSignal(document?.name ?? '')
+  const [kind, setKind] = createSignal(item?.upload.kind)
+  const [task, setTask] = createSignal<UploadTask | undefined>()
+  const [record, setRecord] = createSignal(item?.upload.record)
   let attempted = false
-  let closed = false
-  let selection = 0
   let publication = baseline
 
+  /** End a chosen document's task that no Save released. */
+  const drop = (chosen: UploadTask | undefined): Promise<void> =>
+    chosen === undefined ? Promise.resolve() : chosen.abandon(!attempted)
+
+  const upload = (): FieldBinderUpload => {
+    const arrived = item?.upload
+    if (arrived) {
+      return arrived.source === 'url' && !document ? { ...arrived, url: url().trim() } : arrived
+    }
+    const base = { source: uploadSource(), kind: kind() ?? 'document' }
+    const chosenRecord = record()
+    if (base.source === 'url') return { ...base, url: url().trim() }
+    if (base.source === 'library' && chosenRecord) return { ...base, record: chosenRecord }
+    return base
+  }
+
   return {
+    adding: item === null,
     description,
     setDescription,
+    source: uploadSource,
+    setSource(next: FieldBinderUploadSource) {
+      if (next === uploadSource()) return
+      void drop(task())
+      setTask(undefined)
+      setName('')
+      setKind(undefined)
+      setRecord(undefined)
+      setUploadSource(next)
+    },
     url,
     setUrl,
-    documentAddress,
-    fileName,
-    pending: () => pendingCount() > 0,
-    draft: () => ({
-      id: entryId,
-      description: description(),
-      url: url(),
-      documentAddress: documentAddress(),
-      createdAt
-    }),
-    async choose(file: File): Promise<void> {
-      const choice = ++selection
-      setPendingCount(count => count + 1)
-      try {
-        const document = await source.stage(file)
-        if (closed && !attempted) {
-          await source.discard([document.id])
-          return
-        }
-        staged.push(document.id)
-        if (closed || choice !== selection) return
-        setDocumentAddress(FieldBinderMetadata.address(document.id))
-        setFileName(document.name)
-        if (!description().trim()) setDescription(document.name)
-      } finally {
-        setPendingCount(count => count - 1)
+    name,
+    setName,
+    kind,
+    delivered: document !== undefined,
+    uploadedAt: document?.createdAt,
+    draft: () => {
+      const chosen = task()
+      const placed = chosen ? FieldBinderMetadata.placed(chosen.id) : ''
+      return {
+        id: entryId,
+        description: description(),
+        documentAddress: item?.documentAddress ?? placed,
+        upload: upload(),
+        name: name()
       }
     },
+    choose(chosenName, read, chosenRecord) {
+      const recognized = AttachmentFormats.recognize(new File([], chosenName))
+      const next = source.choose(chosenName, read)
+      void drop(task())
+      setTask(next)
+      setName(chosenName)
+      setKind(recognized.kind)
+      setRecord(chosenRecord)
+      if (!description().trim()) setDescription(chosenName)
+    },
     async save(draft: FieldBinderDraft): Promise<FieldBinderEntry> {
-      if (pendingCount() > 0) {
-        return notValid('Wait for the chosen file to finish saving on this device.')
-      }
-      if (!draft.documentAddress) return notValid('Choose a document file.')
+      if (!draft.documentAddress) return notValid('Choose a document.')
       attempted = true
+      if (item && document && draft.name.trim() !== document.name) {
+        await source.rename(item, draft.name.trim())
+      }
       const entry: FieldBinderEntry = {
         id: draft.id,
         description: draft.description.trim(),
         documentAddress: draft.documentAddress,
-        createdAt: draft.createdAt,
-        updatedAt: when(),
-        ...(draft.url.trim() ? { url: draft.url.trim() } : {})
+        upload: draft.upload
       }
       const result = await source.save(entry, publication)
       publication = FieldBinderMetadata.address(result.publication.document.id)
+      const chosen = task()
+      setTask(undefined)
+      if (chosen) void source.place(chosen)
       return result.entry
     },
     async discard(): Promise<void> {
-      closed = true
-      if (!attempted) await source.discard(staged)
+      const chosen = task()
+      setTask(undefined)
+      await drop(chosen)
     }
   }
 }

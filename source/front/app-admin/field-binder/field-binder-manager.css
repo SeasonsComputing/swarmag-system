@@ -1,0 +1,14 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Field Binder Manager                                                         ║
+║ A pending row is dimmed until its document is delivered.                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-app='field-binder-row'] {
+  display: block;
+}
+
+[data-app='field-binder-row'][data-app-pending] {
+  opacity: 0.6;
+}

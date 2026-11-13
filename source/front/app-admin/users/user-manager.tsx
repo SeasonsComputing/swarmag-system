@@ -122,9 +122,9 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       save = makeAttachmentSave<User, UserDraft>({
         create: draft => api.Users.create(scope.toCreate(draft)),
         update: (user, draft) => api.Users.update(scope.toUpdate(user.id, draft)),
-        place: async (owner, draft) => ({
+        address: async (owner, draft) => ({
           ...draft,
-          notes: await api.Attachments.Users.place(owner, draft.notes)
+          notes: await api.Attachments.Users.address(owner, draft.notes)
         }),
         reconcile: draft => state.setNotes(draft.notes)
       })

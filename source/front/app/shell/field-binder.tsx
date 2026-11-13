@@ -18,7 +18,7 @@ FieldBinder       View-only local document Lister.
 */
 
 import { api } from '@front/api/api.ts'
-import type { FieldBinderEntry } from '@front/api/field-binder-inventory.ts'
+import type { FieldBinderEntry, FieldBinderUploadSource } from '@front/api/field-binder-inventory.ts'
 import { onMount } from '@solid-js'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { CollectionContract } from '@ux/shell/workbench/collection-contract.ts'
@@ -52,7 +52,9 @@ export const FieldBinder = (props: FieldBinderProps): UiComponent => {
       render: entry => (
         <PanelRowIdentity
           title={entry.description}
-          subtitle={entry.url ? new URL(entry.url).host : 'Uploaded'}
+          subtitle={entry.upload.url
+            ? new URL(entry.upload.url).host
+            : SOURCE_LABELS[entry.upload.source]}
           annotation={binder.store.syncedAt
             ? `Copied ${new Date(binder.store.syncedAt).toLocaleString()}`
             : undefined}
@@ -65,4 +67,11 @@ export const FieldBinder = (props: FieldBinderProps): UiComponent => {
     refresh: () => binder.load()
   }
   return <Lister provider={provider} onCancel={props.onCancel} activate={open} />
+}
+
+/** How each entry's document arrived, as its row says it. */
+const SOURCE_LABELS: { [Source in FieldBinderUploadSource]: string } = {
+  upload: 'Uploaded',
+  library: 'Library',
+  url: 'URL'
 }
