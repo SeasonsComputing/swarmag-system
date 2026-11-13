@@ -595,6 +595,23 @@ References to update: `deno.jsonc` tasks, `source/devops/scripts/app-style-guide
 **Picking this up:** unblocked. The Customer Manager production, which also touched
 `architecture-front.md`'s directory tree, landed 2026-09-30.
 
+### B-47 · The shell bars ignore the device's unsafe areas
+
+**Observed:** 2026-11-13 · normal
+
+No app's viewport meta asks for `viewport-fit=cover`, so `env(safe-area-inset-*)` is always 0
+and the dashboard header and the footer (`[data-ui='footer']`) never pad for a notch or the home
+indicator. An installed Ops app on a phone draws edge to edge without the browser's toolbar, and
+the home indicator then overlaps the footer. This is separate from the browser toolbar, which the
+dashboard's `100dvh` already follows.
+
+The fix belongs in `ux/`: a pair of tokens in `tokens.css`, where literals are allowed (for
+example `--sa-safe-top` and `--sa-safe-bottom`, each `env(safe-area-inset-…, 0px)`), which the
+header adds above its row and the footer below `--sa-size-bar`. Spacing literals elsewhere fail
+guard-css rule B7. Then each app that installs adds `viewport-fit=cover` to its viewport meta.
+
+**Picking this up:** when Ops becomes installable.
+
 ## Document Storage
 
 ### B-42 · Unreferenced documents are never swept
