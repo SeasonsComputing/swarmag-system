@@ -1,9 +1,9 @@
 # Upload Tasks — Brief
 
-**Active, undispatched draft; captured 2026-11-12, returned to draft 2026-11-13.** Foundation
-mode: the upload lifecycle, its two consumers (attachments and the Field Binder), and their
-delivery scheduling. One change to locked `core/`, approved by the CA (Escalation). Records hold
-the reasons.
+**Active; reviewed by ACE 2026-11-13, nothing blocks; amended once (After ACE review, at the
+end). Captured 2026-11-12.** Foundation mode: the upload lifecycle, its two consumers
+(attachments and the Field Binder), and their delivery scheduling. One change to locked `core/`,
+approved by the CA (Escalation). Records hold the reasons.
 
 ## Escalation: supplied id on `stage` (approved)
 
@@ -107,7 +107,8 @@ Verified against the code on 2026-11-12 and 2026-11-13:
 - Opening an attachment before its document arrives fails with the store's not-found error.
 - Cancel before any write attempt discards the editor's staging, including stages that complete
   after Close (existing rule).
-- A new record in an owner-bucket topic (Customers, Users, Jobs) keeps the shipped path: create,
+- _[Superseded by the amendment "After ACE review", item 1.]_
+  A new record in an owner-bucket topic (Customers, Users, Jobs) keeps the shipped path: create,
   place, reconcile. Its create path is out of scope.
 - `Attachments.file(attachment): Promise<File>` reads a document's bytes: it resolves the existing
   link and fetches, naming and typing the File from the attachment.
@@ -194,6 +195,8 @@ The Detail aside adds and edits one document.
 
 Collection rows:
 
+_[Amended by the amendment "After ACE review", item 3: rows refresh on delivery.]_
+
 - The Manager reads each entry's server document; that read gives the name and delivery.
 - Title: the description. Subtitle: the document's name, or "Pending" when the document is not on
   the server. Pill: the source, Uploaded, Library, or URL.
@@ -228,6 +231,8 @@ All are decided; the target above reflects them.
 ## Governing documents to amend
 
 Documentation leads code. Each change below is made in the production, not in this brief:
+
+_[Amended by the amendment "After ACE review", item 2: architecture-front is already amended.]_
 
 - **architecture-core §10.2.2:** preparation copies entries whose documents are on the server; a
   sync that skipped one is not current.
@@ -270,7 +275,8 @@ Out of scope:
   progress options
 - the docstore kernel, the providers, and the `BackgroundTasks` contract
 - `ux/`, `domain/`, and the edge functions
-- the attachment consumers' create path (managers and the Onboarding Wizard)
+- _[Amended by the amendment "After ACE review", item 1.]_
+  the attachment consumers' create path (managers and the Onboarding Wizard)
 - chunked or resumable storage (architecture-core §10.5)
 - byte reclamation of unreferenced documents (architecture-core §10.3)
 - retry of a failed Binder upload; Remove and Add again
@@ -330,5 +336,24 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   an entry.
 - **Reclamation is out of scope.** An atomic write leaves no partial documents; unreferenced bytes
   are already a separate responsibility in architecture-core §10.3.
+
+## Amendment — 2026-11-13 — After ACE review
+
+ACE's review found nothing blocking and drafted a production scope. It asked the CA to settle three
+points with the approval. This amendment records the CA's answers and supersedes the marked items
+in Production scope, Governing documents to amend, and Field Binder Manager.
+
+1. **Every upload takes the new path, creates included.** In Customers, Users, and Jobs the
+   placed address contains the record's id. On a create, Save creates the record, builds the placed
+   addresses from its id and the documents' minted ids, updates the record, and returns. Save
+   waits for no transfer, and nothing rewrites the record after Save. `makeAttachmentSave` does
+   this; the Managers and the Onboarding Wizard are unchanged. The attachment list has one mode.
+2. **Architecture-front is amended.** §7.2.4, Document Storage, and §10.1.2, swarmAg-suite
+   foundation, were amended by the CA in `d23d8b4`: every upload is a background task placed after
+   Save, `DocumentDrain` runs one loop per pair, and the Binder Manager has the Source toggle and
+   rename-only Edit. The documentation step does not repeat them.
+3. **Rows refresh on delivery.** The Manager re-reads its rows when the Binder drain's remaining
+   count changes. There is no polling. A document uploaded from another device shows here when the
+   Manager next loads.
 
 _End of Brief_
