@@ -15,7 +15,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Uploads          Document lifecycle over an injected inbox/server pair.
 ├ constructor    Bind the inbox and server.
-├ stage          Capture the supplied file durably.
+├ stage          Capture the supplied file durably, under an optional supplied id.
 ├ isStaged       Classify a document identity.
 ├ discard        Remove staging only.
 ├ place          Copy staging into a consumer's bucket, retaining its source.
@@ -25,6 +25,7 @@ Uploads          Document lifecycle over an injected inbox/server pair.
 */
 
 import { notValid, toId } from '@core/std'
+import type { Id } from '@core/std'
 import { ApiError } from '@core/stdx'
 import type {
   ApiDocumentStoreContract,
@@ -57,11 +58,14 @@ export class Uploads {
     this.#server = server
   }
 
-  /** Capture the supplied name, bytes, and content type durably. */
-  async stage(file: File): Promise<NodeMetadata<DocumentId>> {
+  /**
+   * Capture the supplied name, bytes, and content type durably.
+   * @param options.id A caller-minted document id; staging the same id again returns that document.
+   */
+  async stage(file: File, options?: { id?: Id }): Promise<NodeMetadata<DocumentId>> {
     const namespace = await this.#inbox.namespace.create('Staging', STAGING)
-    const bucket = await this.#inbox.bucket.create(namespace.id, 'Staging', STAGING_BUCKET)
-    return await this.#inbox.document.create(bucket.id, file.name, file)
+    const bucket = await this.#inbox.bucket.create(namespace.id, 'Inbox', STAGING_BUCKET)
+    return await this.#inbox.document.create(bucket.id, file.name, file, options?.id)
   }
 
   /** Whether an identity belongs to this binding's private staging namespace. */
