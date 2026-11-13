@@ -15,7 +15,6 @@ BrandWidget  Dashboard header brand widget.
 */
 
 import { getShellIdentity } from '@ux/shell/runtime/shell-metadata.ts'
-import { UiLayout } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './brand-widget.css'
@@ -33,10 +32,10 @@ export const BrandWidget = (): UiComponent => {
         width={64}
         height={64}
       />
-      <UiLayout gap='tight'>
+      <div data-widget='brand-widget-names'>
         <span data-widget='brand-widget-product'>{identity.productName}</span>
         <span data-widget='brand-widget-application'>{identity.applicationName}</span>
-      </UiLayout>
+      </div>
     </div>
   )
 }
