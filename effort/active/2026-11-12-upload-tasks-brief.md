@@ -75,7 +75,11 @@ Verified against the code on 2026-11-12:
 - The consumer reads `file.stream()`, reports bytes read against `file.size`, assembles the Blob,
   and stages it as a File with the minted id. Storage is not chunked. An interrupted read stages
   nothing.
-- On completion the staging task clears. On failure it publishes `failed`, naming the document.
+- The task is **stage, then place.** It places the staged document into its collection only after
+  the consumer's Save has succeeded, so Cancel before Save leaves nothing placed. The task holds
+  `blocksExit: true` until placement completes, then clears.
+- A stage or placement failure publishes `failed`, naming the document. Dismiss clears it
+  (existing).
 - Delivery stays with the per-pair drain loop and its task, which reports `remaining` after each
   pass.
 - `Uploads` does not import or publish `BackgroundTasks`.
@@ -86,14 +90,10 @@ Verified against the code on 2026-11-12:
 
 - `capture` adds the row at once from the File (name, kind from `AttachmentFormats`, content type,
   chosen-at) and the minted id. It no longer sets the list or the note's Save gate busy.
-- When the placement is known at Save (every update, and every Library topic), the row's address
-  is the placed id-form address, built by one `Attachments` operation from the topic's placement
-  ids and the minted document id. Save writes the record once; placement runs when staging
-  completes.
-- A new record in an owner-bucket topic (Customers, Users, Jobs) keeps the shipped path: create,
-  place, reconcile.
-- When Save precedes staging, placement waits for both the stage and the record write. The
-  attachment Save owns that wait.
+- Save keeps the shipped, recoverable path: the record is written with the staged addresses. The
+  upload task places each document after the record write and its stage have both completed, then
+  reconciles the record's reference to the placed address. Until then the row opens from the
+  staged address.
 - Cancel before any write attempt discards the editor's staging, including stages that complete
   after Close (existing rule).
 - `Attachments.file(attachment): Promise<File>` reads a document's bytes: it resolves the existing
@@ -159,6 +159,8 @@ The Detail aside adds and edits one document.
 - Choosing the document starts its upload task. Kind shows beside the chosen name. Name is
   read-only: the document is staged under the chosen file's name. No status text under the picker.
 - Save publishes the entry once and closes the aside. It does not wait for staging or delivery.
+  The upload task places the staged document after Save; the drain delivers it. An entry whose
+  task never places its document stays pending until removed.
 
 ```
 ┌─ Document details ─────────────────────── [Cancel] [Save] ┐
@@ -214,8 +216,8 @@ Documentation leads code. Each change below is made in the production, not in th
   sync that skipped one is not current.
 - **architecture-core §10.3, The Inbox and Its Drains:** `stage` gains only a supplied id; staging
   progress belongs to the consumer's read; Admin scheduling covers both pairs.
-- **architecture-core §10.4, The Catalog:** attachment Save writes final references once when the
-  placement is known at Save; a new owner-bucket record keeps create, place, reconcile.
+- **architecture-core §10.4, The Catalog:** attachment Save still writes staged references; the
+  upload task places after the record write and reconciles.
 - **Field Binder brief, inventory shape:** the entry shape, "Entry id survives file replacement",
   and "filename remains the uploaded file's name" are superseded by the Field Binder entry above.
 - **Field Binder brief, Field Binder Manager:** "Add stages a chosen file", "replaces the file
@@ -230,18 +232,18 @@ Documentation leads code. Each change below is made in the production, not in th
 
 Order: documentation, then `core/`, then consumers, then tests. Paths are under `source/`.
 
-| Files                                                                                    | Work                                                            |
-| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `core/cli/docstore-uploads.ts`                                                           | Optional `id` on `stage` (Escalation)                           |
-| `front/api/attachments.ts`                                                               | Supplied id, staging read with progress, placed address, `file` |
-| `front/app/shell/attachment-list.tsx`, `make-attachment-save.ts`                         | Immediate rows, staging tasks, single write when placed         |
-| `front/api/field-binder-inventory.ts`                                                    | Entry shape and `upload` container                              |
-| `front/api/field-binder-source.ts`                                                       | Publish once at Save; rename republishes                        |
-| `front/api/field-binder.ts`                                                              | Preparation from server presence; currency                      |
-| `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Source toggle, one document per Add, rows and pill              |
-| `front/app-admin/field-binder/` (one new file)                                           | Library picker                                                  |
-| `front/app-admin/document-drain.ts`, `app.tsx`                                           | One loop per pair                                               |
-| `tests/cases/`                                                                           | Supplied id, both consumers, drain per pair, preparation        |
+| Files                                                                                    | Work                                                       |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `core/cli/docstore-uploads.ts`                                                           | Optional `id` on `stage` (Escalation)                      |
+| `front/api/attachments.ts`                                                               | Supplied id, staging read with progress, `file`            |
+| `front/app/shell/attachment-list.tsx`, `make-attachment-save.ts`                         | Immediate rows; stage, then place after Save; reconcile    |
+| `front/api/field-binder-inventory.ts`                                                    | Entry shape and `upload` container                         |
+| `front/api/field-binder-source.ts`                                                       | Publish once at Save; place after Save; rename republishes |
+| `front/api/field-binder.ts`                                                              | Preparation from server presence; currency                 |
+| `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Source toggle, one document per Add, rows and pill         |
+| `front/app-admin/field-binder/` (one new file)                                           | Library picker                                             |
+| `front/app-admin/document-drain.ts`, `app.tsx`                                           | One loop per pair                                          |
+| `tests/cases/`                                                                           | Supplied id, both consumers, drain per pair, preparation   |
 
 Out of scope:
 
@@ -264,14 +266,14 @@ Escalate any change outside this scope.
   existing document; callers that pass no options behave as before.
 - Staging progress is reported by the consumer's read. An aborted read stages nothing.
 - The drain's task reports `remaining` after each pass, per pair.
-- Attachments: the row appears before staging completes. Note Save does not wait for staging. When
-  placement is known at Save, the record is written once.
+- Attachments: the row appears before staging completes. Note Save does not wait for staging.
+  Placement and reconciliation follow the record write. Cancel before Save places nothing.
 - Field Binder: each source adds one entry. Save returns before delivery. A pending entry is
   dimmed, subtitled "Pending", and never prepared. A delivered entry shows its name and locks
   `upload`. Rename changes the document's name and republishes. A failed task appears in the task
   list.
 - A sync that skipped an entry reports an update available.
-- `blocksExit` is true while staging and clears when staging completes or fails.
+- `blocksExit` is true from choice until placement completes, and clears on placement or failure.
 - CA verifies on screen with a slow source (a Drive-backed folder), after resetting stage storage.
 
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYLE_AUDIT.
@@ -284,8 +286,10 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   supplied id (CONVENTIONS §10.8). An id known at choose time lets the row, the reference, and the
   task exist before the bytes.
 - **Only `stage` changes in `core/`.** Progress comes from the consumer's read, and the drain's
-  existing per-pass result reports `remaining`. New owner-bucket records keep their shipped save
-  path rather than change the shared create contract.
+  existing per-pass result reports `remaining`.
+- **Placement follows Save.** The record keeps staged references until placement, which keeps a
+  save recoverable (architecture-core §10.4) and lets Cancel discard unplaced documents. The task
+  owns placement, so nothing else has to.
 - **Staging reads progressively but writes once.** The slow part is reading the File. Chunked
   storage would change locked `core/` to gain resume, which a reload defeats because the `File`
   does not survive it. Chunking belongs to the survey-map tier.
