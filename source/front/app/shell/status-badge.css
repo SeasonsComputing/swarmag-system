@@ -1,4 +1,10 @@
-/* Status graphic inherits UiBadge's variant color and the catalog glyph. */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Status badge icon                                                            ║
+║ Status graphic inherits UiBadge's variant color and the catalog glyph.       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 [data-app='status-badge'] [data-app='status-badge-icon'] {
   background: currentColor;
   block-size: var(--sa-space-md);
