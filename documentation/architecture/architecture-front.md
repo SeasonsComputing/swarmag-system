@@ -964,7 +964,7 @@ Dashboard owns footer placement; the supplied component owns content and brandin
 use `ShellPageView` and `ShellOverlayView` for route components, not rendered `UiComponent` values.
 All logo assets live flat in `front/app/assets/`. The style guide owns a separate local logo copy.
 Moved presentation imports generic helpers through `@ux/`; only co-located imports stay relative.
-`ConfigTable`, `PanelProbe`, and shell metadata remain generic UX modules. Configuration-property
+`ConfigTable` and shell metadata remain generic UX modules. Configuration-property
 semantics and existing Seasons Computing diagnostic attribution are unchanged by this split.
 
 _End of Architecture UX Document_

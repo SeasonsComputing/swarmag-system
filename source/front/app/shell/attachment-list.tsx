@@ -223,7 +223,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
                 onInput={event => setFilename(event.currentTarget.value)}
               />
             </UiField>
-            <UiFormActions justify='split'>
+            <UiFormActions>
               <UiButton variant='ghost' onClick={() => setRename(null)}>Cancel</UiButton>
               <UiButton
                 variant='primary'

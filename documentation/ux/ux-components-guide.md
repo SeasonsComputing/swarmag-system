@@ -1294,7 +1294,7 @@ update.
 
 ### 5.8 UiFormActions
 
-Right-aligned action row.
+Action row with its buttons at opposite ends.
 
 **Use When**
 
@@ -1302,9 +1302,10 @@ Use at the end of a form or dialog surface for submit and dismissal buttons.
 
 **Props**
 
-| Prop       | Type          | Required | Default | Description     |
-| ---------- | ------------- | -------- | ------- | --------------- |
-| `children` | `UiComponent` | yes      | —       | Action buttons. |
+| Prop       | Type               | Required | Default   | Description                                      |
+| ---------- | ------------------ | -------- | --------- | ------------------------------------------------ |
+| `children` | `UiComponent`      | yes      | —         | Action buttons.                                  |
+| `justify`  | `'split' \| 'end'` | no       | `'split'` | Buttons at opposite ends, or bunched at the end. |
 
 **Example**
 

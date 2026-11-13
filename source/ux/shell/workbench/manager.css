@@ -23,12 +23,6 @@
   margin: 0;
 }
 
-[data-shell='manager-confirmation-actions'] {
-  display: flex;
-  gap: var(--sa-space-sm);
-  justify-content: end;
-}
-
 [data-shell='manager-collapse-action'] {
   display: none;
 }

@@ -1293,7 +1293,6 @@
   border: var(--sa-border-card);
   border-radius: var(--sa-card-border-radius);
   box-shadow: var(--sa-shadow-card);
-  container-type: inline-size;
   inline-size: fit-content;
   inset-block-start: 50%;
   inset-inline-start: 50%;
@@ -1315,10 +1314,13 @@
 /* A workbench owns the block axis for the surface it hosts, so its content must
    fill it rather than size to content. The single row stretches the child, which
    keeps a page-level wrapper transparent to sizing — without it a wrapper with
-   auto height breaks the surface's percentage chain silently. */
+   auto height breaks the surface's percentage chain silently. Only these sizes
+   are query containers for their panels: containment freezes fit-content at its
+   minimum, so a content-sized dialog must not declare it. */
 [data-ui='dialog'][data-ui-size='workbench'],
 [data-ui='dialog'][data-ui-size='sheet'] {
   block-size: clamp(32rem, 85dvh, 42rem);
+  container-type: inline-size;
   display: grid;
   grid-template-rows: minmax(0, 1fr);
   overflow: visible;
@@ -1530,11 +1532,11 @@
   align-items: center;
   display: flex;
   gap: var(--sa-rhythm-gap);
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
-[data-ui='form-actions'][data-ui-justify='split'] {
-  justify-content: space-between;
+[data-ui='form-actions'][data-ui-justify='end'] {
+  justify-content: flex-end;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

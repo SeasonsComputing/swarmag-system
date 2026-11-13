@@ -123,7 +123,7 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
   /** Navbar element: cursor movement on one end, item lifecycle on the other. */
   const nav = (): UiComponent => (
     <div data-ui='collection-cursor-nav'>
-      <UiFormActions justify='split'>
+      <UiFormActions>
         <UiLayout variant='inline-fit' gap='tight'>
           <UiActionButton
             icon='chevron-left'

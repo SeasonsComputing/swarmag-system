@@ -44,7 +44,7 @@ import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
 import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
-import { UiActionButton, UiAlert, UiButton, UiDialog } from '@ux/ui'
+import { UiActionButton, UiAlert, UiButton, UiDialog, UiFormActions } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { CollectionTable } from './collection-table.tsx'
 import type { ManagerAction, ManagerCollectionAction, ManagerContract } from './manager-contract.ts'
@@ -425,7 +425,7 @@ export const Manager = <T extends Instance, Draft>(
               <Show when={actionError()}>
                 {message => <UiAlert variant='danger'>{message()}</UiAlert>}
               </Show>
-              <div data-shell='manager-confirmation-actions'>
+              <UiFormActions>
                 <UiButton disabled={actionPending()} onClick={() => setPendingAction(null)}>
                   Cancel
                 </UiButton>
@@ -437,7 +437,7 @@ export const Manager = <T extends Instance, Draft>(
                 >
                   {target().action.label}
                 </UiButton>
-              </div>
+              </UiFormActions>
             </div>
           </UiDialog>
         )}

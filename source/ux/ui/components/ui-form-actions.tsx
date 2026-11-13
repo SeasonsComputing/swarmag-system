@@ -12,8 +12,8 @@ grid — never nested inside an UiField.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 UiFormActionsJustify  UiFormActions justify options.
-UiFormActions         Action button row. Defaults to end-aligned; justify='split' pushes buttons to
-                      opposite ends.
+UiFormActions         Action button row. Defaults to split, with buttons at opposite ends;
+                      justify='end' bunches them at the end.
 
 COMPONENT PROPERTIES
 ───────────────────────────────────────────────────────────────────────────────

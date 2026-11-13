@@ -174,7 +174,7 @@ const LoginClient = (props: LoginClientProps) => {
                           required
                         />
                       </UiField>
-                      <UiFormActions justify='split'>
+                      <UiFormActions>
                         <UiActionButton
                           align='start'
                           icon='arrow-left'
