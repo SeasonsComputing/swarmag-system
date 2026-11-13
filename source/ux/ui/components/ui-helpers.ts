@@ -33,6 +33,10 @@ UiText               Text conversions for control values and display text.
 ├ relativeTime       Timestamp relative to now, in local time.
 ├ size               Bytes in decimal KB, MB, or GB, formatted for the locale.
 └ from               Number to text.
+
+BROWSER
+───────────────────────────────────────────────────────────────────────────────
+openInNewWindow      Open a secondary window, then point it at a URL resolved afterwards.
 */
 
 import type { When } from '@core/std'
@@ -247,4 +251,34 @@ export const UiText = {
   relativeTime,
   size,
   from
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// BROWSER
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Opens a secondary window and points it at a URL resolved afterwards.
+ *
+ * The window opens first, inside the user's gesture, because browsers block one
+ * opened after an await. A failure to resolve closes it and rethrows. The rule
+ * is shared; the copy is not. `blocked` is required so the wording stays with
+ * the consumer that knows what the window shows.
+ *
+ * @param resolveUrl Produces the URL once the window exists.
+ * @param blocked Message thrown when the browser refuses to open the window.
+ */
+export const openInNewWindow = async (
+  resolveUrl: () => Promise<string>,
+  blocked: string
+): Promise<void> => {
+  const viewer = globalThis.open('about:blank', '_blank')
+  if (!viewer) throw new Error(blocked)
+  viewer.opener = null
+  try {
+    viewer.location.href = await resolveUrl()
+  } catch (error) {
+    viewer.close()
+    throw error
+  }
 }
