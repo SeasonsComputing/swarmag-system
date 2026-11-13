@@ -1,9 +1,9 @@
 # Upload Tasks — Brief
 
-**Active; reviewed by ACE 2026-11-13, nothing blocks; amended once (After ACE review, at the
-end). Captured 2026-11-12.** Foundation mode: the upload lifecycle, its two consumers
-(attachments and the Field Binder), and their delivery scheduling. One change to locked `core/`,
-approved by the CA (Escalation). Records hold the reasons.
+**Active; in production; amended twice (After ACE review; After production review; at the end).
+Captured 2026-11-12.** Foundation mode: the upload lifecycle, its two consumers (attachments and
+the Field Binder), and their delivery scheduling. Two changes to locked `core/cli`, both approved
+by the CA (Escalation; After production review, item 1). Records hold the reasons.
 
 ## Escalation: supplied id on `stage` (approved)
 
@@ -20,6 +20,7 @@ async stage(file: File, options?: { id?: Id }): Promise<NodeMetadata<DocumentId>
   stage returns the complete document it wrote. The consumer mints one id per chosen document and
   never reuses it.
 
+_[Amended by the amendment "After production review", item 1: a second `core/` change.]_
 Nothing else in this brief changes `core/`.
 
 ## Purpose and dependencies
@@ -271,7 +272,8 @@ Order: documentation, then `core/`, then consumers, then tests. Paths are under 
 
 Out of scope:
 
-- any `core/` change beyond the supplied id on `stage`, including the create contract and
+- _[Amended by the amendment "After production review", item 1.]_
+  any `core/` change beyond the supplied id on `stage`, including the create contract and
   progress options
 - the docstore kernel, the providers, and the `BackgroundTasks` contract
 - `ux/`, `domain/`, and the edge functions
@@ -311,7 +313,8 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
 - **The id is supplied.** The application mints ids (domain-model §3.9), and the kernel accepts a
   supplied id (CONVENTIONS §10.8). An id known at choose time lets the row, the reference, and the
   task exist before the bytes.
-- **Only `stage` changes in `core/`.** Progress comes from the consumer's read, and the drain's
+- _[Amended by the amendment "After production review", item 1.]_
+  **Only `stage` changes in `core/`.** Progress comes from the consumer's read, and the drain's
   existing per-pass result reports `remaining`.
 - **Save waits for no transfer.** A slow read is the case this brief exists for, so Save cannot
   wait for staging. Save writes the placed address, which a supplied id makes known before the
@@ -345,8 +348,9 @@ in Production scope, Governing documents to amend, and Field Binder Manager.
 
 1. **Every upload takes the new path, creates included.** In Customers, Users, and Jobs the
    placed address contains the record's id. On a create, Save creates the record, builds the placed
-   addresses from its id and the documents' minted ids, updates the record, and returns. Save
-   waits for no transfer, and nothing rewrites the record after Save. `makeAttachmentSave` does
+   addresses from its id and the documents' minted ids, updates the record, and returns. The
+   create leaves out the attachments chosen in that edit; the update adds them. Save waits for no
+   transfer, and nothing rewrites the record after Save. `makeAttachmentSave` does
    this; the Managers and the Onboarding Wizard are unchanged. The attachment list has one mode.
 2. **Architecture-front is amended.** §7.2.4, Document Storage, and §10.1.2, swarmAg-suite
    foundation, were amended by the CA in `d23d8b4`: every upload is a background task placed after
@@ -355,5 +359,25 @@ in Production scope, Governing documents to amend, and Field Binder Manager.
 3. **Rows refresh on delivery.** The Manager re-reads its rows when the Binder drain's remaining
    count changes. There is no polling. A document uploaded from another device shows here when the
    Manager next loads.
+
+## Amendment — 2026-11-13 — After production review
+
+The CA's review of ACE's production settled four points. This amendment supersedes the marked
+items in Escalation, Production scope, and Records.
+
+1. **A draft attachment holds its real staged address.** `Uploads` gains one additive accessor
+   that returns a minted id's staging address (`Staging/Inbox/<id>`), in the form CONVENTIONS
+   §10.8 allows for an address written before its node exists. `Attachments.stage` writes that
+   address into the draft row. The topic recognizes a draft row with the existing
+   `Uploads.isStaged`. No sentinel address exists. This is the second and last change to
+   `core/cli`, approved by the CA.
+2. **The topic addresses; the task places.** `AttachmentTopic.address` gives each draft row its
+   placed address and records its destination; it moves no bytes. `UploadTask.place` and
+   `Uploads.place` move them. On a create in an owner-bucket topic, `address` without an owner
+   leaves out the attachments that need the record's id.
+3. **Delivery loops start together.** `DocumentDrain.start` starts both pairs' loops at once.
+4. **Cancel ends the task at once.** Abandoning an upload task clears its report and releases exit
+   responsibility immediately, even while its read is still running. The read is not aborted; the
+   staged copy is discarded when it completes.
 
 _End of Brief_
