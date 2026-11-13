@@ -27,7 +27,7 @@ UrlField       URL input and secondary-window open action.
 import { isUrl } from '@core/std'
 import type { UrlScheme } from '@core/std'
 import { createSignal } from '@solid-js'
-import { UiActionButton, UiField, UiInput, UiLayout } from '@ux/ui'
+import { UiActionButton, UiField, UiInput, UiLayout, UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './url-field.css'
@@ -72,7 +72,7 @@ export const UrlField = (props: UrlFieldProps): UiComponent => {
           label='Open URL'
           disabled={!valid()}
           onClick={() => {
-            if (valid()) globalThis.open(props.value.trim(), '_blank', 'noopener,noreferrer')
+            if (valid()) UiWindow.open(props.value.trim())
           }}
         />
       </UiField>

@@ -353,14 +353,6 @@ export const Manager = <T extends Instance, Draft>(
             error={collectionError()}
             headingActions={
               <>
-                <UiActionButton
-                  icon='plus'
-                  label={`New ${props.provider.entityLabel}`}
-                  labelMode='visible'
-                  density='dense'
-                  disabled={savePending() || actionPending()}
-                  onClick={onNew}
-                />
                 <For each={props.provider.collectionActions}>
                   {action => (
                     <UiActionButton
@@ -374,6 +366,14 @@ export const Manager = <T extends Instance, Draft>(
                     />
                   )}
                 </For>
+                <UiActionButton
+                  icon='plus'
+                  label={`New ${props.provider.entityLabel}`}
+                  labelMode='visible'
+                  density='dense'
+                  disabled={savePending() || actionPending()}
+                  onClick={onNew}
+                />
               </>
             }
             renderActions={item => (

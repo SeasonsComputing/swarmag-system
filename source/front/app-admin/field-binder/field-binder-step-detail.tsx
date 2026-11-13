@@ -61,7 +61,8 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
               accept={AttachmentFormats.accept(ATTACHMENT_KINDS)}
               disabled={props.context.busy() || state.pending()}
               error={validation.isInvalid('documentFile')}
-              onChange={async event => {
+              onInput={async event => {
+                // Reset before the text-field primitive reads it; file inputs cannot accept text.
                 const file = event.currentTarget.files?.[0]
                 event.currentTarget.value = ''
                 if (!file) return

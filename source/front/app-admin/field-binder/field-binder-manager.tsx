@@ -27,6 +27,7 @@ import { createQuery } from '@tanstack/solid-query'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { ManagerContract } from '@ux/shell/workbench/manager-contract.ts'
 import { Manager } from '@ux/shell/workbench/manager.tsx'
+import { UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { createFieldBinderState } from './field-binder-state.ts'
 import type { FieldBinderDraft, FieldBinderState } from './field-binder-state.ts'
@@ -34,6 +35,9 @@ import { FieldBinderStepDetail } from './field-binder-step-detail.tsx'
 
 /** The one report key for this Manager's source failures. */
 const SOURCE_FAILURE_KEY = 'field-binder-source-feedback'
+
+/** Shown when the browser refuses a secondary window; an expected failure, not a defect. */
+const BLOCKED_WINDOW = 'Allow a new browser tab to open this document.'
 
 /** Workbench route input, independent of the local reader. */
 export type FieldBinderManagerProps = { onCancel: () => void }
@@ -43,7 +47,7 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
   const source = api.FieldBinderSource
   const query = createQuery(() => ({
     queryKey: ['field-binder-source'],
-    queryFn: async () => await source.read() ?? null
+    queryFn: async () => await source.publication() ?? null
   }))
   let editor: FieldBinderState
   createEffect(() => {
@@ -53,7 +57,7 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
   })
   const provider: ManagerContract<FieldBinderEntry, FieldBinderDraft> = {
     formTitle: 'Field Binder Manager',
-    entityLabel: 'document',
+    entityLabel: 'Document',
     itemLabel: entry => entry.description,
     listColumns: [{
       label: 'Document',
@@ -72,33 +76,19 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     },
     create: draft => editor.save(draft),
     update: (_entry, draft) => editor.save(draft),
+    collectionActions: [{
+      name: 'open-inventory',
+      label: 'Inventory',
+      icon: 'external-link',
+      handler: () =>
+        openSourceWindow('Open Binder inventory', async () => (await source.inventoryLink()).url)
+    }],
     actions: [{
       name: 'open',
       label: 'Open source',
       icon: 'external-link',
-      handler: async entry => {
-        const viewer = globalThis.open('', '_blank')
-        if (!viewer) {
-          reportSourceFailure('Open Binder source', 'Allow a new browser tab to open this document.')
-          return
-        }
-        viewer.opener = null
-        try {
-          const link = await source.link(entry)
-          viewer.location.href = link.url
-        } catch (error) {
-          viewer.close()
-          reportSourceFailure(
-            'Open Binder source',
-            error instanceof Error ? error.message : 'Unable to open the document.'
-          )
-          if (!(error instanceof ApiError)) {
-            queueMicrotask(() => {
-              throw error
-            })
-          }
-        }
-      }
+      handler: entry =>
+        openSourceWindow('Open Binder source', async () => (await source.link(entry)).url)
     }, {
       name: 'remove',
       label: 'Remove',
@@ -141,6 +131,28 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     }
   }
   return <Manager provider={provider} onCancel={props.onCancel} />
+}
+
+/** Open a source document in a new window, reporting expected failures and surfacing the rest. */
+const openSourceWindow = async (
+  label: string,
+  resolveUrl: () => Promise<string>
+): Promise<void> => {
+  try {
+    await UiWindow.openResolved(resolveUrl, BLOCKED_WINDOW)
+  } catch (error) {
+    reportSourceFailure(
+      label,
+      error instanceof Error ? error.message : 'Unable to open the document.'
+    )
+    const expected = error instanceof ApiError
+      || (error instanceof Error && error.message === BLOCKED_WINDOW)
+    if (!expected) {
+      queueMicrotask(() => {
+        throw error
+      })
+    }
+  }
 }
 
 /** Publish a non-blocking failed report for a source operation. */

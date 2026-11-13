@@ -39,7 +39,8 @@ import {
   UiTableCell,
   UiTableHeader,
   UiTableRow,
-  UiText
+  UiText,
+  UiWindow
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { LabelCell } from './table-cells.tsx'
@@ -84,17 +85,12 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
   }
   const open = async (attachment: Attachment): Promise<void> => {
     if (busy()) return
-    const viewer = globalThis.open('about:blank', '_blank')
-    if (!viewer) {
-      setError('Allow a secondary window to open this attachment.')
-      return
-    }
-    viewer.opener = null
     try {
-      const link = await api.Attachments.link(attachment)
-      viewer.location.href = link.url
+      await UiWindow.openResolved(
+        async () => (await api.Attachments.link(attachment)).url,
+        'Allow a secondary window to open this attachment.'
+      )
     } catch (error) {
-      viewer.close()
       setError(error instanceof Error ? error.message : 'Unable to open attachment.')
     }
   }

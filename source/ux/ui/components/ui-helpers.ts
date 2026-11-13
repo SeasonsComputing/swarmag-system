@@ -36,7 +36,9 @@ UiText               Text conversions for control values and display text.
 
 BROWSER
 ───────────────────────────────────────────────────────────────────────────────
-openInNewWindow      Open a secondary window, then point it at a URL resolved afterwards.
+UiWindow             Secondary-window services.
+├ open               Open a URL already in hand in a secondary window.
+└ openResolved       Open a secondary window, then point it at a URL resolved afterwards.
 */
 
 import type { When } from '@core/std'
@@ -258,6 +260,18 @@ export const UiText = {
 // ────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Opens a URL already in hand in a secondary window, with no opener and no referrer.
+ *
+ * With `noopener` the browser returns no window even when one opened, so a
+ * refused window cannot be detected here and nothing is reported.
+ *
+ * @param url The absolute URL to open.
+ */
+const openWindow = (url: string): void => {
+  globalThis.open(url, '_blank', 'noopener,noreferrer')
+}
+
+/**
  * Opens a secondary window and points it at a URL resolved afterwards.
  *
  * The window opens first, inside the user's gesture, because browsers block one
@@ -268,7 +282,7 @@ export const UiText = {
  * @param resolveUrl Produces the URL once the window exists.
  * @param blocked Message thrown when the browser refuses to open the window.
  */
-export const openInNewWindow = async (
+const openWindowResolved = async (
   resolveUrl: () => Promise<string>,
   blocked: string
 ): Promise<void> => {
@@ -281,4 +295,10 @@ export const openInNewWindow = async (
     viewer.close()
     throw error
   }
+}
+
+/** Browser window services.ß */
+export const UiWindow = {
+  open: openWindow,
+  openResolved: openWindowResolved
 }

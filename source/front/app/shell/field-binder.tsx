@@ -14,7 +14,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 FieldBinderProps  Workbench route props.
 └ onCancel             Close the workbench.
-FieldBinder       View-only local document Lister and preparation status.
+FieldBinder       View-only local document Lister.
 */
 
 import { api } from '@front/api/api.ts'
@@ -23,9 +23,8 @@ import { onMount } from '@solid-js'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { CollectionContract } from '@ux/shell/workbench/collection-contract.ts'
 import { Lister } from '@ux/shell/workbench/lister.tsx'
+import { UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-
-import './field-binder.css'
 
 /** Reader route input; no editable-reader mode exists. */
 export type FieldBinderProps = { onCancel: () => void }
@@ -40,9 +39,14 @@ export const FieldBinder = (props: FieldBinderProps): UiComponent => {
       })
     })
   })
+  const open = (entry: FieldBinderEntry): Promise<void> =>
+    UiWindow.openResolved(
+      async () => (await binder.link(entry)).url,
+      'Allow a new browser tab to open this document.'
+    )
   const provider: CollectionContract<FieldBinderEntry> = {
     formTitle: 'Field Binder',
-    entityLabel: 'document',
+    entityLabel: 'Document',
     listColumns: [{
       label: 'Document',
       render: entry => (
@@ -60,25 +64,5 @@ export const FieldBinder = (props: FieldBinderProps): UiComponent => {
     listError: () => binder.store.error,
     refresh: () => binder.load()
   }
-  return (
-    <div data-app='field-binder'>
-      <p aria-live='polite'>{binder.status()}</p>
-      <Lister
-        provider={provider}
-        onCancel={props.onCancel}
-        activate={async entry => {
-          const viewer = globalThis.open('', '_blank')
-          if (!viewer) throw new Error('Allow a new browser tab to open this document.')
-          viewer.opener = null
-          try {
-            const link = await binder.link(entry)
-            viewer.location.href = link.url
-          } catch (error) {
-            viewer.close()
-            throw error
-          }
-        }}
-      />
-    </div>
-  )
+  return <Lister provider={provider} onCancel={props.onCancel} activate={open} />
 }

@@ -188,7 +188,7 @@ export class FieldBinder {
     this.#state[1]({ syncing: true, error: undefined, cleanupError: undefined, verifiedAt: undefined })
     try {
       await navigator.locks.request(PREPARATION_LOCK, async () => {
-        const publication = await this.#source.read()
+        const publication = await this.#source.publication()
         if (!publication) {
           throw new ApiError('The source has no published Field Binder to download.', 404)
         }
@@ -253,7 +253,7 @@ export class FieldBinder {
         } catch (error) {
           this.#state[1]({ cleanupError: `Binder prepared; cleanup failed: ${errorCopy(error)}` })
         }
-        const latest = await this.#source.read()
+        const latest = await this.#source.publication()
         const current = latest !== undefined
           && FieldBinderMetadata.address(latest.document.id) === snapshot.status.sourcePublication
         this.#state[1]({ updateAvailable: !current, verifiedAt: current ? when() : undefined })

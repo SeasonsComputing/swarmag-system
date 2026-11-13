@@ -18,7 +18,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 FieldBinderSource        Source operations over injected Uploads/inbox/server.
 ├ constructor            Bind the independent upload pair.
-├ read                   Capture the latest publication or report no inventory.
+├ publication            Capture the latest publication or report no inventory.
 ├ stage                  Capture using existing AttachmentFormats policy.
 ├ discard                Delegate staging discard to Uploads.
 ├ save                   Place/deliver a file and publish one entry.
@@ -61,7 +61,7 @@ export class FieldBinderSource {
   }
 
   /** Select by metadata time/UUID and capture bytes before returning a publication. */
-  async read(): Promise<FieldBinderPublication | undefined> {
+  async publication(): Promise<FieldBinderPublication | undefined> {
     let bucket: NodeMetadata<BucketId>
     try {
       bucket = await this.#server.bucket.resolve(FieldBinderMetadata.collection())
@@ -132,7 +132,7 @@ export class FieldBinderSource {
     if (stored.name.startsWith('.')) notValid('Binder entries cannot reference reserved metadata.')
     await this.#server.document.read(document)
     const placed = { ...entry, documentAddress: FieldBinderMetadata.address(document) }
-    const current = await this.read()
+    const current = await this.publication()
     checkBaseline(current, baseline)
     const entries = [...(current?.inventory.entries ?? [])]
     const index = entries.findIndex(item => item.id === placed.id)
@@ -145,7 +145,7 @@ export class FieldBinderSource {
   /** Removal changes source membership and leaves captured preparations' files intact. */
   async remove(entryId: Id, baseline?: string): Promise<void> {
     this.#warning[1](undefined)
-    const current = await this.read()
+    const current = await this.publication()
     checkBaseline(current, baseline)
     if (!current?.inventory.entries.some(entry => entry.id === entryId)) {
       throw new ApiError('This Binder entry is no longer in the source collection.', 404)
@@ -162,6 +162,13 @@ export class FieldBinderSource {
     const metadata = await this.#server.document.get(document)
     if (metadata.name.startsWith('.')) notValid('Binder entries cannot open reserved metadata.')
     return await this.#server.document.link(document)
+  }
+
+  /** A temporary link to the current inventory document, for inspection. */
+  async inventoryLink(): Promise<DocumentLink> {
+    const publication = await this.publication()
+    if (publication === undefined) throw new ApiError('No Binder inventory has been published yet.', 404)
+    return await this.#server.document.link(publication.document.id)
   }
 
   /** Cleanup is distinct from whether a new publication was committed. */
