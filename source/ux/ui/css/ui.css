@@ -1549,9 +1549,12 @@
   background: var(--sa-shell-bg);
   border-block-start: var(--sa-shell-border);
   box-shadow: var(--sa-shell-shadow);
+  block-size: var(--sa-size-bar);
+  box-sizing: content-box;
   display: flex;
   justify-content: center;
-  padding-block: var(--sa-space-md) max(var(--sa-space-md), env(safe-area-inset-bottom));
+  /* The safe area extends the bar only past the space its bottom pad once covered. */
+  padding-block: 0 max(0px, calc(env(safe-area-inset-bottom) - var(--sa-space-md)));
 }
 
 [data-ui='footer-logo'] {

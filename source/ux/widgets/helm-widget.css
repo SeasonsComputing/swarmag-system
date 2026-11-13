@@ -21,8 +21,7 @@
   width: fit-content;
 }
 
-/* Stacked header: the field spans its own row, so actions center within it. */
-@container dashboard-header (max-width: 610px) {
+@container dashboard-header (max-width: 510px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
     justify-content: center;

@@ -18,7 +18,6 @@
 
 [data-shell='dashboard-header'] {
   --dashboard-header-field-short: var(--sa-touch-target-sm);
-  --dashboard-header-field-tall: calc(var(--sa-touch-target-sm) * 2);
   backdrop-filter: var(--sa-shell-filter);
   container: dashboard-header / inline-size;
   background: var(--sa-shell-bg);
@@ -43,6 +42,7 @@
   justify-content: flex-start;
   margin-inline: auto;
   max-inline-size: var(--sa-size-lg);
+  min-block-size: var(--sa-size-bar);
   min-inline-size: 0;
 }
 
@@ -57,8 +57,10 @@
 }
 
 /* Stacked header: brand and terminal fields no longer share a row. */
-/* Threshold is the width below which brand + gap + dense actions stop fitting. */
-@container dashboard-header (max-width: 610px) {
+/* Threshold is the width below which the compact brand cluster + gap + dense
+   actions stop fitting. A container query cannot take a token, so a changed
+   threshold must be repeated in helm-widget.css and the app's brand-widget.css. */
+@container dashboard-header (max-width: 510px) {
   [data-shell='dashboard-header-contents'] {
     flex-wrap: wrap;
   }
