@@ -295,17 +295,23 @@ by the target storage contract through packaging (architecture-devops §14); fea
 logical document and destination bucket identities, not physical object keys.
 
 Consumers own save ordering and staged-file lifetime; Uploads owns neither form state nor scheduling.
-Admin's DocumentDrain calls `api.AttachmentsUploads.drain()`. The application root starts the loop
-after bootstrap; the loop owns session eligibility, Web Lock exclusion, and retry pacing. Binder
-preparation and delivery are independently bound application operations.
+Every upload is a background task: the consumer mints the document id when the document is chosen,
+stages it with progress, and places it after Save; Save waits for no transfer. Admin's
+DocumentDrain runs one loop per pair, over `api.AttachmentsUploads` and `api.FieldBinderUploads`,
+each with its own lock name and task key. The application root starts the loops after bootstrap;
+each loop owns session eligibility, Web Lock exclusion, and retry pacing. Binder preparation is an
+independently bound application operation.
 
 Every app composes the local Binder binding. App roots register their own reader/Manager routes,
 commands, and preparation triggers. Admin manages the remote source; the Binder reader uses only
 its complete local mirror. A shared API binding does not grant a role remote access or register
 an editable reader. Remote access is governed by storage policies.
 
-Admin registers `/field-binder-manager` with the stock Manager and one Detail step for file,
-description, and optional source URL. `/field-binder` uses the read-only Lister over local bytes.
+Admin registers `/field-binder-manager` with the stock Manager and one Detail step: on Add, a
+Source toggle (Upload, Library, URL) chooses the document; the step shows its name and kind and
+edits its description and source URL. Edit renames the document and never replaces it. A row is
+pending until its document is on the server. `/field-binder` uses the read-only Lister over local
+bytes.
 Its app-root Helm binding supplies Manager, Binder, Sync, and reactive status through the existing
 widget maker. Sync is explicit and reports its preparation state through BackgroundTasks; saving
 a source entry does not implicitly prepare the local reader. Binder consumes its own Uploads
@@ -608,12 +614,13 @@ and `session-coordinator.ts`.
 
 `NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
 `notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
-`drill: DrillContract`, and `attach`, which stages a chosen file (`Attachments.stage`), with
-optional `attachmentKinds`. It edits Content and the note's attachments, and preserves existing
-timestamps. It never persists. Its host's `makeAttachmentSave` delegate owns the staged-file
-lifetime and record writes, places attachments through the topic's `place`, and reconciles the
-record and editor references. The topic selects the destination and delegates document placement
-to Uploads; the editor does not schedule delivery.
+`drill: DrillContract`, and `attach`, which adds a chosen file's row at once and starts its upload
+task, with optional `attachmentKinds`. It edits Content and the note's attachments, and preserves
+existing timestamps. It never persists. Its host's `makeAttachmentSave` delegate owns the upload
+tasks and record writes. When the placed address is known at choice (every update, and New in a
+Library topic), Save writes it once and the task places after Save. A new record in an owner-bucket
+topic keeps create, place, reconcile. The topic selects the destination and delegates document
+placement to Uploads; the editor does not schedule delivery.
 
 #### 10.1.3 Stays in the app
 
