@@ -24,7 +24,7 @@ import { createSignal, onCleanup } from '@solid-js'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
 import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.ts'
-import { UiField, UiInput, UiLayout } from '@ux/ui'
+import { UiField, UiLayout, UiTextArea } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 /** Controlled label references on one Chemical draft. */
@@ -118,7 +118,7 @@ const LabelPanel = (props: LabelPanelProps): UiComponent => {
         error={attempted() && !isUrl(url().trim(), ['https', 'http'])}
       />
       <UiField label='Description' for='label-description'>
-        <UiInput
+        <UiTextArea
           name='label-description'
           value={description()}
           onInput={event => setDescription(event.currentTarget.value)}
