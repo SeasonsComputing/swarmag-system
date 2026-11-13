@@ -230,11 +230,10 @@ attaches and shares documents; field capture and its upload are the Ops applicat
 - **Durable upload lifecycle and root binding** — closed 2026-11-11, `07a6ce5` and the closing
   commit, `effort/completed/2026-11-11-upload-brief.md`: `Uploads` in `core/cli`, composed per
   inbox/server pair, and `SupabaseDocumentProvider` bound to a configured native root from one
-  storage target contract. The stage transition and on-screen acceptance are backlog B-46. This
-  is distinct from the closed Upload feature below.
-- **Stage on its storage roots** — backlog B-46: provision the attachment and Field Binder roots,
-  apply the materialized policies, dispose of the legacy namespace buckets, and accept attaching
-  in Admin. The CA runs it; it precedes the Field Binder's stage verification.
+  storage target contract. This is distinct from the closed Upload feature below.
+- **Stage on its storage roots** — closed 2026-11-12: the attachment and Field Binder roots are
+  provisioned, the materialized policies applied, and the legacy namespace buckets disposed of.
+  The CA ran it and accepted attaching in Admin.
 - **Background Tasks and Helm menus** — active,
   `effort/active/2026-11-10-background-tasks-brief.md`: application-bound command menus and task
   reporting; uses attachment delivery first and supplies the Binder's command fitting.
@@ -258,6 +257,10 @@ store shared:
    independent remote source through its own upload pair; the reader opens a completely prepared
    local mirror. Files enter by upload. Depends on root binding and Helm menus above; Ops route
    and preparation-trigger integration is M-9's.
+5. **Upload Tasks** — active, `effort/active/2026-11-12-upload-tasks-brief.md`: both uploads run
+   as background tasks; a chosen file is a row at once, staging and delivery report progress, and
+   the Binder publishes an entry when its document is delivered. Supersedes the Field Binder's
+   Save sequence and the attachment-only `DocumentDrain`.
 
 **Rides along:**
 
