@@ -51,9 +51,12 @@ const [taskStore, setTaskStore] = createStore<Dictionary<BackgroundTask>>({})
 
 /** Transient reporting operations; no execution or scheduling callbacks. */
 export const BackgroundTasks = {
+  /** Task store. */
   get store(): Readonly<Dictionary<BackgroundTask>> {
     return taskStore
   },
+
+  /** Publish a task. */
   publish(key: string, task: BackgroundTask): void {
     readBackgroundTaskString(key, 'Task key')
     readBackgroundTaskString(task.label, 'Task label')
@@ -81,6 +84,8 @@ export const BackgroundTasks = {
     }
     setTaskStore(reconcile({ ...unwrap(taskStore), [key]: report }))
   },
+
+  /** Clear task. */
   clear(key: string): void {
     readBackgroundTaskString(key, 'Task key')
     const reports = { ...unwrap(taskStore) }
