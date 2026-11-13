@@ -2,7 +2,7 @@
 
 **Active, undispatched draft; captured 2026-11-12.** Foundation mode: the upload lifecycle in
 locked `core/cli`, its two consumers (attachments and the Field Binder), and their delivery
-scheduling. Two CA decisions remain before dispatch (Decisions). Trailing records hold the reasons.
+scheduling. Its two CA decisions are settled (Decisions). Trailing records hold the reasons.
 
 ## Purpose and dependencies
 
@@ -110,15 +110,16 @@ async drain(options?: DrainOptions): Promise<{ drained: number; remaining: numbe
 
 ## Decisions
 
-Recommended answers are the target above. The CA decides both before dispatch.
+Both are decided; the target above reflects them.
 
-1. **Where a pending Binder entry is durable.** Recommended: in the published inventory, with an
-   entry state, and preparation skips pending entries. Alternative: Admin-local, in the
-   FieldBinderInbox, published only on delivery.
-2. **How Binder delivery is scheduled.** Recommended: `DocumentDrain` runs one loop per pair,
-   each with its own lock name and task key, and the Binder's completion runs after each binder
-   pass. There is still no universal drain (architecture-core §10.2.2). Alternative: keep binder
-   delivery app-invoked, run as a task.
+1. **Where a pending Binder entry is durable.** Decided: in the published inventory, with an
+   entry state, and preparation skips pending entries.
+2. **How Admin schedules Binder delivery.** Decided: Admin's `DocumentDrain` runs one loop per
+   pair, each with its own lock name and task key, and the Binder's completion runs after each
+   binder pass. There is still no universal drain (architecture-core §10.2.2). Binder uploads
+   occur only in Admin, where the Manager lives. Delivery scheduling remains each app's
+   (architecture-core §10.3): Ops stays offline and delivers at base through its deliberate job
+   upload, with no loop.
 
 ## Governing documents to amend
 
@@ -196,6 +197,14 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   entry must not reach preparation before its document is delivered. Attachments do not need this,
   because access follows the document from the inbox. The upload is the same for both; publication
   is the Binder's additional consumer of delivery.
+- **2026-11-12 — Decision 1 settled.** The CA agreed that a pending Binder entry is durable in the
+  published inventory. The Admin-local alternative, held in FieldBinderInbox until delivery, was
+  not taken.
+- **2026-11-12 — Decision 2 settled, scoped to Admin.** The CA noted that Ops is offline. Ops runs
+  no drain loop and never uploads Binder files, so the decision concerns Admin's scheduling only.
+  The task pattern (an immediate row, staging progress) is independent of scheduling and applies to
+  Ops capture when Ops adopts it. The alternative, app-invoked Binder delivery run as a task, was
+  not taken.
 - **Why reclamation is out of scope.** An atomic write leaves no partial documents. What remains is
   a reference to a document that never arrived, presented as failed here, and unreferenced bytes,
   already a separate responsibility in architecture-core §10.3.
