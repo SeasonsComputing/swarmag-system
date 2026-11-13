@@ -32,7 +32,16 @@ import { onCleanup, Show } from '@solid-js'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
-import { UiField, UiFieldset, UiInput, UiLayout, UiText, UiToggleGroup, UiToggleItem } from '@ux/ui'
+import {
+  UiField,
+  UiFieldset,
+  UiInput,
+  UiLayout,
+  UiText,
+  UiTextArea,
+  UiToggleGroup,
+  UiToggleItem
+} from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { FieldBinderLibraryPicker } from './field-binder-library-picker.tsx'
 import type { FieldBinderState } from './field-binder-state.ts'
@@ -88,71 +97,64 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
   )
   return (
     <form ref={form} inert={props.context.busy()} onSubmit={event => event.preventDefault()}>
-      <UiFieldset legend='Document'>
-        <UiLayout>
-          <Show
-            when={state.adding}
-            fallback={
-              <UiField label='Upload' variant='caption'>
-                <p>{uploadLine(props.state)}</p>
-              </UiField>
-            }
-          >
-            <UiField label='Source' variant='caption'>
+      <UiLayout>
+        <UiFieldset legend='Source'>
+          <UiLayout>
+            <Show
+              when={state.adding}
+              fallback={
+                <UiField label='Upload' variant='caption'>
+                  <p>{uploadLine(props.state)}</p>
+                </UiField>
+              }
+            >
               <UiToggleGroup
                 value={state.source()}
                 disabled={props.context.busy()}
-                onChange={(value: FieldBinderUploadSource) => {
-                  state.setSource(value)
-                  validation.changeField('document')
-                }}
+                onChange={(value: FieldBinderUploadSource) => state.setSource(value)}
               >
                 <UiToggleItem value='upload'>Upload</UiToggleItem>
                 <UiToggleItem value='library'>Library</UiToggleItem>
                 <UiToggleItem value='url'>URL</UiToggleItem>
               </UiToggleGroup>
-            </UiField>
-          </Show>
-          <Show when={urlEditable()}>
-            <UrlField
-              name='sourceUrl'
-              label='Source URL'
-              schemes={['http', 'https']}
-              required
-              value={state.url()}
-              onValue={value => {
-                state.setUrl(value)
-                validation.inputField('sourceUrl')
-              }}
-              onBlur={() => validation.blurField('sourceUrl')}
-              error={validation.isInvalid('sourceUrl')}
-            />
-          </Show>
-          <Show when={state.adding}>
-            <Show
-              when={state.source() === 'library'}
-              fallback={chooseFile}
-            >
-              <FieldBinderLibraryPicker
-                disabled={props.context.busy()}
-                onChoose={(name, read, record) => choose(() => state.choose(name, read, record))}
+            </Show>
+            <Show when={urlEditable()}>
+              <UrlField
+                name='sourceUrl'
+                label='Source URL'
+                schemes={['http', 'https']}
+                required
+                value={state.url()}
+                onValue={value => {
+                  state.setUrl(value)
+                  validation.inputField('sourceUrl')
+                }}
+                onBlur={() => validation.blurField('sourceUrl')}
+                error={validation.isInvalid('sourceUrl')}
               />
             </Show>
-            <UiField label='Name' variant='caption'>
-              <p>
-                {state.name()
-                  ? `${state.name()} · ${UiText.label(state.kind() ?? 'document')}`
-                  : 'No document chosen.'}
-              </p>
-            </UiField>
-          </Show>
-          <Show when={state.delivered}>
-            <UiField for='name' label='Name' required>
+            <Show when={state.adding}>
+              <Show
+                when={state.source() === 'library'}
+                fallback={chooseFile}
+              >
+                <FieldBinderLibraryPicker
+                  disabled={props.context.busy()}
+                  onChoose={(name, read, record) => choose(() => state.choose(name, read, record))}
+                />
+              </Show>
+            </Show>
+          </UiLayout>
+        </UiFieldset>
+        <UiFieldset legend='Document'>
+          <UiLayout>
+            <UiField for='name' label='Name' required={state.delivered}>
               <UiInput
                 name='name'
                 value={state.name()}
-                required
-                disabled={props.context.busy()}
+                placeholder='No document chosen.'
+                required={state.delivered}
+                disabled={props.context.busy() || !state.delivered}
                 error={validation.isInvalid('name')}
                 onInput={event => {
                   state.setName(event.currentTarget.value)
@@ -161,23 +163,23 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
                 onBlur={() => validation.blurField('name')}
               />
             </UiField>
-          </Show>
-          <UiField for='description' label='Description' required>
-            <UiInput
-              name='description'
-              value={state.description()}
-              required
-              disabled={props.context.busy()}
-              error={validation.isInvalid('description')}
-              onInput={event => {
-                state.setDescription(event.currentTarget.value)
-                validation.inputField('description')
-              }}
-              onBlur={() => validation.blurField('description')}
-            />
-          </UiField>
-        </UiLayout>
-      </UiFieldset>
+            <UiField for='description' label='Description' required>
+              <UiTextArea
+                name='description'
+                value={state.description()}
+                required
+                disabled={props.context.busy()}
+                error={validation.isInvalid('description')}
+                onInput={event => {
+                  state.setDescription(event.currentTarget.value)
+                  validation.inputField('description')
+                }}
+                onBlur={() => validation.blurField('description')}
+              />
+            </UiField>
+          </UiLayout>
+        </UiFieldset>
+      </UiLayout>
     </form>
   )
 }
