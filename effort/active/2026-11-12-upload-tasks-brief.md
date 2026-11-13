@@ -1,14 +1,39 @@
 # Upload Tasks — Brief
 
-**Active, undispatched draft; captured 2026-11-12.** Foundation mode: the upload lifecycle in
-locked `core/cli`, its two consumers (attachments and the Field Binder), and their delivery
-scheduling. Its two CA decisions are settled (Decisions). Trailing records hold the reasons.
+**Active, undispatched draft; captured 2026-11-12, Field Binder design revised 2026-11-13.**
+Foundation mode: the upload lifecycle in locked `core/cli`, its two consumers (attachments and the
+Field Binder), and their delivery scheduling. Its CA decisions are settled (Decisions). Its one
+`core/` change is an escalation and a prerequisite (below). Trailing records hold the reasons.
+
+## Escalation: supplied id (prerequisite)
+
+The whole design rests on a document id minted by the client before upload. `Uploads.stage` mints
+the id inside the store, so this brief requires one change to locked `core/cli`, under strict
+scrutiny and CA approval before any other production:
+
+```ts
+async stage(file: File, options?: { id?: Id }): Promise<NodeMetadata<DocumentId>>
+```
+
+- **It corrects `Uploads`.** The application mints ids (domain-model §3.9), and the kernel already
+  accepts a supplied id (`suppliedId ?? id()`, CONVENTIONS §10.8). `Uploads` is the one layer that
+  withholds it.
+- **The need is general.** Any offline-first consumer that shows a document before its bytes land
+  needs the identity first: the row, the reference, and the task key.
+- **Without it, every consumer remaps.** A temporary key swapped for the real id after staging
+  changes a row's identity mid-life and rekeys its task, in every consumer.
+- **It is additive.** One optional field. Omitted, `stage` behaves as before. No provider, kernel,
+  or drain change.
+- **Confirm before production:** the kernel refuses a create whose id exists. If it does not,
+  stop and escalate; that is a separate core question.
+
+Nothing else in this brief changes `core/`. Progress is the consumer's (Upload tasks).
 
 ## Purpose and dependencies
 
-A chosen file is transfer work: staging reads it into the inbox, delivery copies it to the server.
-Neither holds the UI. A chosen file appears at once as a row, its transfer runs as a background
-task with progress, and its result shows on its reference: pending, done, or failed.
+Every upload is a background task. A chosen document is transfer work: staging reads it into the
+inbox, delivery copies it to the server. Neither holds the UI. Choosing a document starts its task;
+the form closes on Save; the task reports progress and failure; the consumer's row reflects it.
 
 Both upload consumers adopt this one pattern:
 
@@ -40,44 +65,34 @@ Verified against the code on 2026-11-12:
   with the picker disabled. Save refuses while staging is pending, then places, calls
   `drain()` inline, verifies the server copy, and publishes the inventory
   (`front/api/field-binder-source.ts:105`).
+- Field Binder entries carry `description`, `url`, `documentAddress`, `createdAt`, and `updatedAt`
+  (`front/api/field-binder-inventory.ts:81`). Nothing reads the two timestamps. The row title is
+  the description; Edit offers Choose File to replace the document.
 - Admin's `DocumentDrain` (`front/app-admin/document-drain.ts`) drains the attachment pair only.
 
 ## Target design
 
 ### Identity before bytes
 
-The consumer mints the document's id with `id()` when the file is chosen and supplies it to
-`stage`. The store still produces the `DocumentId`. `place` and the drain already keep the UUID, so
-the row, the reference, and the task key exist before any byte moves.
+The consumer mints the document's id with `id()` when the document is chosen and supplies it to
+`stage` (Escalation). The store still produces the `DocumentId`. `place` and the drain already
+keep the UUID, so the row, the reference, and the task key exist before any byte moves.
 
-### Uploads: additive options
+### Upload tasks
 
-```ts
-export type StageOptions = {
-  id?: Id
-  progress?: (read: number, total: number) => void
-}
-export type DrainOptions = {
-  progress?: (drained: number, remaining: number) => void
-}
-
-async stage(file: File, options?: StageOptions): Promise<NodeMetadata<DocumentId>>
-async drain(options?: DrainOptions): Promise<{ drained: number; remaining: number }>
-```
-
-- `stage` reads `file.stream()`, reports bytes read against `file.size`, and writes the document
-  in one `document.create` with the assembled Blob. Storage is not chunked. An interrupted stage
-  writes nothing.
-- `drain` reports after each delivered document. Delivery progress is per document, not per byte.
-- Existing callers are unchanged. `Uploads` does not import or publish `BackgroundTasks`.
-
-### Transfer tasks
-
-- Choosing a file publishes a staging task keyed by its document id, with
+- Choosing a document publishes a staging task keyed by its document id, with
   `progress: { completed, total, unit: 'bytes' }` and `blocksExit: true`. A chosen `File` does not
   survive a reload, so an interrupted stage cannot be recovered.
-- On completion the staging task clears. On failure it publishes `failed` with error text.
-- Delivery stays with the per-pair drain and its existing task (Decisions, item 2).
+- The consumer reads `file.stream()`, reports bytes read against `file.size`, assembles the Blob,
+  and stages it as a File with the minted id. `stage` writes it in one `document.create`. Storage
+  is not chunked. An interrupted read stages nothing.
+- On completion the staging task clears. On failure it publishes `failed` with error text naming
+  the document.
+- Delivery stays with the per-pair drain and its existing task (Decisions, item 2). The task
+  reports `remaining` from each pass's existing `{ drained, remaining }` result.
+- `Uploads` does not import or publish `BackgroundTasks`.
+- Progress and failure live in the task list, on the device that runs the task. A consumer's row
+  reflects only what its record knows.
 
 ### Attachments
 
@@ -94,23 +109,96 @@ async drain(options?: DrainOptions): Promise<{ drained: number; remaining: numbe
 - A row whose document is in neither the inbox nor the server shows as failed, with Remove. It is
   never shown as an error page or a broken link.
 
-### Field Binder
+### Field Binder entry
 
-- Add takes `multiple` files, labelled "Add files" as attachments' picker is. Each file creates
-  one entry with its own row immediately. Description defaults to the filename. The bare status
+```ts
+export type FieldBinderEntry = Instance & {
+  description: string
+  documentAddress: string
+  state: 'pending' | 'delivered'
+  upload: FieldBinderUpload
+}
+
+export type FieldBinderUpload = {
+  source: 'upload' | 'library' | 'url'
+  kind: AttachmentKind
+  uploadedAt?: When                          // set on delivery
+  url?: string                               // source 'url'
+  record?: { topic: LibraryTopic; id: Id }   // source 'library'
+}
+```
+
+- **Name** is the document's own name. It lives only on the document, starts as the chosen file's
+  name, and changes by rename. The inventory never carries it.
+- **Description** is inventory metadata, the title people read.
+- **`upload`** records how the document arrived. It is editable until the entry is created, except
+  `url`, which stays editable while the entry is pending. On delivery the container is read-only.
+- An entry's document is never replaced. Rename is the only change to a document.
+- `createdAt` and `updatedAt` are removed. The inventory's `schemaVersion` becomes 2.
+
+### Field Binder Manager
+
+The Detail aside adds and edits one document. Add no longer takes `multiple`.
+
+```
+┌─ Add document ─────────────────────────── [Cancel] [Save] ┐
+│  Source       [ Upload | Library | URL ]                   │
+│                                                            │
+│  Upload   →   [Choose file]  DJI-drone-XX-YY-.pdf · PDF    │
+│  Library  →   [Choose from library]  Roundup PowerMAX · SDS│
+│  URL      →   Source URL* [https://…                ] [↗]  │
+│               [Choose file]  sds-download.pdf · PDF        │
+│                                                            │
+│  Name*        [DJI-drone-XX-YY-.pdf                     ]  │
+│  Description* [Drone parts list                         ]  │
+└────────────────────────────────────────────────────────────┘
+```
+
+- The Source toggle sets `upload.source`. Only the document row changes with it.
+- **Upload:** Choose File.
+- **Library:** a picker over the Library namespace's attachments, topic → record → document
+  (Index-Detail). The chosen document is downloaded from AttachmentsServer and staged into
+  FieldBinderUploads as a File. The Binder always holds copies.
+- **URL:** Source URL, Open (↗), and Choose File. The person opens the address, saves the file,
+  and chooses it. The browser never fetches the source.
+- Choosing the document starts its upload task. Kind shows beside the chosen name. The bare status
   text under the picker is removed.
-- Save does not wait for staging or delivery. It publishes the entry in the `pending` state
-  (Decisions, item 1).
+- Save publishes the entry as `pending` and closes the aside. It does not wait for staging or
+  delivery (Decisions, item 1).
+
+```
+┌─ Document details ─────────────────────── [Cancel] [Save] ┐
+│  Upload       URL · PDF · 2026-11-13                       │
+│               https://dji.com/…/parts-list.pdf        [↗]  │
+│  Name*        [DJI-drone-XX-YY-.pdf                     ]  │
+│  Description* [Drone parts list                         ]  │
+└────────────────────────────────────────────────────────────┘
+```
+
+- Edit shows `upload` as a read-only line: source, kind, and the upload date, or "Pending". While
+  pending, Source URL is editable.
+- Changing Name renames the document. Save republishes the inventory, so Sync sees a new
+  publication.
+- Edit has no document control.
+
+Collection rows:
+
+- Title: the description. Subtitle: the document's name. Pill: the source, Uploaded, Library, or
+  URL.
+- A pending row is dimmed. A delivered row is plain. Both states come from the inventory and read
+  the same on every device.
+- Remove is available on every row. A pending entry whose task failed stays pending until removed.
+
+Publication and preparation:
+
 - When an entry's document is delivered and verified on FieldBinderServer, the entry is
-  republished as delivered. The existing stale-baseline comparison applies to that publication.
+  republished as `delivered` with `upload.uploadedAt`. The existing stale-baseline comparison
+  applies to that publication.
 - Preparation includes delivered entries only. A pending entry never reaches a reader.
-- A pending entry whose document is absent from this device's inbox and from the server shows as
-  failed in the Manager, with Remove.
-- The Manager shows entry state as a pill: Pending, Uploaded, or Failed.
 
 ## Decisions
 
-Both are decided; the target above reflects them.
+All are decided; the target above reflects them.
 
 1. **Where a pending Binder entry is durable.** Decided: in the published inventory, with an
    entry state, and preparation skips pending entries.
@@ -120,6 +208,10 @@ Both are decided; the target above reflects them.
    occur only in Admin, where the Manager lives. Delivery scheduling remains each app's
    (architecture-core §10.3): Ops stays offline and delivers at base through its deliberate job
    upload, with no loop.
+3. **How a Binder document arrives.** Decided: by Upload, Library, or URL, chosen with the Source
+   toggle and recorded in the entry's `upload` container.
+4. **How a failed Binder upload shows.** Decided: in the task list only. The row does not infer
+   failure.
 
 ## Governing documents to amend
 
@@ -128,8 +220,14 @@ Documentation leads code. Each change below is made in the production, not in th
 - **architecture-core §10.3:** stage takes a supplied id and reports progress; Save writes final
   references before placement; Admin scheduling covers both pairs (per item 2).
 - **architecture-core §10.2.2:** preparation includes delivered entries only (per item 1).
+- **Field Binder brief, inventory shape:** the entry shape, "Entry id survives file replacement",
+  and "filename remains the uploaded file's name" are superseded by the Field Binder entry above.
+- **Field Binder brief, Field Binder Manager:** "Add stages a chosen file", "replaces the file
+  under the same entry id", and the one-step Choose File presentation are superseded.
 - **Field Binder brief, Publication and Save:** steps 1–2 and "Save requires signal and delivery"
   are superseded.
+- **Field Binder brief, Records 2026-11-11 "one Field Binder":** the Source toggle's withdrawal is
+  reversed; the toggle returns as Upload, Library, URL.
 - **Background Tasks brief, First consumer:** "owns the attachment pair only" is superseded (per
   item 2).
 
@@ -139,36 +237,41 @@ Paths are under `source/`.
 
 | Files                                                                                     | Work                                                        |
 | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `core/cli/docstore-uploads.ts`                                                            | Additive `StageOptions` and `DrainOptions`                  |
-| `front/api/attachments.ts`                                                                | Supplied id, progress passthrough, placed address operation |
+| `core/cli/docstore-uploads.ts`                                                            | Optional `id` on `stage` (Escalation; first, on approval)   |
+| `front/api/attachments.ts`                                                                | Supplied id, staging read with progress, placed address     |
 | `front/app/shell/attachment-list.tsx`, `make-attachment-save.ts`                          | Immediate rows, staging tasks, single record write          |
-| `front/api/field-binder-inventory.ts`                                                     | `FieldBinderEntry` state; inventory schema version          |
-| `front/api/field-binder-source.ts`                                                        | Publish pending, then delivered                             |
-| `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Multiple files, immediate rows, state pill                  |
+| `front/api/field-binder-inventory.ts`                                                     | Entry shape, `upload` container, schema version 2           |
+| `front/api/field-binder-source.ts`                                                        | Publish pending, then delivered; rename republishes         |
+| `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Source toggle, one document per Add, rows and pill          |
+| `front/app-admin/field-binder/` (new file)                                                | Library picker                                              |
 | `front/api/field-binder.ts`                                                               | Preparation includes delivered entries only                 |
 | `front/app-admin/document-drain.ts`, `app.tsx`                                            | Per-pair loops (per item 2)                                 |
-| `tests/cases/`                                                                            | Uploads options, both consumers, drain per pair             |
+| `tests/cases/`                                                                            | Supplied id, both consumers, drain per pair                 |
 
 Out of scope:
 
 - chunked or resumable storage (survey maps, architecture-core §10.5)
 - byte reclamation of unreferenced documents (architecture-core §10.3, a separate
   responsibility)
+- retry of a failed Binder upload; Remove and Add again
+- any `core/` change beyond the supplied id, including progress options on `stage` or `drain`
 - Ops and Customer Portal capture
 - task persistence across reloads
 - changes to the docstore kernel, the providers, or the `BackgroundTasks` contract
 
-Escalate any change to the `BackgroundTasks` contract, the kernel, or a provider.
+Escalate any change to `core/`, the `BackgroundTasks` contract, the kernel, or a provider.
 
 ## Acceptance
 
-- `stage` with a supplied id produces that `DocumentId`. Progress is reported. An aborted read
-  leaves no document. Callers that pass no options behave as before.
-- `drain` reports per document and returns the same result as before.
+- `stage` with a supplied id produces that `DocumentId`. Callers that pass no options behave as
+  before. A supplied id that exists is refused.
+- Staging progress is reported by the consumer's read. An aborted read stages nothing.
+- The drain's task reports `remaining` after each pass.
 - Attachments: the row appears before staging completes. Note Save does not wait for staging.
   The record is written once. A failed or interrupted stage shows as failed on its row.
-- Field Binder: several files create several entries. Save returns before delivery. A pending
-  entry is never prepared. Delivery republishes the entry as delivered. A lost stage shows failed.
+- Field Binder: each source adds one entry. Save returns before delivery. A pending entry is
+  dimmed and never prepared. Delivery republishes the entry as delivered and locks `upload`.
+  Rename changes the document's name and republishes. A failed task appears in the task list.
 - `blocksExit` is true while staging and clears when staging completes or fails.
 - CA verifies on screen with a slow source (a Drive-backed folder).
 
@@ -182,7 +285,8 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   also waits on delivery. The CA's position: staging and delivery are the same kind of work, and
   this is the scenario the task manager was built for. One pattern for both uploads.
 - **Why staging reads progressively but writes once.** The slow part of staging from a network
-  source is reading the File, so progress comes from the read. Chunked storage would change the
+  source is reading the File, so progress comes from the read, which the consumer does before
+  `stage`. Chunked storage would change the
   provider, the read path, the drain, and reclamation in locked `core/` to gain resume, which a
   reload defeats anyway, because the `File` handle does not survive it. Chunking belongs to the
   survey-map tier's resumable uploads.
@@ -206,7 +310,35 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   Ops capture when Ops adopts it. The alternative, app-invoked Binder delivery run as a task, was
   not taken.
 - **Why reclamation is out of scope.** An atomic write leaves no partial documents. What remains is
-  a reference to a document that never arrived, presented as failed here, and unreferenced bytes,
-  already a separate responsibility in architecture-core §10.3.
+  a reference to a document that never arrived, and unreferenced bytes, already a separate
+  responsibility in architecture-core §10.3.
+- **2026-11-12 — Name, description, origin, copies.** In a Field Binder Manager review the CA
+  found the inventory had no name, only a description, and write-only `createdAt` and
+  `updatedAt`. Settled: the name is the document's (`DJI-drone-XX-YY-.pdf`), the description is
+  the label (`Drone parts list`), and a pill shows the origin, Uploaded, Library, or URL. The
+  Library is the attachments namespace of company-wide documents (Assets, Chemicals, …). The Field
+  Binder always holds copies, so removing or renaming a record's attachment never breaks an entry.
+- **2026-11-13 — Adding and uploading are separate.** Adding is the person's act and ends at Save;
+  the upload is a background task. Add therefore keeps the Manager's Detail aside, one document per
+  Add, and `multiple` was dropped. The 2026-11-10 record already holds that binder documents
+  arrive one at a time.
+- **2026-11-13 — The Source toggle returns.** With origin recorded, the toggle withdrawn on
+  2026-11-11 is how it is chosen, Chemical widened to Library. Only the server fetch from a URL
+  stays withdrawn: the person opens, saves, and uploads.
+- **2026-11-13 — The `upload` container.** The CA: entry metadata has an `upload` container of
+  read-only attributes about the upload. It holds what is fixed when the document arrives; what
+  people edit stays outside it. Kind can be carried because a document is never replaced; name
+  cannot, because rename changes it. `uploadedAt` replaces the write-only timestamps. The URL stays
+  editable until the upload is true, at delivery.
+- **2026-11-13 — Failure in the task, not the row.** Only the uploading device's task knows
+  progress or failure; the inventory knows pending or delivered. Inferring failure from an absent
+  document marks every pending entry failed on other devices. A dead pending entry is rare, never
+  prepared, and removed with Remove. Retry on a failed entry was considered and not taken.
+- **2026-11-13 — `core/` held to strict scrutiny.** The first draft listed `StageOptions`
+  (`id`, `progress`) and `DrainOptions` as one scope row in locked `core/cli`, with no escalation.
+  The CA caught it. Byte progress moved to the consumer's read and per-pass `remaining` replaced
+  per-document drain progress, so neither needs `core/`. The supplied id remains: the design rests
+  on it, and it corrects an extraction that kept attachments' old store-minted id instead of the
+  principle the kernel already follows.
 
 _End of Brief_

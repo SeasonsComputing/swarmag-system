@@ -258,9 +258,10 @@ store shared:
    local mirror. Files enter by upload. Depends on root binding and Helm menus above; Ops route
    and preparation-trigger integration is M-9's.
 5. **Upload Tasks** — active, `effort/active/2026-11-12-upload-tasks-brief.md`: both uploads run
-   as background tasks; a chosen file is a row at once, staging and delivery report progress, and
-   the Binder publishes an entry when its document is delivered. Supersedes the Field Binder's
-   Save sequence and the attachment-only `DocumentDrain`.
+   as background tasks; a chosen document is a row at once, staging and delivery report progress,
+   and the Binder publishes an entry pending, then delivered. Prerequisite: a supplied id on
+   `Uploads.stage`, escalated as its one `core/` change. Supersedes the Field Binder's entry
+   shape, Manager Add and Edit, and Save sequence, and the attachment-only `DocumentDrain`.
 
 **Rides along:**
 
