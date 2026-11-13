@@ -16,6 +16,7 @@ PUBLIC
 Uploads          Document lifecycle over an injected inbox/server pair.
 ├ constructor    Bind the inbox and server.
 ├ stage          Capture the supplied file durably, under an optional supplied id.
+├ stagedAddress  A minted id's staging reference, before its document exists.
 ├ isStaged       Classify a document identity.
 ├ discard        Remove staging only.
 ├ place          Copy staging into a consumer's bucket, retaining its source.
@@ -26,7 +27,7 @@ Uploads          Document lifecycle over an injected inbox/server pair.
 
 import { notValid, toId } from '@core/std'
 import type { Id } from '@core/std'
-import { ApiError } from '@core/stdx'
+import { ApiError, DocumentAddresses } from '@core/stdx'
 import type {
   ApiDocumentStoreContract,
   BucketId,
@@ -66,6 +67,20 @@ export class Uploads {
     const namespace = await this.#inbox.namespace.create('Staging', STAGING)
     const bucket = await this.#inbox.bucket.create(namespace.id, 'Inbox', STAGING_BUCKET)
     return await this.#inbox.document.create(bucket.id, file.name, file, options?.id)
+  }
+
+  /**
+   * The id-form reference a minted document id has in staging, which a caller may write before
+   * the document exists (CONVENTIONS §10.8). `stage` with that id stores the document there.
+   */
+  stagedAddress(document: Id): string {
+    return DocumentAddresses.format(
+      DocumentAddresses.build(
+        { id: STAGING },
+        { id: STAGING_BUCKET },
+        { id: document }
+      )
+    )
   }
 
   /** Whether an identity belongs to this binding's private staging namespace. */
