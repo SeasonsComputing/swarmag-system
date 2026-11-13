@@ -1,6 +1,7 @@
 # Upload Tasks — Brief
 
-**Active, dispatched 2026-11-13; amended once (After ACE dispatch review, at the end). Captured
+**Active, dispatched 2026-11-13; amended twice (After ACE dispatch review; After production
+review; at the end). Captured
 2026-11-12; Field Binder design revised 2026-11-13.**
 Foundation mode: the upload lifecycle in locked `core/cli`, its two consumers (attachments and the
 Field Binder), and their delivery scheduling. Its CA decisions are settled (Decisions). Its one
@@ -29,6 +30,7 @@ async stage(file: File, options?: { id?: Id }): Promise<NodeMetadata<DocumentId>
   **Confirm before production:** the kernel refuses a create whose id exists. If it does not,
   stop and escalate; that is a separate core question.
 
+_[Amended by the amendment "After production review", item 2: a second `core/` change.]_
 Nothing else in this brief changes `core/`. Progress is the consumer's (Upload tasks).
 
 ## Purpose and dependencies
@@ -113,6 +115,9 @@ keep the UUID, so the row, the reference, and the task key exist before any byte
 
 ### Field Binder entry
 
+_[Amended by the amendment "After production review", item 3:
+`state` and `uploadedAt` are removed.]_
+
 ```ts
 export type FieldBinderEntry = Instance & {
   description: string
@@ -170,7 +175,8 @@ _[Amended by the amendment "After ACE dispatch review", item 3: Name is read-onl
   and chooses it. The browser never fetches the source.
 - Choosing the document starts its upload task. Kind shows beside the chosen name. The bare status
   text under the picker is removed.
-- Save publishes the entry as `pending` and closes the aside. It does not wait for staging or
+- _[Amended by the amendment "After production review", item 3.]_
+  Save publishes the entry as `pending` and closes the aside. It does not wait for staging or
   delivery (Decisions, item 1).
 
 ```
@@ -194,13 +200,15 @@ Collection rows:
 - _[Amended by the amendment "After ACE dispatch review", item 3.]_
   Title: the description. Subtitle: the document's name. Pill: the source, Uploaded, Library, or
   URL.
-- A pending row is dimmed. A delivered row is plain. Both states come from the inventory and read
+- _[Superseded by the amendment "After production review", item 3.]_
+  A pending row is dimmed. A delivered row is plain. Both states come from the inventory and read
   the same on every device.
 - Remove is available on every row. A pending entry whose task failed stays pending until removed.
 
 Publication and preparation:
 
-- When an entry's document is delivered and verified on FieldBinderServer, the entry is
+- _[Superseded by the amendment "After production review", item 3.]_
+  When an entry's document is delivered and verified on FieldBinderServer, the entry is
   republished as `delivered` with `upload.uploadedAt`. The existing stale-baseline comparison
   applies to that publication.
 - Preparation includes delivered entries only. A pending entry never reaches a reader.
@@ -209,9 +217,12 @@ Publication and preparation:
 
 All are decided; the target above reflects them.
 
-1. **Where a pending Binder entry is durable.** Decided: in the published inventory, with an
+1. _[Superseded by the amendment "After production review", item 3.]_
+   **Where a pending Binder entry is durable.** Decided: in the published inventory, with an
    entry state, and preparation skips pending entries.
-2. **How Admin schedules Binder delivery.** Decided: Admin's `DocumentDrain` runs one loop per
+2. _[Amended by the amendment "After production review", item 3:
+   no completion runs after a binder pass.]_
+   **How Admin schedules Binder delivery.** Decided: Admin's `DocumentDrain` runs one loop per
    pair, each with its own lock name and task key, and the Binder's completion runs after each
    binder pass. There is still no universal drain (architecture-core §10.2.2). Binder uploads
    occur only in Admin, where the Manager lives. Delivery scheduling remains each app's
@@ -251,7 +262,7 @@ Paths are under `source/`.
 | `front/api/attachments.ts`                                                               | Supplied id, staging read with progress, placed address                  |
 | `front/app/shell/attachment-list.tsx`, `make-attachment-save.ts`                         | Immediate rows, staging tasks, single record write                       |
 | `front/api/field-binder-inventory.ts`                                                    | Entry shape, `upload` container, schema version 2 _[Superseded, item 2]_ |
-| `front/api/field-binder-source.ts`                                                       | Publish pending, then delivered; rename republishes                      |
+| `front/api/field-binder-source.ts`                                                       | Publish pending, then delivered; rename republishes _[item 3]_           |
 | `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Source toggle, one document per Add, rows and pill                       |
 | `front/app-admin/field-binder/` (new file)                                               | Library picker                                                           |
 | `front/api/field-binder.ts`                                                              | Preparation includes delivered entries only                              |
@@ -282,7 +293,9 @@ Escalate any change to `core/`, the `BackgroundTasks` contract, the kernel, or a
 - Attachments: the row appears before staging completes. Note Save does not wait for staging.
   The record is written once. A failed or interrupted stage shows as failed on its row.
 - Field Binder: each source adds one entry. Save returns before delivery. A pending entry is
-  dimmed and never prepared. Delivery republishes the entry as delivered and locks `upload`.
+  dimmed and never prepared.
+  _[Superseded by the amendment "After production review", item 3:]_
+  Delivery republishes the entry as delivered and locks `upload`.
   Rename changes the document's name and republishes. A failed task appears in the task list.
 - `blocksExit` is true while staging and clears when staging completes or fails.
 - CA verifies on screen with a slow source (a Drive-backed folder).
@@ -306,7 +319,9 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   accepts a supplied id (CONVENTIONS §10.8). An id known at choose time lets the row, the
   reference, and the task exist before the bytes. Today's `stage` mints the id inside the store,
   so the row could only appear after staging.
-- **Why attachments write final references once.** Placement ids are fixed or the owner's, so the
+- _[Amended by the amendment "After production review", item 2:
+  a new record's id comes from its draft.]_
+  **Why attachments write final references once.** Placement ids are fixed or the owner's, so the
   placed address is known at Save. Writing it directly removes the post-placement rewrite and the
   second record write that would otherwise run in the background against an editable record.
 - **Why the Binder publishes pending entries.** A reader on another device has no inbox, so an
@@ -385,5 +400,58 @@ escalation still awaits CA approval.
      staging progress belongs to the consumer's read; Admin scheduling covers both pairs.
    - **architecture-core §10.4, The Catalog:** attachment Save writes final references once; the
      reference rewrite and reconciliation are removed.
+
+## Amendment — 2026-11-13 — After production review
+
+The production review found that a new record's id is unknown until its first write, that marking
+a Binder entry delivered collides with an open editor's stale-baseline check, and that Attachments
+cannot read a document's bytes for a Library copy. The CA approved both supplied-id escalations
+and replaced the stored delivery state with server presence. This amendment supersedes the marked
+items in Field Binder entry, Field Binder Manager, Decisions, Production scope, Acceptance, and
+Records. Production may proceed once the scope is approved.
+
+1. **The supplied id on `stage` is approved.** The Escalation stands as written. It is a
+   pass-through to the kernel's existing `suppliedId`.
+2. **A supplied id on create is approved, a second additive `core/` change.**
+
+   ```ts
+   // core/std/protocols.ts
+   export type CreateFromInstantiable<T extends Instantiable> = FromInstantiable<T> & { id?: Id }
+   ```
+
+   - The runtime already honors it: `instantiable` spreads state after `id()`, so a supplied id
+     wins. Only the type withheld it. Omitted, `create` mints as before.
+   - A draft for a new record mints its id at New and supplies it to `create`. The placed address
+     of a new record's attachments is then known at Save, and attachment Save writes once on
+     create and on update alike. Consumers: the Customer and User Managers on New, and the
+     Onboarding Wizard.
+   - **Confirm before production:** User create is edge-mediated. The edge function must pass a
+     supplied id through. If it mints its own, that is a defect against domain-model §3.9 and an
+     escalation, not a workaround.
+3. **Delivery is presence on FieldBinderServer.** The inventory stores no delivery state.
+   - `FieldBinderEntry` has no `state`. `FieldBinderUpload` has no `uploadedAt`; the upload date is
+     the server document's creation time.
+   - An entry is delivered when its document is on FieldBinderServer, which is true on every
+     device. The Manager reads each entry's server document for its name; the same read gives
+     delivery. A row whose document is absent is pending.
+   - Save publishes the entry once. The drain does not republish, and no completion runs after a
+     binder pass, so delivery never conflicts with an open editor's baseline.
+   - The `upload` container locks when the document is on the server. Rename still republishes.
+   - Preparation copies the entries whose documents are on the server. The local reader lists the
+     entries it holds. Ops refreshes by Sync, as always.
+4. **Library read is an `Attachments` operation.**
+
+   ```ts
+   // front/api/attachments.ts
+   async file(attachment: Attachment): Promise<File>
+   ```
+
+   It resolves the existing link and fetches the bytes; the File is named and typed from the
+   attachment. The Library picker reaches records through `api.Chemicals`, `api.Assets`, and
+   `api.Services` and their notes. Download progress is read from the response body, as a local
+   File is read. No `core/` change.
+5. **Production details, not design.** The attachment drain already reports `remaining`; only the
+   Binder loop is new. When Save precedes staging, placement waits for both the stage and the
+   record write; the attachment Save owns that wait.
 
 _End of Brief_
