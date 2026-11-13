@@ -60,7 +60,7 @@
 /* Threshold is the width below which the compact brand cluster + gap + dense
    actions stop fitting. A container query cannot take a token, so a changed
    threshold must be repeated in helm-widget.css and the app's brand-widget.css. */
-@container dashboard-header (max-width: 510px) {
+@container dashboard-header (max-width: 485px) {
   [data-shell='dashboard-header-contents'] {
     flex-wrap: wrap;
   }

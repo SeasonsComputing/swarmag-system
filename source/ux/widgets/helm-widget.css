@@ -21,7 +21,7 @@
   width: fit-content;
 }
 
-@container dashboard-header (max-width: 510px) {
+@container dashboard-header (max-width: 485px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
     justify-content: center;

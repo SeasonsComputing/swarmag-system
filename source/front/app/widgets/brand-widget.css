@@ -24,6 +24,13 @@
   inline-size: var(--logo-size);
 }
 
+[data-widget='brand-widget'] > [data-ui='layout'] {
+  gap: 0;
+  justify-items: center;
+  line-height: var(--label-line-height);
+  width: fit-content;
+}
+
 [data-widget='brand-widget-product'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-label-font-family);
@@ -39,12 +46,12 @@
   text-align: center;
 }
 
-/* Stacked header: the brand row keeps the shell bar height. */
+/* Stacked header: the brand row sizes to its content, with the rhythm gap above it. */
 /* Threshold is owned by dashboard.css. */
-@container dashboard-header (max-width: 510px) {
+@container dashboard-header (max-width: 485px) {
   [data-widget='brand-widget'] {
     flex: 1 0 100%;
     justify-content: center;
-    min-block-size: var(--sa-size-bar);
+    padding-block-start: var(--sa-rhythm-gap);
   }
 }
