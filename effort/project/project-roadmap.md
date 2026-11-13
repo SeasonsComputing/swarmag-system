@@ -269,6 +269,10 @@ store shared:
   `effort/completed/2026-11-10-attachment-look-brief.md`: one row look for the notes and
   attachments tables through `LabelCell`, `CollectionPanel.renderLabel`, `UiText.size`, and the
   Attachments tab's fieldset and Add Attachment action.
+- **Helm menus** — active, `effort/active/2026-11-13-helm-menus-brief.md`: the Helm becomes a
+  toolbar of commands and menus, each menu a titled popover with separators; Tasks is a menu of
+  reports; overflow and `labelMode` go. Carries the Field Binder menu's Manage, Open, and
+  Synchronize.
 
 ## M-7 · Workflow, Task, Question & Service
 
