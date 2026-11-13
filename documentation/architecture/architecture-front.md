@@ -312,8 +312,8 @@ Source toggle (Upload, Library, URL) chooses the document; the step shows its na
 edits its description and source URL. Edit renames the document and never replaces it. A row is
 pending until its document is on the server. `/field-binder` uses the read-only Lister over local
 bytes.
-Its app-root Helm binding supplies Manager, Binder, Sync, and reactive status through the existing
-widget maker. Sync is explicit and reports its preparation state through BackgroundTasks; saving
+Its app-root Helm binding supplies Manage, Open, and Synchronize, with the status line, through the
+existing widget maker. Sync is explicit and reports its preparation state through BackgroundTasks; saving
 a source entry does not implicitly prepare the local reader. Binder consumes its own Uploads
 instance and the established document-format policy. Ops/Portal composition does not register
 these screens or commands.
