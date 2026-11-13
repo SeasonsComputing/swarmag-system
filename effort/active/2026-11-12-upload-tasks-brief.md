@@ -1,6 +1,7 @@
 # Upload Tasks — Brief
 
-**Active, undispatched draft; captured 2026-11-12, Field Binder design revised 2026-11-13.**
+**Active, dispatched 2026-11-13; amended once (After ACE dispatch review, at the end). Captured
+2026-11-12; Field Binder design revised 2026-11-13.**
 Foundation mode: the upload lifecycle in locked `core/cli`, its two consumers (attachments and the
 Field Binder), and their delivery scheduling. Its CA decisions are settled (Decisions). Its one
 `core/` change is an escalation and a prerequisite (below). Trailing records hold the reasons.
@@ -24,9 +25,9 @@ async stage(file: File, options?: { id?: Id }): Promise<NodeMetadata<DocumentId>
   changes a row's identity mid-life and rekeys its task, in every consumer.
 - **It is additive.** One optional field. Omitted, `stage` behaves as before. No provider, kernel,
   or drain change.
-- **Create stays idempotent by id.** Both providers return an existing document unchanged, which
-  placement and the drain rely on. A supplied id inherits that: a retried stage returns the
-  complete document it wrote. The consumer mints one id per chosen document and never reuses it.
+- _[Superseded by the amendment "After ACE dispatch review", item 1.]_
+  **Confirm before production:** the kernel refuses a create whose id exists. If it does not,
+  stop and escalate; that is a separate core question.
 
 Nothing else in this brief changes `core/`. Progress is the consumer's (Upload tasks).
 
@@ -129,17 +130,22 @@ export type FieldBinderUpload = {
 }
 ```
 
-- **Name** is the document's own name. It lives only on the document, starts as the chosen file's
+- _[Amended by the amendment "After ACE dispatch review", item 3.]_
+  **Name** is the document's own name. It lives only on the document, starts as the chosen file's
   name, and changes by rename. The inventory never carries it.
 - **Description** is inventory metadata, the title people read.
 - **`upload`** records how the document arrived. It is editable until the entry is created, except
   `url`, which stays editable while the entry is pending. On delivery the container is read-only.
 - An entry's document is never replaced. Rename is the only change to a document.
-- `createdAt` and `updatedAt` are removed. The inventory's `schemaVersion` becomes 2.
+- `createdAt` and `updatedAt` are removed.
+- _[Superseded by the amendment "After ACE dispatch review", item 2.]_
+  The inventory's `schemaVersion` becomes 2.
 
 ### Field Binder Manager
 
 The Detail aside adds and edits one document. Add no longer takes `multiple`.
+
+_[Amended by the amendment "After ACE dispatch review", item 3: Name is read-only on Add.]_
 
 ```
 ┌─ Add document ─────────────────────────── [Cancel] [Save] ┐
@@ -178,13 +184,15 @@ The Detail aside adds and edits one document. Add no longer takes `multiple`.
 
 - Edit shows `upload` as a read-only line: source, kind, and the upload date, or "Pending". While
   pending, Source URL is editable.
-- Changing Name renames the document. Save republishes the inventory, so Sync sees a new
+- _[Amended by the amendment "After ACE dispatch review", item 3.]_
+  Changing Name renames the document. Save republishes the inventory, so Sync sees a new
   publication.
 - Edit has no document control.
 
 Collection rows:
 
-- Title: the description. Subtitle: the document's name. Pill: the source, Uploaded, Library, or
+- _[Amended by the amendment "After ACE dispatch review", item 3.]_
+  Title: the description. Subtitle: the document's name. Pill: the source, Uploaded, Library, or
   URL.
 - A pending row is dimmed. A delivered row is plain. Both states come from the inventory and read
   the same on every device.
@@ -218,7 +226,8 @@ All are decided; the target above reflects them.
 
 Documentation leads code. Each change below is made in the production, not in this brief:
 
-- **architecture-core §10.3:** stage takes a supplied id and reports progress; Save writes final
+- _[Superseded by the amendment "After ACE dispatch review", item 4.]_
+  **architecture-core §10.3:** stage takes a supplied id and reports progress; Save writes final
   references before placement; Admin scheduling covers both pairs (per item 2).
 - **architecture-core §10.2.2:** preparation includes delivered entries only (per item 1).
 - **Field Binder brief, inventory shape:** the entry shape, "Entry id survives file replacement",
@@ -236,18 +245,18 @@ Documentation leads code. Each change below is made in the production, not in th
 
 Paths are under `source/`.
 
-| Files                                                                                     | Work                                                        |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `core/cli/docstore-uploads.ts`                                                            | Optional `id` on `stage` (Escalation; first, on approval)   |
-| `front/api/attachments.ts`                                                                | Supplied id, staging read with progress, placed address     |
-| `front/app/shell/attachment-list.tsx`, `make-attachment-save.ts`                          | Immediate rows, staging tasks, single record write          |
-| `front/api/field-binder-inventory.ts`                                                     | Entry shape, `upload` container, schema version 2           |
-| `front/api/field-binder-source.ts`                                                        | Publish pending, then delivered; rename republishes         |
-| `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Source toggle, one document per Add, rows and pill          |
-| `front/app-admin/field-binder/` (new file)                                                | Library picker                                              |
-| `front/api/field-binder.ts`                                                               | Preparation includes delivered entries only                 |
-| `front/app-admin/document-drain.ts`, `app.tsx`                                            | Per-pair loops (per item 2)                                 |
-| `tests/cases/`                                                                            | Supplied id, both consumers, drain per pair                 |
+| Files                                                                                    | Work                                                                     |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `core/cli/docstore-uploads.ts`                                                           | Optional `id` on `stage` (Escalation; first, on approval)                |
+| `front/api/attachments.ts`                                                               | Supplied id, staging read with progress, placed address                  |
+| `front/app/shell/attachment-list.tsx`, `make-attachment-save.ts`                         | Immediate rows, staging tasks, single record write                       |
+| `front/api/field-binder-inventory.ts`                                                    | Entry shape, `upload` container, schema version 2 _[Superseded, item 2]_ |
+| `front/api/field-binder-source.ts`                                                       | Publish pending, then delivered; rename republishes                      |
+| `front/app-admin/field-binder/field-binder-state.ts`, `-step-detail.tsx`, `-manager.tsx` | Source toggle, one document per Add, rows and pill                       |
+| `front/app-admin/field-binder/` (new file)                                               | Library picker                                                           |
+| `front/api/field-binder.ts`                                                              | Preparation includes delivered entries only                              |
+| `front/app-admin/document-drain.ts`, `app.tsx`                                           | Per-pair loops (per item 2)                                              |
+| `tests/cases/`                                                                           | Supplied id, both consumers, drain per pair                              |
 
 Out of scope:
 
@@ -264,8 +273,10 @@ Escalate any change to `core/`, the `BackgroundTasks` contract, the kernel, or a
 
 ## Acceptance
 
-- `stage` with a supplied id produces that `DocumentId`. Staging the same id again returns the
-  existing document. Callers that pass no options behave as before.
+- `stage` with a supplied id produces that `DocumentId`. Callers that pass no options behave as
+  before.
+- _[Superseded by the amendment "After ACE dispatch review", item 1.]_
+  A supplied id that exists is refused.
 - Staging progress is reported by the consumer's read. An aborted read stages nothing.
 - The drain's task reports `remaining` after each pass.
 - Attachments: the row appears before staging completes. Note Save does not wait for staging.
@@ -341,9 +352,38 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   per-document drain progress, so neither needs `core/`. The supplied id remains: the design rests
   on it, and it corrects an extraction that kept attachments' old store-minted id instead of the
   principle the kernel already follows.
-- **2026-11-13 — Duplicate ids are not refused.** ACE's review found that create returns an
-  existing document rather than refusing it, and stopped on the brief's refusal gate. The gate was
-  wrong. Create is idempotent by design, and a fresh UUID v7 per chosen document collides only
-  through a consumer bug. Guarding that case would break the idempotency `core/` relies on.
+
+## Amendment — 2026-11-13 — After ACE dispatch review
+
+ACE's dispatch review stopped on the Escalation's refusal gate, then raised two Foundation
+decisions and two documentation gaps. The CA settled all four. This amendment supersedes the
+marked items in Escalation, Field Binder entry, Field Binder Manager, Governing documents to
+amend, Production scope, and Acceptance. It does not authorize production; the supplied-id
+escalation still awaits CA approval.
+
+1. **Supplied ids stay idempotent.** Create returns an existing document unchanged in both
+   providers, which placement and the drain rely on. A supplied id inherits that: a retried stage
+   returns the complete document it wrote. The consumer mints one id per chosen document and never
+   reuses it. Staging the same id again returns the existing document. No refusal is added to
+   `core/`. A fresh UUID v7 per chosen document collides only through a consumer bug, and guarding
+   that case would break the idempotency `core/` relies on.
+2. **The inventory shape changes by stage reset.** `schemaVersion` stays 1; the shape changes in
+   place. There is no conversion or compatibility handling. The CA resets stage storage before
+   verification. A local mirror holding the old shape is rejected as malformed and replaced at the
+   next Sync, or cleared. Stage is the only environment and has no users, so no old data survives
+   to be told apart from new.
+3. **A pending entry has no name.** The name lives only on the document, and a pending entry may
+   have no document on this device or any other.
+   - Add shows Name read-only: the document is staged under the chosen file's name.
+   - A pending row's subtitle is "Pending" on every device.
+   - Name is editable once the entry is delivered; changing it renames the document, and Save
+     republishes the inventory.
+
+   Nothing copies the name, so nothing drifts.
+4. **Documentation amendments.** Under Governing documents to amend:
+   - **architecture-core §10.3, The Inbox and Its Drains:** `stage` gains only a supplied id;
+     staging progress belongs to the consumer's read; Admin scheduling covers both pairs.
+   - **architecture-core §10.4, The Catalog:** attachment Save writes final references once; the
+     reference rewrite and reconciliation are removed.
 
 _End of Brief_
