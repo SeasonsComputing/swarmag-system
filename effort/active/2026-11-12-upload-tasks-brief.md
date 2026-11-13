@@ -24,8 +24,9 @@ async stage(file: File, options?: { id?: Id }): Promise<NodeMetadata<DocumentId>
   changes a row's identity mid-life and rekeys its task, in every consumer.
 - **It is additive.** One optional field. Omitted, `stage` behaves as before. No provider, kernel,
   or drain change.
-- **Confirm before production:** the kernel refuses a create whose id exists. If it does not,
-  stop and escalate; that is a separate core question.
+- **Create stays idempotent by id.** Both providers return an existing document unchanged, which
+  placement and the drain rely on. A supplied id inherits that: a retried stage returns the
+  complete document it wrote. The consumer mints one id per chosen document and never reuses it.
 
 Nothing else in this brief changes `core/`. Progress is the consumer's (Upload tasks).
 
@@ -263,8 +264,8 @@ Escalate any change to `core/`, the `BackgroundTasks` contract, the kernel, or a
 
 ## Acceptance
 
-- `stage` with a supplied id produces that `DocumentId`. Callers that pass no options behave as
-  before. A supplied id that exists is refused.
+- `stage` with a supplied id produces that `DocumentId`. Staging the same id again returns the
+  existing document. Callers that pass no options behave as before.
 - Staging progress is reported by the consumer's read. An aborted read stages nothing.
 - The drain's task reports `remaining` after each pass.
 - Attachments: the row appears before staging completes. Note Save does not wait for staging.
@@ -340,5 +341,9 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   per-document drain progress, so neither needs `core/`. The supplied id remains: the design rests
   on it, and it corrects an extraction that kept attachments' old store-minted id instead of the
   principle the kernel already follows.
+- **2026-11-13 — Duplicate ids are not refused.** ACE's review found that create returns an
+  existing document rather than refusing it, and stopped on the brief's refusal gate. The gate was
+  wrong. Create is idempotent by design, and a fresh UUID v7 per chosen document collides only
+  through a consumer bug. Guarding that case would break the idempotency `core/` relies on.
 
 _End of Brief_
