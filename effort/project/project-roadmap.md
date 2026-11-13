@@ -259,8 +259,8 @@ store shared:
    and preparation-trigger integration is M-9's.
 5. **Upload Tasks** — active, `effort/active/2026-11-12-upload-tasks-brief.md`: both uploads run
    as background tasks; a chosen document is a row at once, staging and delivery report progress,
-   and the Binder publishes an entry pending, then delivered. Prerequisite: a supplied id on
-   `Uploads.stage`, escalated as its one `core/` change. Supersedes the Field Binder's entry
+   and a Binder entry is delivered when its document is on the server. Its one `core/` change is
+   a supplied id on `Uploads.stage`, approved. Supersedes the Field Binder's entry
    shape, Manager Add and Edit, and Save sequence, and the attachment-only `DocumentDrain`.
 
 **Rides along:**
