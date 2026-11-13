@@ -1553,8 +1553,6 @@
   box-sizing: content-box;
   display: flex;
   justify-content: center;
-  /* The safe area extends the bar only past the space its bottom pad once covered. */
-  padding-block: 0 max(0px, calc(env(safe-area-inset-bottom) - var(--sa-space-md)));
 }
 
 [data-ui='footer-logo'] {

@@ -33,12 +33,10 @@ export const BrandWidget = (): UiComponent => {
         width={64}
         height={64}
       />
-      <div data-widget='brand-widget-labels'>
-        <UiLayout gap='tight'>
-          <span data-widget='brand-widget-product'>{identity.productName}</span>
-          <span data-widget='brand-widget-application'>{identity.applicationName}</span>
-        </UiLayout>
-      </div>
+      <UiLayout gap='tight'>
+        <span data-widget='brand-widget-product'>{identity.productName}</span>
+        <span data-widget='brand-widget-application'>{identity.applicationName}</span>
+      </UiLayout>
     </div>
   )
 }

@@ -9,7 +9,7 @@
   --label-application-size: var(--sa-font-size-xs);
   --label-line-height: 1.4;
   --label-product-size: calc(var(--sa-font-size-xs) - 0.0625rem);
-  --logo-size: calc(var(--sa-space-xl) + 0.375rem);
+  --logo-size: calc(var(--sa-space-xl) + 0.45rem);
   align-items: center;
   display: inline-flex;
   flex: 0 1 auto;
@@ -22,20 +22,6 @@
   border-radius: var(--sa-radius-sm);
   block-size: var(--logo-size);
   inline-size: var(--logo-size);
-}
-
-[data-widget='brand-widget-labels'] {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  line-height: var(--label-line-height);
-  min-inline-size: 0;
-}
-
-[data-widget='brand-widget-labels'] [data-ui='layout'] {
-  gap: 0;
-  justify-items: center;
-  width: fit-content;
 }
 
 [data-widget='brand-widget-product'] {
