@@ -8,5 +8,5 @@
 [data-shell='about-box'] {
   display: grid;
   gap: var(--sa-space-xl);
-  inline-size: min(100%, var(--sa-size-min));
+  width: var(--sa-size-wrap);
 }
