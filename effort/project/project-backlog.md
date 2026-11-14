@@ -612,6 +612,18 @@ guard-css rule B7. Then each app that installs adds `viewport-fit=cover` to its 
 
 **Picking this up:** when Ops becomes installable.
 
+### B-48 · Loading shows as text where `UiSpinner` exists
+
+**Observed:** 2026-11-13 · normal
+
+Lists say they are loading in words: `CollectionTable`'s *"Loading {entity}s."*, behind every
+Manager and Lister, and the Service manager's *"Loading asset types…"* cell. `UiSpinner` is the
+design system's loading indicator; the Field Binder pickers already use it. Each is a one-line
+swap. Select placeholders (*"Loading Users…"*, *"Loading asset types…"*) are text inside a
+dropdown, where a spinner cannot go; they stay unless the select gains a loading state.
+
+**Picking this up:** with the next `ux/shell` change.
+
 ## Document Storage
 
 ### B-42 · Unreferenced documents are never swept
