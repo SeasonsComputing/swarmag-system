@@ -37,7 +37,7 @@ export const makeAnonymousShell = (Login: ShellPageView, logout: () => Promise<v
 export const makeDashboardShell = (
   seed: DashboardStateSeed,
   widgets: WidgetRegistry,
-  AboutBox: ShellOverlayView,
+  About: ShellOverlayView,
   Footer: () => UiComponent,
   routes: ShellRoute[]
 ): Shell => {
@@ -54,7 +54,7 @@ export const makeDashboardShell = (
     initializers: [(): Promise<void> => DashboardState.init(seed)],
     routes: [
       Routes.index(),
-      Routes.dialog('/about', AboutBox, { size: 'content', dismissible: true }),
+      Routes.dialog('/about', About, { size: 'content', dismissible: true }),
       ...routes
     ]
   }

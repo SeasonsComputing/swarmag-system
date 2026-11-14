@@ -153,7 +153,7 @@ Deno.test('DocumentDrain runs a loop per pair, backs off, and surfaces unexpecte
     remaining = 0
     await scheduledPass()
     assertEquals(Object.keys(BackgroundTasks.store), [])
-    const { SessionCoordinator } = await import('@front/app/shell/session-coordinator.ts')
+    const { SessionCoordinator } = await import('@front/app/shell/startup/session-coordinator.ts')
     for (const rejected of [false, true]) {
       const deferred = Promise.withResolvers<{ drained: number; remaining: number }>()
       pending = deferred.promise

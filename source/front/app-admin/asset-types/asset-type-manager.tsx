@@ -18,7 +18,7 @@ AssetTypeManager  Collection and detail host.
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
-import { StatusBadge } from '@front/app/shell/status-badge.tsx'
+import { StatusBadge } from '@front/app/shell/display/status-badge.tsx'
 import { useAssetTypes } from '@front/app/stores/asset-types-state.ts'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'

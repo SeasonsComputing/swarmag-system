@@ -11,7 +11,7 @@ Customer drafts isolate source, accepted collections, and projected results.
 
 import { toWhen } from '@core/std'
 import { createCustomerState, customerDraft } from '@front/app-admin/customers/customer-state.ts'
-import { UserProvider } from '@front/app/shell/user-provider.ts'
+import { UserProvider } from '@front/app/shell/startup/user-provider.ts'
 import { assertEquals, assertNotStrictEquals } from '@std/assert'
 import { CustomerSamples } from '@tests/fixtures/customer-samples.ts'
 import { UserSamples } from '@tests/fixtures/user-samples.ts'

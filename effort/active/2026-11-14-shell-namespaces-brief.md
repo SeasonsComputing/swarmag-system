@@ -1,6 +1,6 @@
 # Shell Namespaces — Brief
 
-**Active 2026-11-14. Draft, not dispatched.** Not on the roadmap: chosen directly at the CA's
+**Active 2026-11-14. Dispatched to ACE 2026-11-14; production awaiting review.** Not on the roadmap: chosen directly at the CA's
 direction, ahead of the Library, which builds into the tree this brief establishes. Foundation
 mode: the suite tier's module layout and the documentation that describes it. A restructure with no
 behavior change. The documents lead; production follows them.
@@ -168,6 +168,7 @@ Out of scope:
 
 - `ux/`: the `AboutBox` parameter name in `ux/shell/runtime/shell-makers.tsx` and the `ux/`
   components that render dialogs. Renaming them is a separate Foundation decision.
+  _[Amended by the amendment "During production": the parameter is renamed `About`.]_
 - Any change to behavior, exports other than the two renames, or styles.
 - The Drill family, `LibraryLevels`, and the Library, which belong to the Library brief.
 - The `onValue` / `onChange` difference between `UrlField` and `UserPicker`.
@@ -205,5 +206,14 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
 - `foundation/` became `startup/`, which says when its files run and does not share a word with
   Foundation Mode.
 - `session/` (`login`, `session-coordinator`, `user-provider`) was considered and not taken.
+
+## Amendment — 2026-11-14 — During production
+
+1. **The generic maker's parameter is `About`.** `makeDashboardShell` in locked
+   `ux/shell/runtime/shell-makers.tsx` names its About route component `About`, not `AboutBox`.
+   The CA approved the crossing during production (EFFORT §8). The parameter names the route, not
+   the component's kind, so `About` fits whatever the application binds. It overturns the first
+   Out of scope bullet for this one name; the `ux/` components that render dialogs stay out of
+   scope.
 
 _End of Shell Namespaces Brief_

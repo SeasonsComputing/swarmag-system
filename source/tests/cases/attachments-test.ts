@@ -56,7 +56,7 @@ Config.init({
   'FIELD_BINDER_DB_NAME',
   'ATTACHMENTS_TEST_SERVER'
 ])
-const { makeAttachmentSave } = await import('@front/app/shell/make-attachment-save.ts')
+const { makeAttachmentSave } = await import('@front/app/shell/notes/make-attachment-save.ts')
 Object.assign(globalThis, {
   IDBCursor,
   IDBCursorWithValue,

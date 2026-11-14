@@ -21,11 +21,11 @@ import { FieldBinderManager } from '@front/app-admin/field-binder/field-binder-m
 import { OnboardingWizard } from '@front/app-admin/onboarding/onboarding-wizard.tsx'
 import { ServiceManager } from '@front/app-admin/services/service-manager.tsx'
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
-import { FieldBinderHelm } from '@front/app/shell/field-binder-helm.ts'
-import { FieldBinder } from '@front/app/shell/field-binder.tsx'
-import { rootServices } from '@front/app/shell/root-services.ts'
-import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
-import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/shell-makers.tsx'
+import { FieldBinderDialog } from '@front/app/shell/field-binder/field-binder-dialog.tsx'
+import { FieldBinderHelm } from '@front/app/shell/field-binder/field-binder-helm.ts'
+import { rootServices } from '@front/app/shell/startup/root-services.ts'
+import { SessionCoordinator } from '@front/app/shell/startup/session-coordinator.ts'
+import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/startup/shell-makers.tsx'
 import { AppWidgetRegistry } from '@front/app/widgets/widget-registry.ts'
 import { BackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnings.ts'
 import { Routes } from '@ux/shell/runtime/shell.ts'
@@ -57,7 +57,7 @@ void bootstrap(
           Routes.workbench('/chemicals', ChemicalManager),
           Routes.workbench('/services', ServiceManager),
           Routes.workbench('/field-binder-manager', FieldBinderManager),
-          Routes.sheet('/field-binder', FieldBinder)
+          Routes.sheet('/field-binder', FieldBinderDialog)
         ]
       )
     ],

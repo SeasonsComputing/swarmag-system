@@ -128,13 +128,13 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent
 
 ### Field Binder dialogs (`front/app-admin/field-binder/`)
 
-| From                                        | To                                          |
-| ------------------------------------------- | ------------------------------------------- |
-| `field-binder-picker.tsx`, `.css`           | removed; now the Drill family               |
-| `field-binder-library-picker.tsx`           | `field-binder-library-dialog.tsx`           |
-| `FieldBinderLibraryPicker`, its props       | `FieldBinderLibraryDialog`, its props       |
-| `field-binder-chemical-picker.tsx`          | `field-binder-chemical-dialog.tsx`          |
-| `FieldBinderChemicalPicker`, its props      | `FieldBinderChemicalDialog`, its props      |
+| From                                   | To                                     |
+| -------------------------------------- | -------------------------------------- |
+| `field-binder-picker.tsx`, `.css`      | removed; now the Drill family          |
+| `field-binder-library-picker.tsx`      | `field-binder-library-dialog.tsx`      |
+| `FieldBinderLibraryPicker`, its props  | `FieldBinderLibraryDialog`, its props  |
+| `field-binder-chemical-picker.tsx`     | `field-binder-chemical-dialog.tsx`     |
+| `FieldBinderChemicalPicker`, its props | `FieldBinderChemicalDialog`, its props |
 
 - `FieldBinderLibraryDialog` renders `DrillDialog` over `LibraryLevels.root(...)`, whose
   `onDocument` calls `onChoose(attachment.filename, report => api.Attachments.file(attachment,
@@ -183,18 +183,18 @@ Amended by the AA before production:
 
 Paths are under `source/`.
 
-| Files                                                                   | Work                                       |
-| ----------------------------------------------------------------------- | ------------------------------------------ |
-| `front/app/shell/retrieval/drill-navigator.tsx`, `.css`                 | New, from `field-binder-picker`            |
-| `front/app/shell/retrieval/drill-dialog.tsx`                            | New, from `field-binder-picker`            |
-| `front/app/shell/retrieval/library-levels.ts`                           | New, from `field-binder-library-picker`    |
-| `front/app-admin/library/library-dialog.tsx`                            | New                                        |
-| `front/app-admin/field-binder/field-binder-library-dialog.tsx`          | Renamed and thinned                        |
-| `front/app-admin/field-binder/field-binder-chemical-dialog.tsx`         | Renamed; builds on `DrillDialog`           |
-| `front/app-admin/field-binder/field-binder-picker.tsx`, `.css`          | Removed                                    |
-| `front/app-admin/field-binder/field-binder-step-detail.tsx`             | Imports and element names                  |
-| `front/app-admin/app.tsx`                                               | `/library` route                           |
-| `front/app-admin/dashboard-admin.json`                                  | Library command; Administration menu items |
+| Files                                                           | Work                                       |
+| --------------------------------------------------------------- | ------------------------------------------ |
+| `front/app/shell/retrieval/drill-navigator.tsx`, `.css`         | New, from `field-binder-picker`            |
+| `front/app/shell/retrieval/drill-dialog.tsx`                    | New, from `field-binder-picker`            |
+| `front/app/shell/retrieval/library-levels.ts`                   | New, from `field-binder-library-picker`    |
+| `front/app-admin/library/library-dialog.tsx`                    | New                                        |
+| `front/app-admin/field-binder/field-binder-library-dialog.tsx`  | Renamed and thinned                        |
+| `front/app-admin/field-binder/field-binder-chemical-dialog.tsx` | Renamed; builds on `DrillDialog`           |
+| `front/app-admin/field-binder/field-binder-picker.tsx`, `.css`  | Removed                                    |
+| `front/app-admin/field-binder/field-binder-step-detail.tsx`     | Imports and element names                  |
+| `front/app-admin/app.tsx`                                       | `/library` route                           |
+| `front/app-admin/dashboard-admin.json`                          | Library command; Administration menu items |
 
 Out of scope:
 

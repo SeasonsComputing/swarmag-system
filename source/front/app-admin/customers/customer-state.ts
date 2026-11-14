@@ -28,7 +28,7 @@ import type { ContactPreferredChannel, Location, Note } from '@domain/abstractio
 import type { Customer, CustomerSite, CustomerStatus } from '@domain/abstractions/customer.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 import type { scopes } from '@front/api/scopes.ts'
-import { UserProvider } from '@front/app/shell/user-provider.ts'
+import { UserProvider } from '@front/app/shell/startup/user-provider.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'

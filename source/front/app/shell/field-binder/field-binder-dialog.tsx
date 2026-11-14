@@ -12,9 +12,9 @@ application command, independent of this reader's route and refresh operation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-FieldBinderProps  Workbench route props.
-└ onCancel             Close the workbench.
-FieldBinder       View-only local document Lister.
+FieldBinderDialogProps  Workbench route props.
+└ onCancel              Close the workbench.
+FieldBinderDialog       View-only local document Lister.
 */
 
 import { api } from '@front/api/api.ts'
@@ -27,10 +27,10 @@ import { UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 /** Reader route input; no editable-reader mode exists. */
-export type FieldBinderProps = { onCancel: () => void }
+export type FieldBinderDialogProps = { onCancel: () => void }
 
 /** Project the last complete local snapshot independently of remote availability. */
-export const FieldBinder = (props: FieldBinderProps): UiComponent => {
+export const FieldBinderDialog = (props: FieldBinderDialogProps): UiComponent => {
   const binder = api.FieldBinder
   onMount(() => {
     void binder.load().catch(error => {

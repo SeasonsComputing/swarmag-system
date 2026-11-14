@@ -19,7 +19,7 @@ ChemicalLabels       Label collection and nested editor.
 
 import { isUrl, toTrimmed } from '@core/std'
 import type { ChemicalLabel } from '@domain/abstractions/chemical.ts'
-import { UrlField } from '@front/app/shell/url-field.tsx'
+import { UrlField } from '@front/app/shell/retrieval/url-field.tsx'
 import { createSignal, onCleanup } from '@solid-js'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'

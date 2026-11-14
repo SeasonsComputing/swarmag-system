@@ -12,9 +12,9 @@ import '@front/config/ux-config.ts'
 import { bootstrap } from '@ux/shell/runtime/bootstrap.tsx'
 
 // shell bindings
-import { rootServices } from '@front/app/shell/root-services.ts'
-import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
-import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/shell-makers.tsx'
+import { rootServices } from '@front/app/shell/startup/root-services.ts'
+import { SessionCoordinator } from '@front/app/shell/startup/session-coordinator.ts'
+import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/startup/shell-makers.tsx'
 import { AppWidgetRegistry } from '@front/app/widgets/widget-registry.ts'
 import { Routes } from '@ux/shell/runtime/shell.ts'
 import { UxWidgetRegistry } from '@ux/widgets/widget-registry.ts'

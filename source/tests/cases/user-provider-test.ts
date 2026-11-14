@@ -9,7 +9,7 @@ PURPOSE
 Prepared User identity and role-based creation defaults.
 */
 
-import { UserProvider } from '@front/app/shell/user-provider.ts'
+import { UserProvider } from '@front/app/shell/startup/user-provider.ts'
 import { assertEquals, assertStrictEquals } from '@std/assert'
 import { UserSamples } from '@tests/fixtures/user-samples.ts'
 

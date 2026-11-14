@@ -16,6 +16,8 @@ makeDashboardShell  Create the swarmAg dashboard shell.
 */
 
 import { api } from '@front/api/api.ts'
+import { AboutDialog } from '@front/app/shell/display/about-dialog.tsx'
+import { Login } from '@front/app/shell/display/login.tsx'
 import type { DashboardStateSeed } from '@ux/shell/dashboard/dashboard-state.ts'
 import type { WidgetRegistry } from '@ux/shell/dashboard/widget-contract.ts'
 import { logout } from '@ux/shell/runtime/logout.ts'
@@ -26,8 +28,6 @@ import {
 import type { Shell, ShellRoute } from '@ux/shell/runtime/shell.ts'
 import { UiFooter } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { AboutBox } from './about-box.tsx'
-import { Login } from './login.tsx'
 import { SessionCoordinator } from './session-coordinator.ts'
 
 import footerLogo from '@front/app/assets/swarmag-logo-wordmark.png'
@@ -40,7 +40,7 @@ export const makeDashboardShell = (
   seed: DashboardStateSeed,
   widgets: WidgetRegistry,
   routes: ShellRoute[]
-): Shell => makeAppDashboardShell(seed, widgets, AboutBox, Footer, routes)
+): Shell => makeAppDashboardShell(seed, widgets, AboutDialog, Footer, routes)
 
 /** Suite footer content; its placement belongs to the generic dashboard. */
 const Footer = (): UiComponent => <UiFooter logo={footerLogo} alt='swarmAg' />

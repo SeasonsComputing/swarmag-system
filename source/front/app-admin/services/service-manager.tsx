@@ -19,7 +19,7 @@ ServiceManager       Collection and detail host.
 
 import { StringSet } from '@core/std'
 import { api } from '@front/api/api.ts'
-import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import type { AttachmentSave } from '@front/app/shell/notes/make-attachment-save.ts'
 import { ASSET_TYPES_QUERY_KEY, useAssetTypes } from '@front/app/stores/asset-types-state.ts'
 import { Show } from '@solid-js'
 import { onCleanup } from '@solid-js'
