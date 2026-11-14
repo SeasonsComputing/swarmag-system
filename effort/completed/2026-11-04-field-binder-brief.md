@@ -1,12 +1,11 @@
 # Field Binder — Brief
 
-**Active, Foundation completion steps 1–2 authorized; refreshed 2026-11-11.** Roadmap M-6 delivers the Admin
-management and reader acceptance; application-specific rollout remains separately scoped.
+**Completed 2026-11-13.** Shipped in `7227120`, then reshaped by Upload Tasks (`914d0c5`), Helm
+Menus (`d6186c9`), and the Manager's sources (`2518b39`, `147626e`, `a70a928`). Closed at the CA's
+direction after on-screen acceptance in Admin; see "Closure" at the end. Roadmap M-6 feature 4.
 Foundation mode: feature composition, configuration, storage policy, and preparation lifecycle.
-The target design below incorporates the CA decisions recorded during dispatch review.
-The CA requested subagent review, review of its findings by ACE, and presentation to the CA.
-ACE incorrectly dispatched implementation. The partial working-tree changes were not an accepted production. The CA subsequently authorized
-completion and correction (steps 1–2); full verification and independent acceptance remain separate.
+The records keep the dispatch history, including the partial production ACE dispatched in error
+and the CA's later authorization of steps 1–2.
 
 ## Purpose
 
@@ -44,7 +43,7 @@ separate source-to-local-copy operation. Ops reads only the local Binder; it doe
 files remotely. The local store is writable by preparation and read-only to the reader.
 
 Dependencies: `effort/completed/2026-11-11-upload-brief.md` Unit A supplies Uploads; Unit B supplies
-root-bound remote docstores. `effort/active/2026-11-10-background-tasks-brief.md` supplies Helm menus
+root-bound remote docstores. `effort/completed/2026-11-10-background-tasks-brief.md` supplies Helm menus
 and work visibility. Binder production depends on both Upload units. No binder-specific behavior
 belongs in the kernel, concrete provider, Uploads class, Helm widget, or task store.
 
@@ -91,7 +90,7 @@ clear validation copy. Ordinary uploaded names such as `inventory.json` and `sta
 valid. The existing single logical collection bucket is retained; separate Documents/Metadata
 buckets and the earlier `$` prefix alternative are not selected.
 
-_[Superseded by the Upload Tasks brief (`effort/active/2026-11-12-upload-tasks-brief.md`), Field
+_[Superseded by the Upload Tasks brief (`effort/completed/2026-11-12-upload-tasks-brief.md`), Field
 Binder entry: the entry shape, "Entry id survives file replacement", and "filename remains the
 uploaded file's name".]_
 
@@ -548,7 +547,7 @@ Modified:
 - `documentation/architecture/architecture-core.md`
 - `documentation/architecture/architecture-devops.md`
 - `documentation/architecture/architecture-front.md`
-- `effort/active/2026-11-04-field-binder-brief.md`
+- `effort/completed/2026-11-04-field-binder-brief.md`
 - `source/back/storage/storage-policies.sql`
 - `source/devops/scripts/app-admin-package.sh`
 - `source/devops/scripts/app-customer-package.sh`
@@ -617,5 +616,41 @@ to step 3 and have not been performed for this artifact. users-api-test.ts and
 session-coordinator-test.ts remain excluded when that suite is dispatched. No live role/grant test,
 provisioning, policy application, reset, deployment, commit, or general access-model work was done.
 CA acceptance and effort closure remain outstanding; this is not a production-complete claim.
+
+## Closure — 2026-11-13
+
+The CA directed closure after accepting the Field Binder on screen in Admin: the Manager's three
+sources, Synchronize, and the reader.
+
+**Shipped.** The implementation in `7227120`. Upload Tasks (`914d0c5`) superseded the entry shape,
+Add and Edit, and the Save sequence. Helm Menus (`d6186c9`) carried the Binder's Manage, Open, and
+Synchronize, with its status line, and made a source with nothing published an empty Binder rather
+than a failed Synchronize. The Manager's sources are Upload, Library, and Chemicals (`2518b39`): a
+Chemicals entry walks three steps, select a chemical document, open it and save it, upload it.
+`147626e` gave the Library and Chemical pickers one `FieldBinderPicker` of declared levels and gave
+`DrillDown` a narrow `DrillHostContext`, an approved `ux/shell` change. `a70a928` made each picker a
+form field, so a save with nothing chosen focuses and marks it. architecture-front §7.2.4 follows
+(`8901094`, `f646713`).
+
+**Verified.** `deno task check` passed on each commit's checks. The CA's on-screen acceptance in
+Admin.
+
+**Not recorded.** Opening the local Binder with the network disabled.
+
+**Settled on closing.**
+
+- **Step 3** (routes, Helm binding, verification) is done, through the commits above.
+- **Provisioning and live grants** are done: the roadmap's "Stage on its storage roots", closed
+  2026-11-12.
+- **Ops and Portal rollout** are roadmap M-9 (The Field Binder, Ops side) and M-10.
+- **Remote reclamation** is backlog B-42.
+- **Search and filter on a large list** is parking-lot P-13.
+- **Loading shown as text** in the pickers and elsewhere is backlog B-48.
+- **Source fetching and automatic chemical import** are dropped. The Chemicals source chooses a
+  chemical's document link; the user opens it, saves it, and uploads it.
+- **Replacing a document** is dropped. Remove, then Add.
+- **The pickers on `Lister`** are dropped. The validated drill look stays.
+- **Attachment catalog changes, durable editor drafts, and icon presentation** are dropped from
+  this effort.
 
 _End of Brief_

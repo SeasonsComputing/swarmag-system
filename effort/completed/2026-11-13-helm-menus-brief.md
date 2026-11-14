@@ -1,10 +1,10 @@
 # Helm Menus — Brief
 
-**Active; reviewed by ACE 2026-11-13; amended once (After ACE review, at the end). Captured
-2026-11-13.** Foundation mode: the Helm's configuration
-contract and widget in locked `ux/widgets`, and the three applications' dashboard configuration.
-The CA settled the design and approved the `ux/widgets` change (Escalation). Records hold the
-reasons.
+**Completed 2026-11-13.** Shipped in `d6186c9`, after architecture-front §7.2.4 (`8901094`).
+Closed at the CA's direction after on-screen acceptance; see "Closure" at the end. An M-6
+ride-along. Foundation mode: the Helm's configuration contract and widget in locked
+`ux/widgets`, and the three applications' dashboard configuration. The CA settled the design and
+approved the `ux/widgets` change (Escalation). Records hold the reasons.
 
 ## Escalation: `ux/widgets` (approved)
 
@@ -102,6 +102,7 @@ Each item keeps its existing icon. No icon is added.
 ## Governing documents to amend
 
 _[Amended by the amendment "After ACE review", item 2: ACE amends it first.]_
+
 - **architecture-front §7.2.4, Document Storage:** the Binder's Helm entries are Manage, Open,
   and Synchronize, with the status line.
 
@@ -110,13 +111,13 @@ _[Amended by the amendment "After ACE review", item 2: ACE amends it first.]_
 _[Amended by the amendment "After ACE review", item 1: the task list joins the scope.]_
 Paths are under `source/`.
 
-| Files                                                                         | Work                                                   |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `ux/widgets/helm-widget-contract.ts`                                          | Toolbar, menu, separator types; toolbar validator      |
-| `ux/widgets/make-helm-widget.tsx`                                             | Toolbar, menu popovers with titles, Tasks as a menu    |
-| `ux/widgets/helm-widget.css`                                                  | Menu title and separator                               |
-| `front/app-admin/dashboard-admin.json`, `app-ops/…`, `app-customer/…`         | `settings.toolbar` per the configuration above         |
-| `tests/cases/helm-widget-test.ts`, `bootstrap-lifecycle-test.ts`              | Toolbar, menus, separators, titles, Tasks              |
+| Files                                                                 | Work                                                |
+| --------------------------------------------------------------------- | --------------------------------------------------- |
+| `ux/widgets/helm-widget-contract.ts`                                  | Toolbar, menu, separator types; toolbar validator   |
+| `ux/widgets/make-helm-widget.tsx`                                     | Toolbar, menu popovers with titles, Tasks as a menu |
+| `ux/widgets/helm-widget.css`                                          | Menu title and separator                            |
+| `front/app-admin/dashboard-admin.json`, `app-ops/…`, `app-customer/…` | `settings.toolbar` per the configuration above      |
+| `tests/cases/helm-widget-test.ts`, `bootstrap-lifecycle-test.ts`      | Toolbar, menus, separators, titles, Tasks           |
 
 Out of scope:
 
@@ -170,5 +171,27 @@ Acceptance.
 3. **The browser test changes with the Helm.** `bootstrap-lifecycle-test.ts` drops its overflow
    and in-menu task assertions and covers the toolbar, menus, and Tasks. Its browser run
    (`-- --browser`) is part of acceptance and runs with the other checks.
+
+## Closure — 2026-11-13
+
+The CA directed closure after reviewing the Helm on screen.
+
+**Shipped.** `settings.toolbar` of commands and titled menus; Tasks as a menu of reports;
+`labelMode` and overflow gone; strict toolbar validation; open menu triggers stay in place
+(`d6186c9`).
+
+**Departures, settled by the CA during production.**
+
+- **Separators** are dropped. The target design had them; on screen they read badly beside the
+  icons, so menus group by order alone.
+- **The main menu's icon** is `dots-vertical`.
+- **A menu has a 10rem minimum width,** a centered title, and rhythm before its status line.
+- **An empty Binder.** A source with nothing published synchronizes as an empty Binder, not a
+  failed Synchronize. The fix rode in the same commit.
+
+**Settled on closing.**
+
+- **Nested menus and overflow** are dropped.
+- **New icons** were not needed.
 
 _End of Brief_

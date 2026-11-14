@@ -1,9 +1,11 @@
 # Background Tasks — Brief
 
-**Active, approved Foundation production; refreshed 2026-11-11.** Foundation mode: generic work
-reporting and one-level Helm command menus in locked `ux/`. The CA authorized production and the named locked-namespace
-crossings, including the optional bootstrap mount fitting. The main text is the implementation target; trailing
-records preserve decisions and replaced proposals.
+**Completed 2026-11-13.** Shipped in `548d0e1`, with the Helm amendments recorded at the end.
+Closed at the CA's direction after on-screen acceptance of Admin attachment delivery and the Helm;
+see "Closure" at the end. Foundation mode: generic work reporting and one-level Helm command menus
+in locked `ux/`. Helm Menus (`effort/completed/2026-11-13-helm-menus-brief.md`) superseded the
+Helm's menu and overflow design. The main text is the target as produced; trailing records
+preserve decisions and replaced proposals.
 
 ## Purpose and dependencies
 
@@ -16,7 +18,7 @@ class with separate instances for separate inbox/server pairs.
 
 `effort/completed/2026-11-11-upload-brief.md` Unit A supplies `api.AttachmentsUploads`, the first
 reporting consumer. This effort does not require the Supabase root change or a completed Binder.
-`effort/active/2026-11-04-field-binder-brief.md` supplies Binder menu bindings and preparation reports
+`effort/completed/2026-11-04-field-binder-brief.md` supplies Binder menu bindings and preparation reports
 under its own feature scope.
 
 ## Helm command/menu contract
@@ -103,7 +105,7 @@ retain their own reporting and rethrow/stop rules.
 
 ## First consumer: Admin attachment delivery
 
-_[Superseded by the Upload Tasks brief (`effort/active/2026-11-12-upload-tasks-brief.md`),
+_[Superseded by the Upload Tasks brief (`effort/completed/2026-11-12-upload-tasks-brief.md`),
 Decision 2: "owns the attachment pair only". `DocumentDrain` runs one loop per pair, each with
 its own lock name and task key.]_
 
@@ -286,7 +288,7 @@ Created, relative to `source/`:
 Modified:
 
 - `documentation/architecture/architecture-front.md`
-- `effort/active/2026-11-10-background-tasks-brief.md`
+- `effort/completed/2026-11-10-background-tasks-brief.md`
 - `source/ux/shell/runtime/bootstrap.tsx`
 - `source/ux/widgets/helm-widget.tsx`
 - `source/ux/widgets/helm-widget.css`
@@ -423,5 +425,24 @@ halo and color, responsive target sizing, glyph alignment, loading, disabled act
 Enter/Space/Escape, focus return, and ref/event forwarding. `STYLE_AUDIT: PASS` for the local
 component, CSS, maker, and browser test. No verification failures remain. No deployment or
 effort closure is included.
+
+## Closure — 2026-11-13
+
+The CA directed closure after accepting real Admin attachment delivery and the Helm on screen.
+
+**Shipped.** `BackgroundTasks` and the exit warnings in `ux/shell/runtime`, the Helm's application
+bindings, the bootstrap mount, and Admin's drain reporting in `548d0e1`. The four Helm amendments
+above followed. Upload Tasks (`914d0c5`) made every upload a reported task. Helm Menus
+(`d6186c9`) replaced the inline menus, overflow, and `labelMode` with a toolbar of commands and
+titled menus, Tasks among them.
+
+**Settled on closing.**
+
+- **CA acceptance** is done, on screen.
+- **Ops and Portal rollout** are roadmap M-9 and M-10.
+- **Persistent task history, cross-tab reporting, and per-file failure surfaces** are dropped.
+  Reports are transient by design, and the uploading tab owns its tasks.
+- **An execution engine and a new logout policy** are dropped.
+- **Upload scheduling** changed under Upload Tasks, which owns it.
 
 _End of Brief_

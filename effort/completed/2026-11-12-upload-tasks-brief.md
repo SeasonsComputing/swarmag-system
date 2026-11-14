@@ -1,9 +1,10 @@
 # Upload Tasks — Brief
 
-**Active; in production; amended twice (After ACE review; After production review; at the end).
-Captured 2026-11-12.** Foundation mode: the upload lifecycle, its two consumers (attachments and
-the Field Binder), and their delivery scheduling. Two changes to locked `core/cli`, both approved
-by the CA (Escalation; After production review, item 1). Records hold the reasons.
+**Completed 2026-11-13.** Shipped in `66238c1` and `e1c2653` (`core/cli`) and `914d0c5`. Closed at
+the CA's direction after on-screen acceptance in Admin; see "Closure" at the end. Roadmap M-6
+feature 5. Foundation mode: the upload lifecycle, its two consumers (attachments and the Field
+Binder), and their delivery scheduling. Two changes to locked `core/cli`, both approved by the CA
+(Escalation; After production review, item 1). Records hold the reasons.
 
 ## Escalation: supplied id on `stage` (approved)
 
@@ -44,9 +45,9 @@ Both upload consumers adopt this one pattern:
 Dependencies:
 
 - `effort/completed/2026-11-11-upload-brief.md`: `Uploads`, its pairs, and the inbox lifecycle.
-- `effort/active/2026-11-10-background-tasks-brief.md`: `BackgroundTasks`, its `progress` and
+- `effort/completed/2026-11-10-background-tasks-brief.md`: `BackgroundTasks`, its `progress` and
   `remaining` fields, `blocksExit`, and `DocumentDrain`.
-- `effort/active/2026-11-04-field-binder-brief.md`: the Manager, publication, and preparation.
+- `effort/completed/2026-11-04-field-binder-brief.md`: the Manager, publication, and preparation.
 
 ## Current behavior
 
@@ -379,5 +380,26 @@ items in Escalation, Production scope, and Records.
 4. **Cancel ends the task at once.** Abandoning an upload task clears its report and releases exit
    responsibility immediately, even while its read is still running. The read is not aborted; the
    staged copy is discarded when it completes.
+
+## Closure — 2026-11-13
+
+The CA directed closure after accepting both uploads on screen in Admin.
+
+**Shipped.** A supplied id on `Uploads.stage` (`66238c1`) and `Uploads.stagedAddress`
+(`e1c2653`). Every upload a background task that stages, then places after Save; attachments
+writing placed addresses; the Binder's Source toggle, Library picker, rename, and delivery from
+server presence; one drain loop per pair (`914d0c5`). The Field Binder's later source work is in
+its own closure.
+
+**Not recorded.** The slow-source check after a stage storage reset, separately from the CA's
+acceptance.
+
+**Settled on closing.**
+
+- **Byte reclamation** is backlog B-42.
+- **Chunked or resumable storage** is dropped from this effort; architecture-core §10.5 holds it.
+- **Retry of a failed Binder upload** is dropped. Remove, then Add.
+- **Ops and Customer Portal capture** are roadmap M-9 and M-10.
+- **Task persistence across reloads** is dropped. Reports are transient by design.
 
 _End of Brief_

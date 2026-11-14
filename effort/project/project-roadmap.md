@@ -234,8 +234,8 @@ attaches and shares documents; field capture and its upload are the Ops applicat
 - **Stage on its storage roots** — closed 2026-11-12: the attachment and Field Binder roots are
   provisioned, the materialized policies applied, and the legacy namespace buckets disposed of.
   The CA ran it and accepted attaching in Admin.
-- **Background Tasks and Helm menus** — active,
-  `effort/active/2026-11-10-background-tasks-brief.md`: application-bound command menus and task
+- **Background Tasks** — closed 2026-11-13, `548d0e1`,
+  `effort/completed/2026-11-10-background-tasks-brief.md`: application-bound Helm commands and task
   reporting; uses attachment delivery first and supplies the Binder's command fitting.
 
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
@@ -253,14 +253,16 @@ store shared:
    `effort/completed/2026-10-30-document-store-supabase-brief.md`: `SupabaseDocumentProvider`
    over Storage's API with names in its metadata, swapped into `api` for `DocumentServer`; storage
    provisioning, reset, and usage tasks; the staff roles' storage policies; SDK 2.119.0.
-4. **The Field Binder** (`effort/active/2026-11-04-field-binder-brief.md`): Admin manages an
+4. **The Field Binder** — closed 2026-11-13, `7227120` through `a70a928`,
+   `effort/completed/2026-11-04-field-binder-brief.md`: Admin manages an
    independent remote source through its own upload pair; the reader opens a completely prepared
    local mirror. Files enter by upload. Depends on root binding and Helm menus above; Ops route
    and preparation-trigger integration is M-9's.
-5. **Upload Tasks** — active, `effort/active/2026-11-12-upload-tasks-brief.md`: both uploads run
+5. **Upload Tasks** — closed 2026-11-13, `914d0c5`,
+   `effort/completed/2026-11-12-upload-tasks-brief.md`: both uploads run
    as background tasks; a chosen document is a row at once, staging and delivery report progress,
-   and a Binder entry is delivered when its document is on the server. Its one `core/` change is
-   a supplied id on `Uploads.stage`, approved. Supersedes the Field Binder's entry
+   and a Binder entry is delivered when its document is on the server. Its two `core/cli`
+   changes, both approved, are a supplied id on `Uploads.stage` and `Uploads.stagedAddress`. Supersedes the Field Binder's entry
    shape, Manager Add and Edit, and Save sequence, and the attachment-only `DocumentDrain`.
 
 **Rides along:**
@@ -269,10 +271,10 @@ store shared:
   `effort/completed/2026-11-10-attachment-look-brief.md`: one row look for the notes and
   attachments tables through `LabelCell`, `CollectionPanel.renderLabel`, `UiText.size`, and the
   Attachments tab's fieldset and Add Attachment action.
-- **Helm menus** — active, `effort/active/2026-11-13-helm-menus-brief.md`: the Helm becomes a
-  toolbar of commands and menus, each menu a titled popover with separators; Tasks is a menu of
-  reports; overflow and `labelMode` go. Carries the Field Binder menu's Manage, Open, and
-  Synchronize.
+- **Helm menus** — closed 2026-11-13, `d6186c9`,
+  `effort/completed/2026-11-13-helm-menus-brief.md`: the Helm becomes a toolbar of commands and
+  menus, each menu a titled popover; Tasks is a menu of reports; overflow and `labelMode` go.
+  Carries the Field Binder menu's Manage, Open, and Synchronize.
 
 ## M-7 · Workflow, Task, Question & Service
 
@@ -332,7 +334,7 @@ bucket is designed here.
 
 **The Field Binder, Ops side** — every Ops device mirrors the binder into its `FieldBinder` store
 when behind its version, and a crew opens a document offline
-(`effort/active/2026-11-04-field-binder-brief.md`).
+(`effort/completed/2026-11-04-field-binder-brief.md`).
 
 ## M-10 · Customer Portal
 

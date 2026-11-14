@@ -63,7 +63,7 @@ Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close 
 Its themes predate decisions made since. §3 Asset Maintenance and §4 Chemical Maintenance describe
 manager work that has shipped, while maintenance itself became a dedicated workbench, parked as
 P-8. The Job Definition sections (§2.3–§2.9) are empty. Features decided since, such as the Field
-Binder (`effort/active/2026-11-04-field-binder-brief.md`), have no story. The roadmap draws on
+Binder (`effort/completed/2026-11-04-field-binder-brief.md`), have no story. The roadmap draws on
 the user stories (`EFFORT.md` §3), so bring them current before the next milestone is
 placed from them.
 
@@ -616,10 +616,10 @@ guard-css rule B7. Then each app that installs adds `viewport-fit=cover` to its 
 
 **Observed:** 2026-11-13 · normal
 
-Lists say they are loading in words: `CollectionTable`'s *"Loading {entity}s."*, behind every
-Manager and Lister, and the Service manager's *"Loading asset types…"* cell. `UiSpinner` is the
+Lists say they are loading in words: `CollectionTable`'s _"Loading {entity}s."_, behind every
+Manager and Lister, and the Service manager's _"Loading asset types…"_ cell. `UiSpinner` is the
 design system's loading indicator; the Field Binder pickers already use it. Each is a one-line
-swap. Select placeholders (*"Loading Users…"*, *"Loading asset types…"*) are text inside a
+swap. Select placeholders (_"Loading Users…"_, _"Loading asset types…"_) are text inside a
 dropdown, where a spinner cannot go; they stay unless the select gains a loading state.
 
 **Picking this up:** with the next `ux/shell` change.
