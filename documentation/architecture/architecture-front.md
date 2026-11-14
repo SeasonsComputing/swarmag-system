@@ -56,6 +56,12 @@ source/
     │   ├── users/                   — user manager
     │   ├── customers/               — customer manager and its steps
     │   ├── onboarding/              — guided new customer intake (COW)
+    │   ├── asset-types/             — asset type manager
+    │   ├── assets/                  — asset manager
+    │   ├── chemicals/               — chemical manager
+    │   ├── services/                — service manager
+    │   ├── library/                 — Library sheet: catalog manager launchers and document browsing
+    │   ├── field-binder/            — Field Binder manager and its library and chemical dialogs
     │   ├── workflow-builder/        — workflow authoring/editing
     │   ├── job-assessment/          — guided onsite detailed assessment (maps, photos, workflow mods)
     │   └── job-planning/            — workflow mods + crew + equipment + chemical assignment
@@ -315,6 +321,12 @@ existing widget maker. Sync is explicit and reports its preparation state throug
 a source entry does not implicitly prepare the local reader. Binder consumes its own Uploads
 instance and the established document-format policy. Ops/Portal composition does not register
 these screens or commands.
+
+Admin registers `/library` with `Routes.sheet` as `LibraryDialog`, opened from a Library button on
+the Admin Helm toolbar. Its top row launches the Asset Types, Assets, Chemicals, and Services
+managers; the Administration menu does not list them. Below the launchers, a `DrillNavigator` over
+`LibraryLevels` walks a Library topic, its records, and their documents; activating a document
+opens it in a secondary window.
 
 ### 7.3 Provided Infrastructure
 
@@ -661,6 +673,7 @@ are built as CONVENTIONS §17 describes; their behavior is in their module heade
   Finish. Both of the Wizard's progress presentations derive from the composed sequence.
 - `UserManager` returns the single `user-step-detail` step; `user-state.ts` owns the state,
   `UserDraft`, and the `userDraft(state)` projection.
+- `library/` supplies `LibraryDialog`, the Library sheet (§7.2.4).
 - Steps follow the naming in CONVENTIONS §4.2.
 
 The Customer workbench declares contact, identity, status, account-manager assignment, address,
@@ -874,14 +887,15 @@ Per `domain-model.md §2.5`:
 
 ### 11.6 Management Forms (app-admin)
 
-Standard domain pages follow a list → form pattern. Each root abstraction not subsumed by a feature page gets a domain page in `app-admin`.
+Standard domain pages are Managers: a list, then the selected item's steps. Each root abstraction not subsumed by a feature page gets a Manager in `app-admin`.
 
-| Domain Page | Form           | Key complexity                                |
-| ----------- | -------------- | --------------------------------------------- |
-| `/user`     | `UserForm`     | Role multi-select, status                     |
-| `/asset`    | `AssetForm`    | Type association, status                      |
-| `/service`  | `ServiceForm`  | Required asset types, facets                  |
-| `/chemical` | `ChemicalForm` | Signal word severity, restricted use, SDS url |
+| Route          | Manager            | Key complexity                                |
+| -------------- | ------------------ | --------------------------------------------- |
+| `/users`       | `UserManager`      | Role multi-select, status                     |
+| `/asset-types` | `AssetTypeManager` | Label, active status                          |
+| `/assets`      | `AssetManager`     | Type association, status                      |
+| `/services`    | `ServiceManager`   | Required asset types, facets                  |
+| `/chemicals`   | `ChemicalManager`  | Signal word severity, restricted use, SDS url |
 
 ### 11.7 Job Runner Interaction Contract (app-ops)
 

@@ -318,7 +318,7 @@ position and does not adapt.
    which Parts appear, and where, is configuration
 ```
 
-**Known uses.** The Admin, Customer, and Ops dashboards, composed from the shared widget catalog. Each application supplies only its dashboard JSON — the catalog is the kit, the dashboard is the chassis. In each application the dashboard is also the primary navigation: dashboard, then a page, then back to the dashboard; there is no navigation menu.
+**Known uses.** The Admin, Customer, and Ops dashboards, composed from the shared widget catalog. Each application supplies only its dashboard JSON — the catalog is the kit, the dashboard is the chassis. In each application the dashboard is also the primary navigation: a page opens from it, and closing the page returns to it.
 
 ## 5. Composition Rules
 
@@ -377,6 +377,7 @@ The machinery this repository already builds for the common cases. Reach for the
 | Present a standalone list and activate its Items | `Lister`                                                    | Collection                          |
 | Present one panel as a full-device dialog        | `Routes.sheet` + `PanelSheet`                               | —                                   |
 | Present a nested Collection at any depth         | `DrillDown` + `CollectionPanel`                             | Index-Detail                        |
+| Walk nested levels to one Item and activate it   | `DrillNavigator`; `DrillDialog` from a field                | Index                               |
 | Capture or review Items one at a time            | `UiCollectionCursor`                                        | Collection-Cursor                   |
 | Decompose a complex subject into steps           | `Wizard` + `PanelStep`                                      | Sequence                            |
 | Gate steps in order, in any workbench            | `createPanelSequence`                                       | Sequence                            |

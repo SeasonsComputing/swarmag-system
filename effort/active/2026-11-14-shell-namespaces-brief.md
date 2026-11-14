@@ -92,12 +92,12 @@ front/app/shell/
 
 ### Renames
 
-| From                                  | To                                                  |
-| ------------------------------------- | --------------------------------------------------- |
-| `about-box.tsx`, `about-box.css`      | `display/about-dialog.tsx`, `display/about-dialog.css` |
-| `AboutBox`                            | `AboutDialog`                                       |
-| `field-binder.tsx`                    | `field-binder/field-binder-dialog.tsx`              |
-| `FieldBinder`, `FieldBinderProps`     | `FieldBinderDialog`, `FieldBinderDialogProps`       |
+| From                              | To                                                     |
+| --------------------------------- | ------------------------------------------------------ |
+| `about-box.tsx`, `about-box.css`  | `display/about-dialog.tsx`, `display/about-dialog.css` |
+| `AboutBox`                        | `AboutDialog`                                          |
+| `field-binder.tsx`                | `field-binder/field-binder-dialog.tsx`                 |
+| `FieldBinder`, `FieldBinderProps` | `FieldBinderDialog`, `FieldBinderDialogProps`          |
 
 Every other file keeps its name and exports and moves to its namespace. Imports follow the
 existing rules: a sibling in the same namespace by relative path, anything else through its
@@ -150,8 +150,6 @@ Not amended:
 - `project-roadmap.md` M-4 · Notes Editor, a closed milestone: its "lands in `front/app/shell/`"
   is history.
 - `effort/genesis/**`: genesis is off limits.
-- The Field Binder picker references (architecture-front §7.2.4 Document Storage,
-  `project-backlog.md`) belong to the Library brief, which renames the pickers.
 
 The census covered every live Markdown file on 2026-11-14 and found no other references.
 
@@ -159,12 +157,12 @@ The census covered every live Markdown file on 2026-11-14 and found no other ref
 
 Paths are under `source/`.
 
-| Files                                                         | Work                                    |
-| ------------------------------------------------------------- | --------------------------------------- |
-| `front/app/shell/**`                                          | Move into the five namespaces; renames  |
-| `front/app-admin/**` (18 modules and `app.tsx`)               | Import paths; `FieldBinderDialog` route |
-| `front/app-ops/app.tsx`, `front/app-customer/app.tsx`         | Import paths                            |
-| `tests/cases/` (the 6 cases named under Current behavior)     | Import paths                            |
+| Files                                                     | Work                                    |
+| --------------------------------------------------------- | --------------------------------------- |
+| `front/app/shell/**`                                      | Move into the five namespaces; renames  |
+| `front/app-admin/**` (18 modules and `app.tsx`)           | Import paths; `FieldBinderDialog` route |
+| `front/app-ops/app.tsx`, `front/app-customer/app.tsx`     | Import paths                            |
+| `tests/cases/` (the 6 cases named under Current behavior) | Import paths                            |
 
 Out of scope:
 
