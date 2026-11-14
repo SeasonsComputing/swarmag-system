@@ -1,6 +1,7 @@
 # Helm Menus — Brief
 
-**Active, undispatched draft; captured 2026-11-13.** Foundation mode: the Helm's configuration
+**Active; reviewed by ACE 2026-11-13; amended once (After ACE review, at the end). Captured
+2026-11-13.** Foundation mode: the Helm's configuration
 contract and widget in locked `ux/widgets`, and the three applications' dashboard configuration.
 The CA settled the design and approved the `ux/widgets` change (Escalation). Records hold the
 reasons.
@@ -100,11 +101,13 @@ Each item keeps its existing icon. No icon is added.
 
 ## Governing documents to amend
 
+_[Amended by the amendment "After ACE review", item 2: ACE amends it first.]_
 - **architecture-front §7.2.4, Document Storage:** the Binder's Helm entries are Manage, Open,
   and Synchronize, with the status line.
 
 ## Production scope
 
+_[Amended by the amendment "After ACE review", item 1: the task list joins the scope.]_
 Paths are under `source/`.
 
 | Files                                                                         | Work                                                   |
@@ -135,6 +138,7 @@ Escalate any change outside this scope.
 - A configuration with `labelMode`, `@tasks` inside a menu, or a nested menu fails validation.
 - CA verifies on screen in each application.
 
+_[Amended by the amendment "After ACE review", item 3: the browser test runs too.]_
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYLE_AUDIT.
 
 ## Records
@@ -149,5 +153,22 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
 - **Tasks is a menu of reports.** It is a popover of items like any menu; its items are live.
 - **Titles live in configuration.** Each application names its main menu in its dashboard JSON
   rather than deriving it from its application name.
+
+## Amendment — 2026-11-13 — After ACE review
+
+ACE's review raised three points. Each follows from the target design; this amendment states
+them. It supersedes the marked passages in Governing documents to amend, Production scope, and
+Acceptance.
+
+1. **The task list is the Tasks menu's items.** `ux/widgets/background-task-list.tsx` (and its
+   CSS, where a rule serves only what goes) joins the production scope. It keeps rendering each
+   report: label, progress, error, and Dismiss. It loses its own "Tasks" heading, because the
+   menu's configured label is the title, and both explanatory paragraphs, because a menu holds
+   only items. The `BackgroundTasks` contract is unchanged.
+2. **ACE amends architecture-front §7.2.4 first.** The amendment is in ACE's production scope and
+   comes before the code, since documentation leads code.
+3. **The browser test changes with the Helm.** `bootstrap-lifecycle-test.ts` drops its overflow
+   and in-menu task assertions and covers the toolbar, menus, and Tasks. Its browser run
+   (`-- --browser`) is part of acceptance and runs with the other checks.
 
 _End of Brief_
