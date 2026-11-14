@@ -67,28 +67,28 @@ When this library provides a UI control for an HTML element or interaction
 pattern, application code must use the corresponding UI control instead of the native element.
 This is a design-system boundary, not a stylistic preference.
 
-| Use                                  | Do Not Use                                              |
-| ------------------------------------ | ------------------------------------------------------- |
-| `UiButton`                           | `<button>`                                              |
-| `UiInput`                            | `<input>`                                               |
-| `UiTextArea`                         | `<textarea>`                                            |
-| `UiSingleSelect`                     | `<select>`                                              |
-| `UiCheckbox`                         | `<input type='checkbox'>`                               |
-| `UiRadioGroup`, `UiRadioItem`        | `<input type='radio'>`                                  |
-| `UiToggle`, `UiToggleGroup`          | ad hoc pressed button groups                            |
-| `UiTabs`                             | ad hoc tab markup                                       |
-| `UiAccordion`                        | ad hoc disclosure markup                                |
-| `UiDialog`, `UiPopover`, `UiTooltip` | ad hoc overlay primitives                               |
-| `UiProgress`                         | raw progress markup                                     |
-| `UiBadge`, `UiAlert`, `UiAvatar`     | ad hoc status display markup                            |
-| `UiCard`                             | ad hoc panel wrappers                                   |
-| `UiList`, `UiListItem`               | `<ul>`, `<ol>`, `<li>`                                  |
-| `UiTable`                            | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
-| `UiFieldset`                         | `<fieldset>` + `<legend>`                               |
-| `UiField`                            | `<div>` + `<label>` + {control}                         |
-| `UiCollectionCursor`                 | ad hoc position or paging controls                      |
-| `UiLayout`, `UiFormActions`          | ad hoc layout wrappers                                  |
-| `UiText`                             | hand-rolled label, number, or empty-value text rules    |
+| Use                                                     | Do Not Use                                              |
+| ------------------------------------------------------- | ------------------------------------------------------- |
+| `UiButton`                                              | `<button>`                                              |
+| `UiInput`                                               | `<input>`                                               |
+| `UiTextArea`                                            | `<textarea>`                                            |
+| `UiSingleSelect`                                        | `<select>`                                              |
+| `UiCheckbox`                                            | `<input type='checkbox'>`                               |
+| `UiRadioGroup`, `UiRadioItem`                           | `<input type='radio'>`                                  |
+| `UiToggle`, `UiToggleGroup`                             | ad hoc pressed button groups                            |
+| `UiTabs`                                                | ad hoc tab markup                                       |
+| `UiAccordion`                                           | ad hoc disclosure markup                                |
+| `UiDialog`, `UiConfirmDialog`, `UiPopover`, `UiTooltip` | ad hoc overlays and confirmations                       |
+| `UiProgress`                                            | raw progress markup                                     |
+| `UiBadge`, `UiAlert`, `UiAvatar`                        | ad hoc status display markup                            |
+| `UiCard`                                                | ad hoc panel wrappers                                   |
+| `UiList`, `UiListItem`                                  | `<ul>`, `<ol>`, `<li>`                                  |
+| `UiTable`                                               | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
+| `UiFieldset`                                            | `<fieldset>` + `<legend>`                               |
+| `UiField`                                               | `<div>` + `<label>` + {control}                         |
+| `UiCollectionCursor`                                    | ad hoc position or paging controls                      |
+| `UiLayout`, `UiFormActions`                             | ad hoc layout wrappers                                  |
+| `UiText`                                                | hand-rolled label, number, or empty-value text rules    |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
 state rendering, and accessibility behavior aligned with the design language.
@@ -639,9 +639,10 @@ UiAccordion
 
 ### 3.12 UiDialog
 
-General modal primitive with overlay for focused tasks such as edit forms and
-confirmations. Use triggered mode when the dialog owns its opener control; use
-controlled mode when open state is owned externally.
+General modal primitive with overlay for focused tasks such as edit forms. A
+confirmation is `UiConfirmDialog` (Confirmation, below). Use triggered mode when
+the dialog owns its opener control; use controlled mode when open state is owned
+externally.
 
 **Two modes**
 
@@ -695,6 +696,41 @@ controlled mode when open state is owned externally.
     <MyForm onClose={() => setOpen(false)} />
   </UiLayout>
 </UiDialog>
+```
+
+**Confirmation: `UiConfirmDialog`**
+
+The one confirmation dialog: a title, an optional message, Cancel, and one action, at `content`
+size. It renders open; the host shows it while a confirmation is pending and closes it from its
+handlers.
+
+| Prop        | Type                                                 | Required | Default | Description                                          |
+| ----------- | ---------------------------------------------------- | -------- | ------- | ---------------------------------------------------- |
+| `title`     | `string`                                             | yes      | —       | The question.                                        |
+| `message`   | `string`                                             | no       | unset   | What confirming does.                                |
+| `action`    | `{ label: string; variant?: 'danger' \| 'primary' }` | yes      | —       | The action button; `variant` defaults to `'danger'`. |
+| `onConfirm` | `() => void \| Promise<void>`                        | yes      | —       | Runs the action.                                     |
+| `onCancel`  | `() => void`                                         | yes      | —       | Cancel, Escape, or an outside click.                 |
+
+While a returned promise runs, both buttons are disabled, the action shows loading, and dismissal
+is ignored. A rejection shows its message in a danger `UiAlert`, and the dialog stays open; the
+host closes it when the action succeeds.
+
+Emitted attributes: `data-ui='confirm-dialog'`, `data-ui='confirm-dialog-title'`,
+`data-ui='confirm-dialog-message'`.
+
+```tsx
+<Show when={pendingRemove()}>
+  {target => (
+    <UiConfirmDialog
+      title='Remove attachment?'
+      message='This attachment will be removed from the note.'
+      action={{ label: 'Remove' }}
+      onConfirm={() => remove(target())}
+      onCancel={() => setPendingRemove(null)}
+    />
+  )}
+</Show>
 ```
 
 ### 3.13 UiPopover
@@ -1272,11 +1308,8 @@ update.
 `data-ui='collection-cursor-actions'`, `data-ui='collection-cursor-rule'`,
 `data-ui='collection-cursor-body'`, `data-ui='collection-cursor-empty'`,
 `data-ui='collection-cursor-empty-icon'`, `data-ui-icon`,
-`data-ui='collection-cursor-empty-message'`,
-`data-ui='collection-cursor-confirm'`,
-`data-ui='collection-cursor-confirm-title'`,
-`data-ui='collection-cursor-confirm-message'`,
-`data-ui='collection-cursor-confirm-actions'`.
+`data-ui='collection-cursor-empty-message'`. Its delete confirmation is a
+`UiConfirmDialog` (§3.12).
 
 **Example**
 

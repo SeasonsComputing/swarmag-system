@@ -80,6 +80,9 @@ badge
 button
 card
 checkbox
+confirm-dialog
+confirm-dialog-message
+confirm-dialog-title
 dialog
 dialog-overlay
 field
@@ -375,24 +378,25 @@ This selector shape is invalid because one element cannot hold two different `da
 
 ### 5.1 Interactive Controls
 
-| Control         | Intent                                                                 |
-| --------------- | ---------------------------------------------------------------------- |
-| `button`        | Action trigger with primary, secondary, ghost, and danger variants     |
-| `action-button` | Compact icon action button for dense surfaces; icon via `data-ui-icon` |
-| `input`         | Single-line text entry                                                 |
-| `textarea`      | Multi-line text entry                                                  |
-| `single-select` | Dropdown single-value picker                                           |
-| `multi-select`  | Inline multi-value listbox                                             |
-| `checkbox`      | Checkbox with inline label                                             |
-| `radio-group`   | Radio selection group                                                  |
-| `toggle`        | Standalone pressed/unpressed toggle                                    |
-| `toggle-group`  | Single-select segmented toggle group                                   |
-| `tabs`          | Tabbed content primitive                                               |
-| `accordion`     | Collapsible content primitive                                          |
-| `dialog`        | Modal content primitive with overlay                                   |
-| `popover`       | Floating content panel anchored to a trigger                           |
-| `tooltip`       | Hover/focus advisory content                                           |
-| `progress`      | Linear determinate progress, with `progress-track` and `progress-fill` |
+| Control          | Intent                                                                 |
+| ---------------- | ---------------------------------------------------------------------- |
+| `button`         | Action trigger with primary, secondary, ghost, and danger variants     |
+| `action-button`  | Compact icon action button for dense surfaces; icon via `data-ui-icon` |
+| `input`          | Single-line text entry                                                 |
+| `textarea`       | Multi-line text entry                                                  |
+| `single-select`  | Dropdown single-value picker                                           |
+| `multi-select`   | Inline multi-value listbox                                             |
+| `checkbox`       | Checkbox with inline label                                             |
+| `radio-group`    | Radio selection group                                                  |
+| `toggle`         | Standalone pressed/unpressed toggle                                    |
+| `toggle-group`   | Single-select segmented toggle group                                   |
+| `tabs`           | Tabbed content primitive                                               |
+| `accordion`      | Collapsible content primitive                                          |
+| `dialog`         | Modal content primitive with overlay                                   |
+| `confirm-dialog` | Confirmation dialog: title, message, Cancel, one action                |
+| `popover`        | Floating content panel anchored to a trigger                           |
+| `tooltip`        | Hover/focus advisory content                                           |
+| `progress`       | Linear determinate progress, with `progress-track` and `progress-fill` |
 
 ### 5.2 Display Controls
 
