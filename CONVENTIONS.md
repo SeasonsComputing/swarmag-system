@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.19)
+# Software Construction Conventions (1.20)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.19
-- Published: 2026 November 13th
+- Version: 1.20
+- Published: 2026 November 14th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -147,6 +147,23 @@ Acronyms are not a special case — they are words, and words transform with the
 | API          | `Api`      | `api`     | `api-`     |
 | URL          | `Url`      | `url`     | `url-`     |
 | ID           | `Id`       | `id`      | `id-`      |
+
+### 4.4 Subject and kind, family and role
+
+A name's shape says whether it names a finished thing or a piece to build with.
+
+- **Subject, then kind.** A finished thing works as it is; its host gives it only wiring. It is
+  named for its subject, then its kind: `InvoiceManager`, `CustomerPicker`, `SettingsDialog`.
+  The kind is the word for what the user meets. A component the user meets as a dialog has
+  `Dialog` as its kind, whether it renders the dialog itself or its route does.
+- **Family, then role.** A piece built with does nothing until it is constructed. Its family
+  prefix comes first, then its role: `PanelSheet`, `PanelList`, `PanelHeader`; `UiDialog`,
+  `UiTable`. A family has siblings; a lone prefix reads as a subject.
+
+The same word may close both shapes, as in `UiDialog` and `SettingsDialog`; the first word says
+which shape it is. A file is named for its export (§4.2), so a family's files share its prefix and
+cluster when they move into a folder of their own. Folder layout is the leaf guard's
+(`guard:leaf`, §19.1).
 
 ## 5. Source Code Formatting
 
@@ -1212,7 +1229,7 @@ file declares them and hands them to `bootstrap`; the shell does the rest.
   preference state, session initialization, and mounting the route runtime.
 - **Two shells:** an anonymous shell for signed-out routes and a dashboard shell for the signed-in
   application. `makeAnonymousShell` and `makeDashboardShell` (`@ux/shell/runtime/shell-makers.tsx`)
-  take branded route components (a login, an about box, a footer) as parameters; the shell never
+  take branded route components (a login, an About dialog, a footer) as parameters; the shell never
   imports a branded component. An application binds its brand once, in makers of its own, and
   every root uses the bound makers.
 - The shell is a closed framework. It owns its extension contracts (widgets, session) and never
@@ -1558,9 +1575,9 @@ it is not tied to a Collection or to a list.
   `'workbench'`.
 
 ```typescript
-Routes.sheet('/field-binder', FieldBinder)
+Routes.sheet('/documents', DocumentsDialog)
 
-<PanelSheet title='Field Binder' onCancel={props.onCancel} busy={pending()}>
+<PanelSheet title='Documents' onCancel={props.onCancel} busy={pending()}>
   <CollectionTable provider={provider} activate={activate} />
 </PanelSheet>
 ```
@@ -1624,6 +1641,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.20    | 2026 November 14th  | New §4.4 Subject and kind, family and role: a finished thing is named subject then kind, `Dialog` included; a piece built with is named family then role, and a family has siblings; folder layout is the leaf guard's. §16.1 and §17.7 name the About and sheet examples by that rule, and §17.7's example no longer cites application code.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.19    | 2026 November 13th  | §17.7: a sheet is the one-panel dialog; its size and its full-device behavior on a phone belong to the design language, which the section already cites, and are no longer restated here. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | 1.18    | 2026 November 13th  | §10.8: a supplied id lets a caller write and store a node's address before the node exists; the nominal identity still comes only from the store or a stored reference. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 1.17    | 2026 November 10th  | New §17.3 Index: `Lister`, a standalone list over `CollectionContract`, which `ManagerContract` extends; activation is the consumer's. The former §17.3–§17.5 are renumbered §17.4–§17.6.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
