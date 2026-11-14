@@ -36,6 +36,13 @@ import type { HelmBindings, HelmCommand, HelmMenuItem, HelmToolbarItem } from '.
 
 import './helm-widget.css'
 
+/** What a menu popover shows: its trigger glyph, its disabled state, and its items. */
+type HelmMenuSpec = {
+  icon: string
+  disabled: () => boolean
+  content: () => UiComponent
+}
+
 /** Bind application behavior; an empty binding preserves the generic default. */
 export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
 (
@@ -161,15 +168,4 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
       </UiLayout>
     </nav>
   )
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// IMPLEMENTATION
-// ────────────────────────────────────────────────────────────────────────────
-
-/** What a menu popover shows: its trigger glyph, its disabled state, and its items. */
-type HelmMenuSpec = {
-  icon: string
-  disabled: () => boolean
-  content: () => UiComponent
 }
