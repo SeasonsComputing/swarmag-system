@@ -141,10 +141,8 @@ Amended by the AA before production, each in its own change:
 3. **README** §2.4.5 UX Toolkit: the `session-coordinator.ts` path.
 4. **`project-backlog.md`** B-9: the `login.tsx` path.
 
-Open for the CA:
-
-- `effort/pending/2026-10-10-access-model-brief.md`, decision 13: "lives in `front/app/shell/`"
-  names the suite tier. The feature it describes becomes its own namespace there when built.
+5. **`effort/pending/2026-10-10-access-model-brief.md`**, decision 13: Starting Job Work is a
+   namespace of its own in `front/app/shell/`.
 
 Not amended:
 

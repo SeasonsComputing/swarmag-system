@@ -77,7 +77,8 @@ active user.
     subject (backlog: B-29 "Job work records stamp the session user"). Anyone who chose a Job may run
     it.
 13. **Starting Job Work is an office feature.** It transitions the Job to `executing` and finalizes
-    the manifest. It lives in `front/app/shell/` so that Admin uses it now and `app-leads` later.
+    the manifest. It is a namespace of its own in `front/app/shell/`, so that Admin uses it now and
+    `app-leads` later.
     Ops runs only Jobs already started.
 
 ## Reasoning trail
