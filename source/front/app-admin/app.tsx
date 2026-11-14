@@ -9,10 +9,7 @@
 import '@front/config/ux-config.ts'
 
 // bootstrap
-import { BackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnings.ts'
 import { bootstrap } from '@ux/shell/runtime/bootstrap.tsx'
-
-import { DocumentDrain } from './document-drain.ts'
 
 // shell bindings
 import { api } from '@front/api/api.ts'
@@ -30,9 +27,11 @@ import { rootServices } from '@front/app/shell/root-services.ts'
 import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
 import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/shell-makers.tsx'
 import { AppWidgetRegistry } from '@front/app/widgets/widget-registry.ts'
+import { BackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnings.ts'
 import { Routes } from '@ux/shell/runtime/shell.ts'
 import { makeHelmWidget } from '@ux/widgets/make-helm-widget.tsx'
 import { UxWidgetRegistry } from '@ux/widgets/widget-registry.ts'
+import { DocumentDrain } from './document-drain.ts'
 
 // application specialized dashboard
 import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
