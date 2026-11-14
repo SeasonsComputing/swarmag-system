@@ -308,10 +308,12 @@ its complete local mirror. A shared API binding does not grant a role remote acc
 an editable reader. Remote access is governed by storage policies.
 
 Admin registers `/field-binder-manager` with the stock Manager and one Detail step: on Add, a
-Source toggle (Upload, Library, URL) chooses the document; the step shows its name and kind and
-edits its description and source URL. Edit renames the document and never replaces it. A row is
-pending until its document is on the server. `/field-binder` uses the read-only Lister over local
-bytes.
+Source toggle (Upload, Library, Chemicals) chooses the document. Library and Chemicals each open
+a picker sheet over their documents. Chemicals walks three numbered steps: select a chemical's
+SDS or label link, which becomes the source URL; open it and save the file; upload that file.
+The step shows the document's name and kind and edits its description and source URL. Edit
+renames the document and never replaces it. A row is pending until its document is on the
+server. `/field-binder` uses the read-only Lister over local bytes.
 Its app-root Helm binding supplies Manage, Open, and Synchronize, with the status line, through the
 existing widget maker. Sync is explicit and reports its preparation state through BackgroundTasks; saving
 a source entry does not implicitly prepare the local reader. Binder consumes its own Uploads
