@@ -31,6 +31,8 @@ FieldBinderPickerProps  Picker inputs.
 ├ label                 The opening button's label and the sheet's title.
 ├ title                 The card's heading and the root level's title.
 ├ disabled              The host is busy.
+├ name                  The form field the picker fills.
+├ error                 The field is shown invalid.
 └ root                  The first level.
 FieldBinderPicker       Opening button and sheet.
 */
@@ -80,11 +82,13 @@ export type PickerBranch = PickerRowBase & { open: () => PickerLevel }
 /** A row that chooses; choosing closes the sheet, then runs. */
 export type PickerLeaf = PickerRowBase & { choose: () => void }
 
-/** The button and sheet labels, the host's busy state, and the first level. */
+/** The button and sheet labels, the host's busy state, the field it fills, and the first level. */
 export type FieldBinderPickerProps = {
   label: string
   title: string
   disabled: boolean
+  name: string
+  error: boolean
   root: PickerLevel
 }
 
@@ -117,6 +121,8 @@ export const FieldBinderPicker = (props: FieldBinderPickerProps): UiComponent =>
         align='start'
         density='dense'
         disabled={props.disabled}
+        name={props.name}
+        error={props.error}
         onClick={() => setOpen(true)}
       />
       <Show when={open()}>

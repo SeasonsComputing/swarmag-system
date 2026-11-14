@@ -16,6 +16,8 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 FieldBinderLibraryPickerProps  Picker inputs.
 ├ disabled                     The host is busy.
+├ name                         The form field the picker fills.
+├ error                        The field is shown invalid.
 └ onChoose                     Receives the chosen document.
 FieldBinderLibraryPicker       Choose-from-library button and sheet.
 */
@@ -35,6 +37,8 @@ import type { PickerLevel } from './field-binder-picker.tsx'
 /** The host's busy state and the chosen document's receiver. */
 export type FieldBinderLibraryPickerProps = {
   disabled: boolean
+  name: string
+  error: boolean
   onChoose: (name: string, read: UploadRead, record: { topic: LibraryTopic; id: Id }) => void
 }
 
@@ -81,6 +85,8 @@ export const FieldBinderLibraryPicker = (props: FieldBinderLibraryPickerProps): 
       label='Choose from library'
       title='Library'
       disabled={props.disabled}
+      name={props.name}
+      error={props.error}
       root={topics}
     />
   )

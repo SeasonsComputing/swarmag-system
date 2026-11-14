@@ -19,6 +19,8 @@ ChemicalDocument                A chosen chemical document link.
 └ url                           The document's link.
 FieldBinderChemicalPickerProps  Picker inputs.
 ├ disabled                      The host is busy.
+├ name                          The form field the picker fills.
+├ error                         The field is shown invalid.
 └ onChoose                      Receives the chosen document.
 FieldBinderChemicalPicker       Add-chemical-document button and sheet.
 */
@@ -37,6 +39,8 @@ export type ChemicalDocument = { chemical: Id; name: string; url: string }
 /** The host's busy state and the chosen document's receiver. */
 export type FieldBinderChemicalPickerProps = {
   disabled: boolean
+  name: string
+  error: boolean
   onChoose: (document: ChemicalDocument) => void
 }
 
@@ -71,6 +75,8 @@ export const FieldBinderChemicalPicker = (props: FieldBinderChemicalPickerProps)
       label='Add Chemical Document'
       title='Chemicals'
       disabled={props.disabled}
+      name={props.name}
+      error={props.error}
       root={chemicals}
     />
   )

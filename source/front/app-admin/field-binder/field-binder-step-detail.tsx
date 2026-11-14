@@ -147,6 +147,8 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
               >
                 <FieldBinderLibraryPicker
                   disabled={props.context.busy()}
+                  name='document'
+                  error={validation.isInvalid('document')}
                   onChoose={(name, read, record) => choose(() => state.choose(name, read, record))}
                 />
               </Show>
@@ -155,6 +157,8 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
               <UiField label='1. Select chemical document' variant='caption'>
                 <FieldBinderChemicalPicker
                   disabled={props.context.busy()}
+                  name='link'
+                  error={validation.isInvalid('link')}
                   onChoose={chosen => {
                     state.chooseLink(chosen.name, chosen.url)
                     validation.changeField('link')
