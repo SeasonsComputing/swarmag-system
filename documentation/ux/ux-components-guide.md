@@ -837,24 +837,35 @@ catalog name is valid for an action button.
 
 ### 4.1 UiBadge
 
-Inline status pill.
+Inline pill for semantic status or category identification by color.
 
 **Props**
 
 Extends native `span` attributes, excluding styling and semantic hook props.
 
-| Prop       | Type                                           | Default | Description           |
-| ---------- | ---------------------------------------------- | ------- | --------------------- |
-| `variant`  | `'success' \| 'warning' \| 'danger' \| 'info'` | unset   | Status tone.          |
-| `disabled` | `boolean`                                      | `false` | Emits disabled state. |
-| `error`    | `boolean`                                      | `false` | Emits error state.    |
-| `loading`  | `boolean`                                      | `false` | Emits loading state.  |
+| Prop       | Type                                                                                 | Default | Description                               |
+| ---------- | ------------------------------------------------------------------------------------ | ------- | ----------------------------------------- |
+| `variant`  | `'success' \| 'warning' \| 'danger' \| 'info' \| 'color'`                            | unset   | Semantic status or named-color treatment. |
+| `color`    | `'gray' \| 'yellow' \| 'green' \| 'red' \| 'blue' \| 'purple' \| 'orange' \| 'cyan'` | unset   | Required only for `variant='color'`.      |
+| `disabled` | `boolean`                                                                            | `false` | Emits disabled state.                     |
+| `error`    | `boolean`                                                                            | `false` | Emits error state.                        |
+| `loading`  | `boolean`                                                                            | `false` | Emits loading state.                      |
+
+`variant='color'` requires `color`. Semantic variants and the omitted/default variant do not
+accept `color`; the props enforce these alternatives. The color treatment selects the background
+and keeps the default badge text and border roles.
+
+**Emitted Attributes**
+
+`data-ui='badge'`, `data-ui-variant`, `data-ui-state`, and, for the color variant only,
+`data-ui-color`. The component owns these attributes; consumers supply `variant` and `color`.
 
 **Example**
 
 ```tsx
 <UiBadge variant='success'>Active</UiBadge>
 <UiBadge variant='warning'>Pending</UiBadge>
+<UiBadge variant='color' color='yellow'>Library</UiBadge>
 ```
 
 ### 4.2 UiAlert

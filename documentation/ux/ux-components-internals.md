@@ -147,7 +147,7 @@ Variants are only valid where explicitly declared.
 | --------------- | -------------------- | ---------------------------------------------------------------------------- |
 | `action-button` | `data-ui-variant`    | `default`, `danger`                                                          |
 | `alert`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`                                       |
-| `badge`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`                                       |
+| `badge`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`, `color`                              |
 | `button`        | `data-ui-variant`    | `primary`, `secondary`, `ghost`, `danger`                                    |
 | `card`          | `data-ui-decoration` | `gradient`                                                                   |
 | `card`          | `data-ui-elevation`  | `raised`, `floating`                                                         |
@@ -158,22 +158,30 @@ Variants are only valid where explicitly declared.
 
 Controls and parts may additionally declare these extension attributes:
 
-| Control / Part    | Attribute             | Declared Values                       |
-| ----------------- | --------------------- | ------------------------------------- |
-| `action-button`   | `data-ui-align`       | `start`, `end`                        |
-| `action-button`   | `data-ui-icon`        | Any `icons.css` catalog name          |
-| `layout`          | `data-ui-gap`         | `loose`, `tight`, `none`              |
-| `tab-list`        | `data-ui-drag`        | `enabled`, `active`                   |
-| `tab-list`        | `data-ui-layout`      | `between`                             |
-| `table-cell`      | `data-ui-align`       | `start`, `center`, `end`              |
-| `table-container` | `data-ui-overflow`    | `hidden`, `scroll`                    |
-| `table-row`       | `data-ui-interactive` | Presence only — emitted, never valued |
+| Control / Part    | Attribute             | Declared Values                                                      |
+| ----------------- | --------------------- | -------------------------------------------------------------------- |
+| `action-button`   | `data-ui-align`       | `start`, `end`                                                       |
+| `action-button`   | `data-ui-icon`        | Any `icons.css` catalog name                                         |
+| `badge`           | `data-ui-color`       | `gray`, `yellow`, `green`, `red`, `blue`, `purple`, `orange`, `cyan` |
+| `layout`          | `data-ui-gap`         | `loose`, `tight`, `none`                                             |
+| `tab-list`        | `data-ui-drag`        | `enabled`, `active`                                                  |
+| `tab-list`        | `data-ui-layout`      | `between`                                                            |
+| `table-cell`      | `data-ui-align`       | `start`, `center`, `end`                                             |
+| `table-container` | `data-ui-overflow`    | `hidden`, `scroll`                                                   |
+| `table-row`       | `data-ui-interactive` | Presence only — emitted, never valued                                |
 
 Rules:
 
 - no undeclared variants
 - no implicit defaults beyond what is defined
 - controls do not invent free-form values
+
+Badge emits `data-ui-color` only with `data-ui-variant='color'`. Its public props require a color
+for that variant and prohibit color on semantic or default variants. The color prop is consumed
+by the component rather than forwarded as a native span attribute. Consumers cannot supply
+`data-ui-color` directly. Color selectors match both the variant and color attributes, use the
+corresponding `--sa-bg-color-*` role for the background, and keep the default badge text and
+border roles. Semantic variants use their `--sa-state-*` roles.
 
 The `data-ui-icon` glyph set is defined in `icons.css`, which maps the
 full icon library: each entry binds its asset filename to the matching SVG via the inherited
@@ -390,7 +398,7 @@ This selector shape is invalid because one element cannot hold two different `da
 
 | Control     | Intent                                                       |
 | ----------- | ------------------------------------------------------------ |
-| `badge`     | Inline status pill                                           |
+| `badge`     | Inline semantic status or named-color category pill          |
 | `alert`     | Inline feedback message with left-border accent              |
 | `avatar`    | User or entity initials/avatar marker                        |
 | `card`      | Framed content surface with decoration and elevation control |
