@@ -124,7 +124,7 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
       open={open() === surface}
       onOpenChange={value => changeOpen(surface, value)}
     >
-      <UiLayout variant='block-fit' gap='tight' data-widget='helm-menu'>
+      <UiLayout variant='block-fit' data-widget='helm-menu'>
         <span data-widget='helm-menu-title'>{surface.label}</span>
         {spec.content()}
       </UiLayout>
