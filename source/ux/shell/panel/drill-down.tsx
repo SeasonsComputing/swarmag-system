@@ -7,11 +7,16 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Hosts a root panel and lets descendants replace it with a child panel while the
-host owns the return control and directional transition.
+host owns the return control and directional transition. A hosting surface that
+passes a DrillHostContext takes the return control into its own header; without
+one, DrillDown draws its own return row.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 DrillDownProps  Props for the drill-down host.
+├ rootTitle     The root panel's title, and the first return label.
+├ root          Renders the root panel, given the DrillContract.
+└ context       Optional hosting surface; takes the return control and header.
 DrillDown       Render the drill-down host surface.
 
 SEMANTICS
@@ -20,7 +25,8 @@ Opened panels receive DrillPanelContext: isActive, registerDirty, registerSave,
 and returnToParent; CollectionPanel passes that context to its item renderer.
 Panel activity is host-owned and independent of depth. Only the active panel
 supplies the header Save; a covered panel retains its working copy and dirty
-checks. Every open panel contributes to workbench discard protection.
+checks. Every open panel contributes to the hosting surface's discard protection
+when it registers dirty checks.
 
 Local drill-back checks only the active panel and asks before discarding
 changes. A successful Save validates and updates the parent draft before
@@ -40,16 +46,20 @@ import {
 } from '@solid-js'
 import { UiActionButton, UiButton, UiDialog, UiFormActions, UiLayout } from '@ux/ui'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
-import type { DrillContract, DrillPanelContext, DrillReturnControl } from './drill-contract.ts'
-import type { PanelStepContext } from './panel-sequence-contract.ts'
+import type {
+  DrillContract,
+  DrillHostContext,
+  DrillPanelContext,
+  DrillReturnControl
+} from './drill-contract.ts'
 
 import './drill-down.css'
 
-/** Props for the drill-down host and its optional workbench services. */
+/** Props for the drill-down host and its optional hosting surface. */
 export type DrillDownProps = {
   rootTitle: string
   root: (drill: DrillContract) => UiComponent
-  context?: PanelStepContext
+  context?: DrillHostContext
 }
 
 /** Direction of the current drill panel transition. */
@@ -119,7 +129,7 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
           isActive: (): boolean => isOpen() && frame() === current,
           registerDirty: (check: () => boolean): () => void => {
             current.dirty.add(check)
-            const unregister = props.context?.registerDirty(check)
+            const unregister = props.context?.registerDirty?.(check)
             const cleanup = (): void => {
               current.dirty.delete(check)
               unregister?.()
@@ -157,7 +167,7 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
       }
       : null
     props.context?.registerDrillReturn(control)
-    props.context?.registerTrailingAction(current.save())
+    props.context?.registerTrailingAction?.(current.save())
   })
   onCleanup(() => {
     let current = frame()
@@ -166,7 +176,7 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
       current = current.parent
     }
     props.context?.registerDrillReturn(null)
-    props.context?.registerTrailingAction(null)
+    props.context?.registerTrailingAction?.(null)
   })
 
   return (

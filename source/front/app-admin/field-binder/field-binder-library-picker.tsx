@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-An Index-Detail over the Library's attachments, in a picker sheet: the Library
+Declares three picker levels over the Library's attachments: the Library
 topics, a topic's records, and a record's documents from its notes. Choosing a
 document hands back its name, a read of its bytes through Attachments that
 reports download progress from the response body, and the record it came from.
@@ -22,16 +22,15 @@ FieldBinderLibraryPicker       Choose-from-library button and sheet.
 
 import type { Id } from '@core/std'
 import { listAll } from '@core/stdx'
-import type { Attachment, Note } from '@domain/abstractions/common.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 import { api } from '@front/api/api.ts'
 import { LIBRARY_TOPICS } from '@front/api/attachments.ts'
 import type { LibraryTopic } from '@front/api/attachments.ts'
 import type { UploadRead } from '@front/api/upload-task.ts'
-import { createResource, For, Show } from '@solid-js'
-import type { DrillContract } from '@ux/shell/panel/drill-contract.ts'
-import { UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow, UiText } from '@ux/ui'
+import { UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { FieldBinderPicker, PickerDrillCell } from './field-binder-picker.tsx'
+import { FieldBinderPicker } from './field-binder-picker.tsx'
+import type { PickerLevel } from './field-binder-picker.tsx'
 
 /** The host's busy state and the chosen document's receiver. */
 export type FieldBinderLibraryPickerProps = {
@@ -39,133 +38,67 @@ export type FieldBinderLibraryPickerProps = {
   onChoose: (name: string, read: UploadRead, record: { topic: LibraryTopic; id: Id }) => void
 }
 
-/** A picker sheet over the Library; choosing a document closes it. */
-export const FieldBinderLibraryPicker = (props: FieldBinderLibraryPickerProps): UiComponent => (
-  <FieldBinderPicker
-    label='Choose from library'
-    title='Library'
-    disabled={props.disabled}
-    root={(drill, close) => (
-      <Topics
-        drill={drill}
-        choose={(topic, record, attachment) => {
-          close()
-          props.onChoose(
-            attachment.filename,
-            report => api.Attachments.file(attachment, report),
-            { topic, id: record }
-          )
-        }}
-      />
-    )}
-  />
-)
+/** A picker over the Library: topic, record, then document; choosing one closes it. */
+export const FieldBinderLibraryPicker = (props: FieldBinderLibraryPickerProps): UiComponent => {
+  const documents = (topic: LibraryTopic, record: LibraryRecord): PickerLevel => ({
+    column: 'Document',
+    detail: 'Kind',
+    empty: 'This record has no documents.',
+    load: () =>
+      Promise.resolve(
+        record.notes.flatMap(note => note.attachments).map(attachment => ({
+          label: attachment.filename,
+          detail: UiText.label(attachment.kind),
+          choose: () =>
+            props.onChoose(
+              attachment.filename,
+              report => api.Attachments.file(attachment, report),
+              { topic, id: record.id }
+            )
+        }))
+      )
+  })
 
-// ────────────────────────────────────────────────────────────────────────────
-// LIBRARY: TOPICS, RECORDS, DOCUMENTS
-// ────────────────────────────────────────────────────────────────────────────
+  const records = (topic: LibraryTopic): PickerLevel => ({
+    column: TOPIC_ITEMS[topic],
+    empty: `No ${topic.toLowerCase()}.`,
+    load: async () =>
+      (await loadRecords(topic)).map(record => ({
+        label: record.label,
+        open: () => documents(topic, record)
+      }))
+  })
 
-/** A Library record as the picker lists it: its id, label, and notes. */
-type LibraryRecord = { id: Id; label: string; notes: readonly Note[] }
+  const topics: PickerLevel = {
+    column: 'Topic',
+    empty: 'No topics.',
+    load: () =>
+      Promise.resolve(LIBRARY_TOPICS.map(topic => ({ label: topic, open: () => records(topic) })))
+  }
 
-/** Receives a chosen document with its topic and record. */
-type Choose = (topic: LibraryTopic, record: Id, attachment: Attachment) => void
-
-/** The Library topics; activating one opens its records. */
-const Topics = (props: { drill: DrillContract; choose: Choose }): UiComponent => (
-  <UiTable>
-    <UiTableHeader>
-      <UiTableCell>Topic</UiTableCell>
-      <UiTableCell />
-    </UiTableHeader>
-    <UiTableBody>
-      <For each={LIBRARY_TOPICS}>
-        {topic => (
-          <UiTableRow
-            onActivate={() =>
-              props.drill.open(
-                () => <Records topic={topic} drill={props.drill} choose={props.choose} />,
-                topic
-              )}
-          >
-            <UiTableCell>{topic}</UiTableCell>
-            <PickerDrillCell />
-          </UiTableRow>
-        )}
-      </For>
-    </UiTableBody>
-  </UiTable>
-)
-
-/** One topic's records; activating one opens its documents. */
-const Records = (
-  props: { topic: LibraryTopic; drill: DrillContract; choose: Choose }
-): UiComponent => {
-  const [records] = createResource(() => props.topic, loadRecords)
   return (
-    <Show when={!records.loading} fallback={<p role='status'>Loading records…</p>}>
-      <UiTable>
-        <UiTableHeader>
-          <UiTableCell>Record</UiTableCell>
-          <UiTableCell />
-        </UiTableHeader>
-        <UiTableBody>
-          <For each={records()} fallback={emptyRow('No records.')}>
-            {record => (
-              <UiTableRow
-                onActivate={() =>
-                  props.drill.open(
-                    () => (
-                      <Documents
-                        record={record}
-                        choose={attachment => props.choose(props.topic, record.id, attachment)}
-                      />
-                    ),
-                    record.label
-                  )}
-              >
-                <UiTableCell>{record.label}</UiTableCell>
-                <PickerDrillCell />
-              </UiTableRow>
-            )}
-          </For>
-        </UiTableBody>
-      </UiTable>
-    </Show>
+    <FieldBinderPicker
+      label='Choose from library'
+      title='Library'
+      disabled={props.disabled}
+      root={topics}
+    />
   )
 }
 
-/** One record's documents, from its notes; activating one chooses it. */
-const Documents = (
-  props: { record: LibraryRecord; choose: (attachment: Attachment) => void }
-): UiComponent => (
-  <UiTable>
-    <UiTableHeader>
-      <UiTableCell>Document</UiTableCell>
-      <UiTableCell align='end'>Kind</UiTableCell>
-    </UiTableHeader>
-    <UiTableBody>
-      <For
-        each={props.record.notes.flatMap(note => note.attachments)}
-        fallback={emptyRow('This record has no documents.')}
-      >
-        {attachment => (
-          <UiTableRow onActivate={() => props.choose(attachment)}>
-            <UiTableCell>{attachment.filename}</UiTableCell>
-            <UiTableCell align='end'>{UiText.label(attachment.kind)}</UiTableCell>
-          </UiTableRow>
-        )}
-      </For>
-    </UiTableBody>
-  </UiTable>
-)
+// ────────────────────────────────────────────────────────────────────────────
+// IMPLEMENTATION
+// ────────────────────────────────────────────────────────────────────────────
 
-/** A read-only row that says a list is empty. */
-const emptyRow = (message: string): UiComponent => (
-  <UiTableRow>
-    <UiTableCell>{message}</UiTableCell>
-  </UiTableRow>
-)
+/** What one record of each Library topic is called, as its column says. */
+const TOPIC_ITEMS: { [Topic in LibraryTopic]: string } = {
+  Assets: 'Asset',
+  Chemicals: 'Chemical',
+  Services: 'Service'
+}
+
+/** A Library record as the picker lists it: its id, label, and notes. */
+type LibraryRecord = { id: Id; label: string; notes: readonly Note[] }
 
 /** A topic's live records, labelled and ordered for choosing. */
 const loadRecords = async (topic: LibraryTopic): Promise<readonly LibraryRecord[]> => {

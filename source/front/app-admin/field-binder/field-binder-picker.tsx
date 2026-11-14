@@ -1,64 +1,103 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Field Binder picker                                                          ║
-║ A button that opens a sheet of drill-down content for choosing a document.   ║
+║ A button that opens a sheet of declared levels for choosing a document.      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Owns what every Binder picker shares: the opening button, the sheet titled by
-it with Close, and a card holding the drill-down host, as a Lister presents.
-The card's title carries the path and the return control, as other headers do.
-The consumer supplies the content as the drill-down's root, and receives close
-to call once a document is chosen.
+Owns everything a Binder picker presents: the opening button, the sheet titled
+by it with Close, a card holding the drill-down host, the path and Back on the
+card's title, and every level's table with its loading and empty rows. A row
+that opens a level drills into it and shows a right arrow; a row that chooses
+closes the sheet, then runs. A concrete picker only declares its levels.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+PickerLevel             One level: its columns, its rows, and its empty text.
+├ column                The rows' heading.
+├ detail                Optional right-aligned second column heading.
+├ empty                 What an empty level says.
+└ load                  Reads the level's rows.
+PickerRow               One row: a branch or a leaf, never both or neither.
+PickerRowBase           What every row shows.
+├ label                 The row's text.
+└ detail                Optional second-column text.
+PickerBranch            A row that drills; extends PickerRowBase.
+└ open                  The level it drills into.
+PickerLeaf              A row that chooses; extends PickerRowBase.
+└ choose                What choosing it does.
 FieldBinderPickerProps  Picker inputs.
 ├ label                 The opening button's label and the sheet's title.
-├ title                 The card's heading and the drill-down's root title.
+├ title                 The card's heading and the root level's title.
 ├ disabled              The host is busy.
-└ root                  The content, given the drill-down and close.
+└ root                  The first level.
 FieldBinderPicker       Opening button and sheet.
-PickerDrillCell         Trailing cell marking a row that opens another level.
 */
 
-import { createSignal, Show } from '@solid-js'
-import type { DrillContract, DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
+import { createResource, createSignal, For, Show } from '@solid-js'
+import type {
+  DrillContract,
+  DrillHostContext,
+  DrillReturnControl
+} from '@ux/shell/panel/drill-contract.ts'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
-import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { PanelSheet } from '@ux/shell/panel/panel-sheet.tsx'
-import { UiActionButton, UiDialog, UiLayout, UiTableCell } from '@ux/ui'
+import {
+  UiActionButton,
+  UiDialog,
+  UiLayout,
+  UiSpinner,
+  UiTable,
+  UiTableBody,
+  UiTableCell,
+  UiTableHeader,
+  UiTableRow
+} from '@ux/ui'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 
 import './field-binder-picker.css'
 
-/** The button and sheet labels, the host's busy state, and the sheet's content. */
+/** One level of a picker: its column headings, its rows, and what an empty level says. */
+export type PickerLevel = {
+  column: string
+  detail?: string
+  empty: string
+  load: () => Promise<readonly PickerRow[]>
+}
+
+/** One row: a row that opens drills deeper and shows the arrow; a row that chooses ends it. */
+export type PickerRow = PickerBranch | PickerLeaf
+
+/** What every row shows. */
+export type PickerRowBase = { label: string; detail?: string }
+
+/** A row that drills into another level; it shows the arrow. */
+export type PickerBranch = PickerRowBase & { open: () => PickerLevel }
+
+/** A row that chooses; choosing closes the sheet, then runs. */
+export type PickerLeaf = PickerRowBase & { choose: () => void }
+
+/** The button and sheet labels, the host's busy state, and the first level. */
 export type FieldBinderPickerProps = {
   label: string
   title: string
   disabled: boolean
-  root: (drill: DrillContract, close: () => void) => UiComponent
+  root: PickerLevel
 }
 
-/** A button that opens the picker sheet; the content closes it on a choice. */
+/** A button that opens the picker sheet; choosing a row closes it. */
 export const FieldBinderPicker = (props: FieldBinderPickerProps): UiComponent => {
   const [open, setOpen] = createSignal(false)
   const [drillReturn, setDrillReturn] = createSignal<DrillReturnControl | null>(null)
   const close = (): void => {
     setOpen(false)
   }
-  // The card's title owns the drill return, as a sequence header does; a picker
-  // has no validation, drafts, feedback, or trailing action.
-  const context: PanelStepContext = {
-    registerValidation: () => () => {},
-    registerDrillReturn: control => setDrillReturn(() => control),
-    registerTrailingAction: () => {},
-    registerDirty: () => () => {},
-    feedback: () => {},
-    busy: () => false
+  // The card's title owns the drill return, as a sequence header does.
+  const context: DrillHostContext = {
+    registerDrillReturn: control => setDrillReturn(() => control)
   }
   const path = (): readonly string[] | undefined => {
     const control = drillReturn()
@@ -85,19 +124,13 @@ export const FieldBinderPicker = (props: FieldBinderPickerProps): UiComponent =>
           <PanelSheet title={props.label} onCancel={close}>
             <PanelList
               header={{
-                leading: (
-                  <PanelHeaderTitle
-                    title={props.title}
-                    path={path()}
-                    command={command()}
-                  />
-                )
+                leading: <PanelHeaderTitle title={props.title} path={path()} command={command()} />
               }}
             >
               <DrillDown
                 rootTitle={props.title}
                 context={context}
-                root={drill => props.root(drill, close)}
+                root={drill => <PickerTable level={props.root} drill={drill} close={close} />}
               />
             </PanelList>
           </PanelSheet>
@@ -107,9 +140,59 @@ export const FieldBinderPicker = (props: FieldBinderPickerProps): UiComponent =>
   )
 }
 
-/** A row that opens another level ends in a right arrow; a row that chooses does not. */
-export const PickerDrillCell = (): UiComponent => (
-  <UiTableCell align='end'>
-    <span data-app='field-binder-drill-mark' data-ui-icon='chevron-right' aria-hidden='true' />
-  </UiTableCell>
+// ────────────────────────────────────────────────────────────────────────────
+// LEVELS
+// ────────────────────────────────────────────────────────────────────────────
+
+/** One level's table: loading, then its rows or its empty text. */
+const PickerTable = (
+  props: { level: PickerLevel; drill: DrillContract; close: () => void }
+): UiComponent => {
+  const [rows] = createResource(() => props.level, level => level.load())
+  const activate = (row: PickerRow): void => {
+    if ('open' in row) {
+      props.drill.open(
+        () => <PickerTable level={row.open()} drill={props.drill} close={props.close} />,
+        row.label
+      )
+      return
+    }
+    props.close()
+    row.choose()
+  }
+  return (
+    <Show when={!rows.loading} fallback={<UiSpinner aria-label={`Loading ${props.level.column}`} />}>
+      <UiTable>
+        <UiTableHeader>
+          <UiTableCell>{props.level.column}</UiTableCell>
+          <UiTableCell align='end'>{props.level.detail}</UiTableCell>
+        </UiTableHeader>
+        <UiTableBody>
+          <For each={rows()} fallback={<EmptyRow message={props.level.empty} />}>
+            {row => (
+              <UiTableRow onActivate={() => activate(row)}>
+                <UiTableCell>{row.label}</UiTableCell>
+                <UiTableCell align='end'>
+                  <Show when={'open' in row} fallback={row.detail}>
+                    <span
+                      data-app='field-binder-drill-mark'
+                      data-ui-icon='chevron-right'
+                      aria-hidden='true'
+                    />
+                  </Show>
+                </UiTableCell>
+              </UiTableRow>
+            )}
+          </For>
+        </UiTableBody>
+      </UiTable>
+    </Show>
+  )
+}
+
+/** A read-only row that says a level is empty. */
+const EmptyRow = (props: { message: string }): UiComponent => (
+  <UiTableRow>
+    <UiTableCell>{props.message}</UiTableCell>
+  </UiTableRow>
 )
