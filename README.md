@@ -200,7 +200,7 @@ only where it equals what genesis would produce.
 Import toolkit modules through `@ux/`; `@ux/ui` exposes the UI component barrel and
 `@ux/css` loads the shared CSS foundation. `AppState`, `SessionState`, and `DashboardState`
 live in `source/ux/shell/`. swarmAg session coordination lives in
-`source/front/app/shell/session-coordinator.ts`.
+`source/front/app/shell/startup/session-coordinator.ts`.
 
 **One design language.** `ux/` follows the same principle as `core/`. Headless accessible
 primitives (Kobalte) and routing (TanStack Router) are bounded libraries and are used; the design

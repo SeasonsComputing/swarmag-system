@@ -232,7 +232,7 @@ minute for a code they already have.
 Needs an affordance on the request step that jumps straight to code entry for an already
 issued code.
 
-Code entry is one plain text field (`front/app/shell/login.tsx`). It becomes a six-box code input,
+Code entry is one plain text field (`front/app/shell/display/login.tsx`). It becomes a six-box code input,
 the code's length being `otp_length = 6` (`architecture-devops.md` §13.3): one digit per box, focus
 advancing as a digit is typed and returning on backspace, a pasted code filling every box, and the
 platform's one-time-code autofill (`autocomplete='one-time-code'`) still offered. Where the control

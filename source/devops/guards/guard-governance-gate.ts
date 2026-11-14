@@ -15,6 +15,9 @@ genuine, CA-authorized edit is committed with the guard deliberately bypassed
 guard-completed-immutable.ts already established for a different class of
 change nothing should silently pass through.
 
+The genesis contracts under effort/genesis/ are gated the same way: they are
+regenerable scaffolding with their own lifecycle, never edited in passing.
+
 Found necessary 2026-09-15: an AI Coding Engine, asked to fix one
 confrontational
 sentence in EFFORT.md, generalized that into a tone rewrite across the whole
@@ -32,6 +35,7 @@ import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
 const NAME = 'Governance-gate'
 const WATCHED_PATHS = ['CONSTITUTION.md', 'AGENTS.md', 'CONVENTIONS.md', 'EFFORT.md']
+const WATCHED_PREFIX = 'effort/genesis/'
 
 const git = async (...args: string[]): Promise<{ success: boolean; stdout: string }> => {
   const { success, stdout } = await new Deno.Command('git', { args }).output()
@@ -46,14 +50,14 @@ const stagedPaths = async (): Promise<string[]> => {
 
 const main = async (): Promise<void> => {
   const violations = (await stagedPaths())
-    .filter(path => WATCHED_PATHS.includes(path))
-    .map(path => `${path} is staged for change — a meta-tier governance document`)
+    .filter(path => WATCHED_PATHS.includes(path) || path.startsWith(WATCHED_PREFIX))
+    .map(path => `${path} is staged for change — a governance-gated path`)
 
   if (violations.length > 0) {
     guardFail(
       NAME,
       violations,
-      'Every governance document at the repo root carries a mandatory admonishment: no AI agent edits it without prior CA authorization. This guard cannot verify authorization, only visibility — if this change is CA-authorized, commit with --no-verify and note the authorization in the commit message. If it arrived incidentally (a bulk rename or reference-update pass), unstage it and exclude these paths from that pass.'
+      'Every gated path carries a mandatory admonishment: no AI agent edits it without prior CA authorization. This guard cannot verify authorization, only visibility — if this change is CA-authorized, commit with --no-verify. If it arrived incidentally (a bulk rename or reference-update pass), unstage it and exclude these paths from that pass.'
     )
   }
 
