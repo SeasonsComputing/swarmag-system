@@ -370,4 +370,27 @@ a drained copy until the inbox releases it, a Field Binder version until it is c
 
 **Picking this up:** when the upload brief designs the drain, its second consumer.
 
+## P-15 · How should the shell display a secondary window over the window that opened it?
+
+**Parked:** 2026-11-14 — CA, while designing the Library: an Admin sheet, opened from the Helm,
+that launches the Assets, Asset Types, Chemicals, and Services managers and browses Library
+documents.
+
+**What it is:** A secondary window displays over the window that opened it; that is decided.
+The shell does otherwise: a secondary window replaces its opener. The shell
+compiles every overlay route as a flat child of its shell route (`compileShell` and
+`ShellOverlayRoute` in `ux/shell/runtime/shell-compiler.tsx`), so one overlay cannot be the
+parent of another. Opening `/assets` from `/library` unmounts the Library, and closing the manager
+redirects to `/`, not to the Library. The router is not the fault: TanStack nests routes, and a
+mounted parent keeps rendering while its child displays over it, so `/library/assets` could draw
+the manager over a live Library and close back to `/library`. What is missing is in the shell's
+route grammar (`Routes`, CONVENTIONS §16.2) and its compiler, which know one level of overlay.
+
+**Why parked:** For now the Library accepts the return to the dashboard, which keeps the
+dashboard as the primary navigation (UX design archetypes §4.3).
+
+**Picking this up:** Foundation Mode: `ux/shell` is locked, and nested windows amend the route
+grammar and archetypes §4.3. Decide it beside P-5, since both concern where navigation lives;
+the Library's Helm button is app-specific navigation that P-5 would move out of the Helm.
+
 _End of Feature Parking Lot Document_
