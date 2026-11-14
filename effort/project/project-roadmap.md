@@ -202,7 +202,7 @@ items moved: the Chemical labels editor and document storage to M-6. The `projec
 iteration for the fuller Asset and Chemical themes was not done; it waits with that work, parked as
 P-8.
 
-## M-6 · Document Storage
+## M-6 · Document Storage — Closed 2026-11-13
 
 Created 2026-10-30, when document storage proved a design effort of its own. Admin
 attaches and shares documents; field capture and its upload are the Ops application's (M-9).
@@ -275,6 +275,14 @@ store shared:
   `effort/completed/2026-11-13-helm-menus-brief.md`: the Helm becomes a toolbar of commands and
   menus, each menu a titled popover; Tasks is a menu of reports; overflow and `labelMode` go.
   Carries the Field Binder menu's Manage, Open, and Synchronize.
+
+Closed 2026-11-13 with its enablers and features shipped and verified. The CA accepted attaching,
+upload delivery, the Helm, and the Field Binder's Manager and reader on screen in Admin. The
+verification pass ran on `c9b0916`: `deno task check` and `deno task fmt:check` passed, and the unit
+suite, excluding `users-api-test.ts` and `session-coordinator-test.ts`, passed 224 tests (14 steps)
+with none failed and 3 ignored. Its remaining items are settled in the closed briefs and moved:
+the Field Binder's Ops side and field capture to M-9, the portal's to M-10; the sweep of
+unreferenced documents stays backlog B-42, the document store CLI B-44, and loading text B-48.
 
 ## M-7 · Workflow, Task, Question & Service
 
