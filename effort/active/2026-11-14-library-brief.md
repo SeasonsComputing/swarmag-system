@@ -2,7 +2,7 @@
 
 **Active 2026-11-14. Draft, not dispatched.** Not on the roadmap: chosen directly at the CA's
 direction. Feature mode inside established architecture; no locked namespace changes. It builds
-into the tree the Shell Namespaces brief establishes and is dispatched after that brief ships.
+into the tree the Shell Namespaces brief established (`608a3a4`).
 The documents are already amended (Governing documents).
 
 ## Purpose and dependencies
@@ -15,7 +15,7 @@ Library and the Field Binder share.
 
 Dependencies:
 
-- `effort/active/2026-11-14-shell-namespaces-brief.md`: the `front/app/shell/` namespaces, in
+- `effort/completed/2026-11-14-shell-namespaces-brief.md`: the `front/app/shell/` namespaces, in
   particular `retrieval/`, which this brief populates.
 - Architecture-front §7.2.4 Document Storage and §10.1.2; UX design archetypes §6 (the Drill row);
   CONVENTIONS §4.4 (the names).

@@ -159,6 +159,17 @@ selected state on `UiTableRow` that any Collection-Detail surface opts into.
 
 Design record: [Overlay Controls API — Brief](../pending/2026-10-13-overlay-trigger-brief.md).
 
+### B-49 · The suite's field controls name their change callback two ways
+
+**Observed:** 2026-11-14 · low
+
+`UrlField` (`front/app/shell/retrieval/url-field.tsx`) reports an edit through `onValue`;
+`UserPicker` (`front/app/shell/retrieval/user-picker.tsx`) reports a selection through
+`onChange`. Both are controlled fields with `name`, `value`, and `error`, so one name serves both.
+The rename touches each control and its callers.
+
+**Picking this up:** with the next change to either control.
+
 ## Auth
 
 ### B-7 · A stale session survives genesis and is not ejected

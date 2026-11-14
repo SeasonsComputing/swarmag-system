@@ -1,6 +1,7 @@
 # Shell Namespaces — Brief
 
-**Active 2026-11-14. Dispatched to ACE 2026-11-14; production awaiting review.** Not on the roadmap: chosen directly at the CA's
+**Completed 2026-11-14.** Shipped in `608a3a4`, with the styling-namespace follow-up in `0395442`.
+Closed at the CA's direction after on-screen acceptance; see "Closure" at the end. Not on the roadmap: chosen directly at the CA's
 direction, ahead of the Library, which builds into the tree this brief establishes. Foundation
 mode: the suite tier's module layout and the documentation that describes it. A restructure with no
 behavior change. The documents lead; production follows them.
@@ -215,5 +216,28 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
    the component's kind, so `About` fits whatever the application binds. It overturns the first
    Out of scope bullet for this one name; the `ux/` components that render dialogs stay out of
    scope.
+
+## Closure — 2026-11-14
+
+The CA directed closure after on-screen acceptance.
+
+**Shipped.** `front/app/shell/` is the five namespaces; `AboutDialog` and `FieldBinderDialog`;
+`makeDashboardShell`'s parameter is `About` (`608a3a4`). Independent verification found every
+stylesheet and 13 modules moved byte-identical, and the three changed modules differing only by the
+approved renames and imports.
+
+**Found in review, fixed.** The About dialog's styling hook still said `about-box`. Behind it, the
+whole suite tier styled with `data-shell`, which UX design language §2.3 reserves for `ux/shell`,
+and `guard-css` never scanned `front/app/`. The CA decided the layer, not the folder, sets the
+prefix: `front/app/` hooks are `data-app`, the brand widget's included, and `guard-css` scans
+`front/app/`. The expanded scan also corrected two label hover selectors and allowed the documented
+`data-ui-interactive` hook (`0395442`).
+
+**Settled on closing.**
+
+- **The `ux/` components that render dialogs** are dropped. They are family pieces built with,
+  named by CONVENTIONS §4.4's family form, not finished kinds.
+- **The Drill family, `LibraryLevels`, and the Library** are the Library brief's.
+- **The `onValue` / `onChange` difference** between `UrlField` and `UserPicker` is backlog B-49.
 
 _End of Shell Namespaces Brief_
