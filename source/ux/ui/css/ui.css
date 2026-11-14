@@ -1331,12 +1331,11 @@
   max-inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
 }
 
-/* A sheet is the workbench held at its collapse point. The pad is added because
-   the panel container fills the content box. A changed floor must be re-solved in
-   manager.css and wizard.css, whose thresholds cannot take a token. */
+/* A sheet holds one panel at its own width, independent of the workbench. The pad
+   is added because the panel container fills the content box. */
 [data-ui='dialog'][data-ui-size='sheet'] {
   inline-size: min(
-    calc(var(--sa-size-wrap) + var(--sa-size-min) + var(--sa-rhythm-gap) + var(--sa-dialog-pad) * 2),
+    calc(var(--sa-size-xx) + var(--sa-dialog-pad) * 6),
     calc(100vw - var(--sa-rhythm-pad) * 2)
   );
 }
@@ -1379,7 +1378,7 @@
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-ui-font-weight);
-  max-inline-size: 20rem;
+  max-inline-size: 16rem;
   padding: var(--sa-space-md);
   z-index: var(--sa-z-popover);
 }

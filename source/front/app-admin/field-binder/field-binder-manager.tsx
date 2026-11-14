@@ -88,7 +88,11 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
           <PanelRowIdentity
             title={entry.description}
             subtitle={documentOf(entry)?.name ?? 'Pending'}
-            annotation={<UiBadge>{SOURCE_LABELS[entry.upload.source]}</UiBadge>}
+            annotation={
+              <UiBadge variant='info'>
+                {SOURCE_LABELS[entry.upload.source]}
+              </UiBadge>
+            }
           />
         </span>
       )
@@ -162,9 +166,9 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
 
 /** How each entry's document arrived, as its row's pill says it. */
 const SOURCE_LABELS: { [Source in FieldBinderUploadSource]: string } = {
-  upload: 'Uploaded',
+  upload: 'Upload',
   library: 'Library',
-  url: 'URL'
+  url: 'Chemicals'
 }
 
 /** Open a source document in a new window, reporting expected failures and surfacing the rest. */

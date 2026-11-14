@@ -23,7 +23,7 @@
 }
 
 [data-widget='helm-menu'] {
-  min-inline-size: 10rem;
+  min-inline-size: 12rem;
 }
 
 [data-widget='helm-menu'] > [data-widget='helm-menu-title'] {

@@ -8,10 +8,11 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Owns one entry's description, how its document arrives, and, on Edit, the
 document's name. The entry id is minted once per editor, including retries. Add
-chooses one document by Upload, Library, or URL; choosing starts its upload
-task, and only the latest choice is kept. Save publishes the entry once and
-waits for no transfer, then releases the task, which places the document for
-the drain. Edit never replaces the document: once delivered, a changed name
+chooses one document by Upload, Library, or Chemicals, where a chemical
+document's link becomes the source URL and the user uploads the file it holds;
+choosing a file starts its upload task, and only the latest choice is kept.
+Save publishes the entry once and waits for no transfer, then releases the
+task, which places the document for the drain. Edit never replaces the document: once delivered, a changed name
 renames it, and until then the source URL stays editable. Closing before any
 write attempt discards the chosen document's staging.
 
@@ -28,9 +29,11 @@ FieldBinderState    One retained editor lifetime.
 ├ description       Required description reader.
 ├ setDescription    Edit the description.
 ├ source            How Add takes the document.
-├ setSource         Switch Upload, Library, or URL.
+├ setSource         Switch Upload, Library, or Chemicals.
 ├ url               Source URL reader.
 ├ setUrl            Edit the source URL.
+├ link              The chosen chemical document's name.
+├ chooseLink        Take a chemical document's link as the source URL.
 ├ name              The document's name.
 ├ setName           Edit the name of a delivered document.
 ├ kind              The chosen document's kind.
@@ -78,6 +81,8 @@ export type FieldBinderState = {
   setSource: (source: FieldBinderUploadSource) => void
   url: Accessor<string>
   setUrl: Setter<string>
+  link: Accessor<string>
+  chooseLink: (name: string, url: string) => void
   name: Accessor<string>
   setName: Setter<string>
   kind: Accessor<AttachmentKind | undefined>
@@ -103,6 +108,7 @@ export const createFieldBinderState = (
   const [description, setDescription] = createSignal(item?.description ?? '')
   const [uploadSource, setUploadSource] = createSignal(item?.upload.source ?? 'upload')
   const [url, setUrl] = createSignal(item?.upload.url ?? '')
+  const [link, setLink] = createSignal('')
   const [name, setName] = createSignal(document?.name ?? '')
   const [kind, setKind] = createSignal(item?.upload.kind)
   const [task, setTask] = createSignal<UploadTask | undefined>()
@@ -138,10 +144,18 @@ export const createFieldBinderState = (
       setName('')
       setKind(undefined)
       setRecord(undefined)
+      setUrl('')
+      setLink('')
       setUploadSource(next)
     },
     url,
     setUrl,
+    link,
+    chooseLink(chosenName, chosenUrl) {
+      setLink(chosenName)
+      setUrl(chosenUrl)
+      if (!description().trim()) setDescription(chosenName)
+    },
     name,
     setName,
     kind,

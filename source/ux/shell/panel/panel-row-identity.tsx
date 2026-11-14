@@ -34,11 +34,13 @@ export type PanelRowIdentityProps = {
 /** Present title, subtitle, and annotation with shared line styles. */
 export const PanelRowIdentity = (props: PanelRowIdentityProps): UiComponent => (
   <div data-shell-panel='row-identity'>
-    <UiLayout variant='block-fit' gap='none'>
-      <span data-shell-panel='row-title'>{props.title}</span>
-      <Show when={props.subtitle !== undefined}>
-        <span data-shell-panel='row-subtitle'>{props.subtitle}</span>
-      </Show>
+    <UiLayout variant='block-fit' gap='tight'>
+      <UiLayout variant='block-fit' gap='none'>
+        <span data-shell-panel='row-title'>{props.title}</span>
+        <Show when={props.subtitle !== undefined}>
+          <span data-shell-panel='row-subtitle'>{props.subtitle}</span>
+        </Show>
+      </UiLayout>
       <Show when={props.annotation !== undefined}>
         <span data-shell-panel='row-annotation'>{props.annotation}</span>
       </Show>

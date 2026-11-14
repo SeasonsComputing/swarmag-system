@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-An Index-Detail over the Library's attachments, opened in a dialog: the Library
+An Index-Detail over the Library's attachments, in a picker sheet: the Library
 topics, a topic's records, and a record's documents from its notes. Choosing a
 document hands back its name, a read of its bytes through Attachments that
 reports download progress from the response body, and the record it came from.
@@ -17,7 +17,7 @@ PUBLIC
 FieldBinderLibraryPickerProps  Picker inputs.
 ├ disabled                     The host is busy.
 └ onChoose                     Receives the chosen document.
-FieldBinderLibraryPicker       Choose-from-library button and dialog.
+FieldBinderLibraryPicker       Choose-from-library button and sheet.
 */
 
 import type { Id } from '@core/std'
@@ -27,21 +27,11 @@ import { api } from '@front/api/api.ts'
 import { LIBRARY_TOPICS } from '@front/api/attachments.ts'
 import type { LibraryTopic } from '@front/api/attachments.ts'
 import type { UploadRead } from '@front/api/upload-task.ts'
-import { createResource, createSignal, For, Show } from '@solid-js'
+import { createResource, For, Show } from '@solid-js'
 import type { DrillContract } from '@ux/shell/panel/drill-contract.ts'
-import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
-import {
-  UiActionButton,
-  UiDialog,
-  UiLayout,
-  UiTable,
-  UiTableBody,
-  UiTableCell,
-  UiTableHeader,
-  UiTableRow,
-  UiText
-} from '@ux/ui'
+import { UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { FieldBinderPicker, PickerDrillCell } from './field-binder-picker.tsx'
 
 /** The host's busy state and the chosen document's receiver. */
 export type FieldBinderLibraryPickerProps = {
@@ -49,39 +39,27 @@ export type FieldBinderLibraryPickerProps = {
   onChoose: (name: string, read: UploadRead, record: { topic: LibraryTopic; id: Id }) => void
 }
 
-/** A button that opens the Library picker; choosing a document closes it. */
-export const FieldBinderLibraryPicker = (props: FieldBinderLibraryPickerProps): UiComponent => {
-  const [open, setOpen] = createSignal(false)
-  const choose = (topic: LibraryTopic, record: Id, attachment: Attachment): void => {
-    setOpen(false)
-    props.onChoose(
-      attachment.filename,
-      report => api.Attachments.file(attachment, report),
-      { topic, id: record }
-    )
-  }
-  return (
-    <UiLayout variant='inline-fit'>
-      <UiActionButton
-        icon='plus'
-        label='Choose from library'
-        labelMode='visible'
-        align='start'
-        density='dense'
-        disabled={props.disabled}
-        onClick={() => setOpen(true)}
+/** A picker sheet over the Library; choosing a document closes it. */
+export const FieldBinderLibraryPicker = (props: FieldBinderLibraryPickerProps): UiComponent => (
+  <FieldBinderPicker
+    label='Choose from library'
+    title='Library'
+    disabled={props.disabled}
+    root={(drill, close) => (
+      <Topics
+        drill={drill}
+        choose={(topic, record, attachment) => {
+          close()
+          props.onChoose(
+            attachment.filename,
+            report => api.Attachments.file(attachment, report),
+            { topic, id: record }
+          )
+        }}
       />
-      <Show when={open()}>
-        <UiDialog open size='sheet' onOpenChange={next => !next && setOpen(false)}>
-          <DrillDown
-            rootTitle='Library'
-            root={drill => <Topics drill={drill} choose={choose} />}
-          />
-        </UiDialog>
-      </Show>
-    </UiLayout>
-  )
-}
+    )}
+  />
+)
 
 // ────────────────────────────────────────────────────────────────────────────
 // LIBRARY: TOPICS, RECORDS, DOCUMENTS
@@ -98,6 +76,7 @@ const Topics = (props: { drill: DrillContract; choose: Choose }): UiComponent =>
   <UiTable>
     <UiTableHeader>
       <UiTableCell>Topic</UiTableCell>
+      <UiTableCell />
     </UiTableHeader>
     <UiTableBody>
       <For each={LIBRARY_TOPICS}>
@@ -110,6 +89,7 @@ const Topics = (props: { drill: DrillContract; choose: Choose }): UiComponent =>
               )}
           >
             <UiTableCell>{topic}</UiTableCell>
+            <PickerDrillCell />
           </UiTableRow>
         )}
       </For>
@@ -127,6 +107,7 @@ const Records = (
       <UiTable>
         <UiTableHeader>
           <UiTableCell>Record</UiTableCell>
+          <UiTableCell />
         </UiTableHeader>
         <UiTableBody>
           <For each={records()} fallback={emptyRow('No records.')}>
@@ -144,6 +125,7 @@ const Records = (
                   )}
               >
                 <UiTableCell>{record.label}</UiTableCell>
+                <PickerDrillCell />
               </UiTableRow>
             )}
           </For>

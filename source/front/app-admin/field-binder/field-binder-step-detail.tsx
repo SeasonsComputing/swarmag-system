@@ -1,14 +1,16 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Field Binder detail Step                                                     ║
-║ Adds one document by Upload, Library, or URL; edits name and description.    ║
+║ Adds one document by Upload, Library, or Chemicals; edits name, description. ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Renders the stock Manager's single Detail Step. On Add, the Source toggle
 chooses how the document arrives, and choosing it starts its upload task; the
-name is the chosen document's, read-only. On Edit, how the document arrived is
+name is the chosen document's, read-only. Chemicals walks three numbered steps:
+select a chemical document, open its link and save the file, upload the file;
+each later step reads as a direction until the first is done. On Edit, how the document arrived is
 a read-only line, the source URL stays editable while the document is pending,
 and a delivered document's name is editable, which renames it. There is no
 document control on Edit. Validation, dirty checks, and Close belong to the
@@ -43,6 +45,7 @@ import {
   UiToggleItem
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { FieldBinderChemicalPicker } from './field-binder-chemical-picker.tsx'
 import { FieldBinderLibraryPicker } from './field-binder-library-picker.tsx'
 import type { FieldBinderState } from './field-binder-state.ts'
 
@@ -56,8 +59,11 @@ export type FieldBinderStepDetailProps = {
 export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComponent => {
   let form: HTMLFormElement | undefined
   const state = props.state
-  const urlEditable = (): boolean => state.source() === 'url' && !state.delivered
+  const chemicals = (): boolean => state.adding && state.source() === 'url'
+  const urlEditable = (): boolean =>
+    state.source() === 'url' && !state.delivered && (!state.adding || state.link() !== '')
   const validation = useFormValidation(() => form, {
+    link: () => chemicals() ? expectNonEmptyString(state.link(), 'Chemical document') : null,
     document: () => state.adding ? expectNonEmptyString(state.name(), 'Document') : null,
     sourceUrl: () =>
       urlEditable() ? expectUrl(state.url().trim(), 'Source URL', ['http', 'https']) : null,
@@ -78,7 +84,22 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
       })
     }
   }
-  const chooseFile = (
+  const sourceUrl = (): UiComponent => (
+    <UrlField
+      name='sourceUrl'
+      label='Source URL'
+      schemes={['http', 'https']}
+      required
+      value={state.url()}
+      onValue={value => {
+        state.setUrl(value)
+        validation.inputField('sourceUrl')
+      }}
+      onBlur={() => validation.blurField('sourceUrl')}
+      error={validation.isInvalid('sourceUrl')}
+    />
+  )
+  const chooseFile = (): UiComponent => (
     <UiField for='document' label='Choose file' required>
       <UiInput
         type='file'
@@ -115,34 +136,44 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
               >
                 <UiToggleItem value='upload'>Upload</UiToggleItem>
                 <UiToggleItem value='library'>Library</UiToggleItem>
-                <UiToggleItem value='url'>URL</UiToggleItem>
+                <UiToggleItem value='url'>Chemicals</UiToggleItem>
               </UiToggleGroup>
             </Show>
-            <Show when={urlEditable()}>
-              <UrlField
-                name='sourceUrl'
-                label='Source URL'
-                schemes={['http', 'https']}
-                required
-                value={state.url()}
-                onValue={value => {
-                  state.setUrl(value)
-                  validation.inputField('sourceUrl')
-                }}
-                onBlur={() => validation.blurField('sourceUrl')}
-                error={validation.isInvalid('sourceUrl')}
-              />
-            </Show>
-            <Show when={state.adding}>
+            <Show when={!state.adding && urlEditable()}>{sourceUrl()}</Show>
+            <Show when={state.adding && !chemicals()}>
               <Show
                 when={state.source() === 'library'}
-                fallback={chooseFile}
+                fallback={chooseFile()}
               >
                 <FieldBinderLibraryPicker
                   disabled={props.context.busy()}
                   onChoose={(name, read, record) => choose(() => state.choose(name, read, record))}
                 />
               </Show>
+            </Show>
+            <Show when={chemicals()}>
+              <UiField label='1. Select chemical document' variant='caption'>
+                <FieldBinderChemicalPicker
+                  disabled={props.context.busy()}
+                  onChoose={chosen => {
+                    state.chooseLink(chosen.name, chosen.url)
+                    validation.changeField('link')
+                  }}
+                />
+              </UiField>
+              <UiField label='2. Open document and save to your device' variant='caption'>
+                <Show when={state.link()} fallback={<p>{CHEMICAL_FIRST}</p>}>
+                  <UiLayout gap='tight'>
+                    <p>{state.link()}</p>
+                    {sourceUrl()}
+                  </UiLayout>
+                </Show>
+              </UiField>
+              <UiField label='3. Upload document' variant='caption'>
+                <Show when={state.link()} fallback={<p>{CHEMICAL_FIRST}</p>}>
+                  {chooseFile()}
+                </Show>
+              </UiField>
             </Show>
           </UiLayout>
         </UiFieldset>
@@ -184,11 +215,14 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
   )
 }
 
+/** A Chemicals step's direction until a chemical document is selected. */
+const CHEMICAL_FIRST = 'Select chemical document first.'
+
 /** How each document arrives, as the Edit line says it. */
 const SOURCE_LABELS: { [Source in FieldBinderUploadSource]: string } = {
-  upload: 'Uploaded',
+  upload: 'Upload',
   library: 'Library',
-  url: 'URL'
+  url: 'Chemicals'
 }
 
 /** Source, kind, and the upload date, or Pending while the document has not arrived. */
