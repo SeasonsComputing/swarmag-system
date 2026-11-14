@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-widget='brand-widget'] {
+[data-app='brand-widget'] {
   --label-application-size: var(--sa-font-size-xs);
   --label-line-height: 1.4;
   --label-product-size: calc(var(--sa-font-size-xs) - 0.0625rem);
@@ -18,13 +18,13 @@
   white-space: nowrap;
 }
 
-[data-widget='brand-widget-logo'] {
+[data-app='brand-widget-logo'] {
   border-radius: var(--sa-radius-sm);
   block-size: var(--logo-size);
   inline-size: var(--logo-size);
 }
 
-[data-widget='brand-widget-names'] {
+[data-app='brand-widget-names'] {
   display: grid;
   gap: var(--sa-space-xs);
   justify-items: center;
@@ -32,14 +32,14 @@
   width: fit-content;
 }
 
-[data-widget='brand-widget-product'] {
+[data-app='brand-widget-product'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-label-font-family);
   font-size: var(--label-product-size);
   font-weight: var(--sa-label-font-weight);
 }
 
-[data-widget='brand-widget-application'] {
+[data-app='brand-widget-application'] {
   color: var(--sa-color-accent);
   font-family: var(--sa-heading-font-family);
   font-size: var(--label-application-size);
@@ -50,7 +50,7 @@
 /* Stacked header: the brand row sizes to its content, with the rhythm gap above it. */
 /* Threshold is owned by dashboard.css. */
 @container dashboard-header (max-width: 485px) {
-  [data-widget='brand-widget'] {
+  [data-app='brand-widget'] {
     flex: 1 0 100%;
     justify-content: center;
     padding-block-start: var(--sa-rhythm-gap);

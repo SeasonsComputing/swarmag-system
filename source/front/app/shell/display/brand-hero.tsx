@@ -24,11 +24,11 @@ import logoArt from '@front/app/assets/swarmag-ops-logo-art.png'
 export const BrandHero = (): UiComponent => {
   const shell = getShellMetadata()
   return (
-    <div data-shell='brand-hero'>
-      <img data-shell='brand-hero-logo' src={logoArt} alt='swarmAg' />
+    <div data-app='brand-hero'>
+      <img data-app='brand-hero-logo' src={logoArt} alt='swarmAg' />
       <UiLayout gap='tight'>
-        <span data-shell='brand-hero-product'>{shell.identity.productName}</span>
-        <span data-shell='brand-hero-application'>{shell.identity.applicationName}</span>
+        <span data-app='brand-hero-product'>{shell.identity.productName}</span>
+        <span data-app='brand-hero-application'>{shell.identity.applicationName}</span>
       </UiLayout>
     </div>
   )

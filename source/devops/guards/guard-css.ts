@@ -92,6 +92,7 @@ const ALLOWED_DATA_ATTRIBUTES = new StringSet([
   'data-ui-elevation',
   'data-ui-gap',
   'data-ui-icon',
+  'data-ui-interactive',
   'data-ui-layout',
   'data-ui-overflow',
   'data-ui-state',
@@ -727,6 +728,7 @@ const main = async (): Promise<void> => {
   const cssDirectory = `${root}/source/ux/ui/css`
   const directories = [
     `${root}/source/ux`,
+    `${root}/source/front/app`,
     `${root}/source/front/app-admin`,
     `${root}/source/front/app-customer`,
     `${root}/source/front/app-ops`,

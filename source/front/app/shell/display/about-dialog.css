@@ -1,11 +1,11 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ About box styles                                                             ║
+║ About dialog styles                                                          ║
 ║ Shell application identity and configuration dialog styles.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-shell='about-box'] {
+[data-app='about-dialog'] {
   display: grid;
   gap: var(--sa-space-xl);
   width: var(--sa-size-wrap);

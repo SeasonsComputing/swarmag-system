@@ -120,16 +120,16 @@ const LoginClient = (props: LoginClientProps) => {
       when={loginRequired()}
       fallback={<ShellReplace to='/' />}
     >
-      <div data-shell='login'>
-        <div data-shell='login-layout'>
+      <div data-app='login'>
+        <div data-app='login-layout'>
           {/* Hero imagery */}
           <BrandHero />
 
           {/* Login form */}
-          <div data-shell='login-center'>
+          <div data-app='login-center'>
             <Show when={!session.isLoading}>
               {/* STEP 1: validate email and send OTP code */}
-              <div data-shell='login-form'>
+              <div data-app='login-form'>
                 <Show when={step() === 'email'}>
                   <form onSubmit={submitEmailForm}>
                     <UiLayout>
@@ -198,8 +198,8 @@ const LoginClient = (props: LoginClientProps) => {
               {/* ERROR: display error message if present */}
               <div
                 aria-hidden={error() === null}
-                data-shell='login-feedback'
-                data-shell-state={error() === null ? 'hidden' : 'visible'}
+                data-app='login-feedback'
+                data-app-state={error() === null ? 'hidden' : 'visible'}
               >
                 <UiAlert variant='danger'>{error() ?? ''}</UiAlert>
               </div>

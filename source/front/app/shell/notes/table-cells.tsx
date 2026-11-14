@@ -29,16 +29,16 @@ export type LabelCellProps = { text: string; icon?: string; iconLabel?: string }
 
 /** Render label content whose colors follow its containing interactive row. */
 export const LabelCell = (props: LabelCellProps): UiComponent => (
-  <span data-shell='label-cell'>
+  <span data-app='label-cell'>
     <Show when={props.icon}>
       <span
-        data-shell='label-cell-icon'
+        data-app='label-cell-icon'
         data-ui-icon={props.icon}
         role={props.iconLabel ? 'img' : undefined}
         aria-label={props.iconLabel}
         aria-hidden={props.iconLabel ? undefined : true}
       />
     </Show>
-    <span data-shell='label-cell-text'>{props.text}</span>
+    <span data-app='label-cell-text'>{props.text}</span>
   </span>
 )

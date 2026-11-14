@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-shell='label-cell'] {
+[data-app='label-cell'] {
   align-items: center;
   color: var(--sa-text-secondary);
   display: flex;
@@ -13,13 +13,13 @@
   min-inline-size: 0;
 }
 
-[data-shell='label-cell'] [data-shell='label-cell-text'] {
+[data-app='label-cell'] [data-app='label-cell-text'] {
   min-inline-size: 0;
   overflow-wrap: anywhere;
   white-space: normal;
 }
 
-[data-shell='label-cell'] [data-shell='label-cell-icon'] {
+[data-app='label-cell'] [data-app='label-cell-icon'] {
   background: currentColor;
   block-size: var(--sa-space-md);
   color: var(--sa-text-primary);
@@ -28,12 +28,11 @@
   mask: var(--sa-icon) center / contain no-repeat;
 }
 
-[data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible) [data-shell='label-cell'] {
+[data-app='label-cell']:is([data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible) *) {
   color: var(--sa-text-primary);
 }
 
-[data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible)
-  [data-shell='label-cell']
-  [data-shell='label-cell-icon'] {
+[data-app='label-cell']:is([data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible) *)
+  [data-app='label-cell-icon'] {
   color: var(--sa-color-primary);
 }

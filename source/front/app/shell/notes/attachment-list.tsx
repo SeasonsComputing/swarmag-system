@@ -134,11 +134,11 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
           <Show when={busy()}>
             <p role='status'>Attaching files…</p>
           </Show>
-          <div data-shell='attachment-list'>
+          <div data-app='attachment-list'>
             <Show
               when={props.attachments().length > 0}
               fallback={
-                <p data-shell='attachment-list-empty'>
+                <p data-app='attachment-list-empty'>
                   <span>
                     No attachments yet. Use <kbd>Add Attachment</kbd> to add one.
                   </span>
@@ -258,7 +258,7 @@ const AttachmentSize = (props: { attachment: Attachment }): UiComponent => {
     () => api.Attachments.size(props.attachment)
   )
   return (
-    <span data-shell='attachment-size' title={size.error ? 'Unable to read document size' : undefined}>
+    <span data-app='attachment-size' title={size.error ? 'Unable to read document size' : undefined}>
       {size.error ? 'Unavailable' : size.loading ? '…' : UiText.size(size()!)}
     </span>
   )

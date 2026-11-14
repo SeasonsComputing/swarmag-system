@@ -63,7 +63,7 @@ export const NotesEditor = (props: NotesEditorProps): UiComponent => {
     return pending ? [...props.notes(), pending] : props.notes()
   }
   return (
-    <div data-shell='notes-editor'>
+    <div data-app='notes-editor'>
       <CollectionPanel
         legend='Notes'
         itemColumn='Note'
@@ -161,9 +161,9 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
         <UiTabPanel value='note'>
           <UiFieldset legend='Note'>
             <UiLayout>
-              <UiLayout data-shell='note-content' gap='none'>
+              <UiLayout data-app='note-content' gap='none'>
                 <time
-                  data-shell='note-created-at'
+                  data-app='note-created-at'
                   dateTime={draft.createdAt}
                   title={new Date(draft.createdAt).toLocaleString()}
                 >

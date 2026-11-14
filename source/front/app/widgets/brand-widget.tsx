@@ -24,17 +24,17 @@ import headerLogo from '@front/app/assets/swarmag-ops-logo-flat.png'
 export const BrandWidget = (): UiComponent => {
   const identity = getShellIdentity()
   return (
-    <div data-widget='brand-widget'>
+    <div data-app='brand-widget'>
       <img
-        data-widget='brand-widget-logo'
+        data-app='brand-widget-logo'
         src={headerLogo}
         alt=''
         width={64}
         height={64}
       />
-      <div data-widget='brand-widget-names'>
-        <span data-widget='brand-widget-product'>{identity.productName}</span>
-        <span data-widget='brand-widget-application'>{identity.applicationName}</span>
+      <div data-app='brand-widget-names'>
+        <span data-app='brand-widget-product'>{identity.productName}</span>
+        <span data-app='brand-widget-application'>{identity.applicationName}</span>
       </div>
     </div>
   )
