@@ -668,12 +668,12 @@ controlled mode when open state is owned externally.
 
 **Sizes**
 
-| Size        | Use                                                                                                                     |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `content`   | Small confirmations and compact content.                                                                                |
-| `panel`     | Standard form panels.                                                                                                   |
-| `workbench` | Management surfaces and list/edit flows.                                                                                |
-| `sheet`     | Full-device dialog: a card at the workbench's collapse-point width, the whole device on a phone. Any one-panel content. |
+| Size        | Use                                                                                                                        |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `content`   | Small confirmations and compact content.                                                                                   |
+| `panel`     | Standard form panels.                                                                                                      |
+| `workbench` | Management surfaces and list/edit flows.                                                                                   |
+| `sheet`     | One-panel dialog: a card one panel wide, independent of the workbench, the whole device on a phone. Any one-panel content. |
 
 **Triggered mode**
 
