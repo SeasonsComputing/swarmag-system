@@ -36,16 +36,16 @@ source/
     ├── config/
     ├── app/                         — swarmAg-suite-wide, shared across all three apps, not generic
     │   ├── assets/                  — swarmAg brand assets (logo files, flat — one asset kind today)
-    │   ├── components/              — swarmAg-specific reusable UI controls (placeholder — none yet)
     │   ├── stores/                  — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
     │   ├── views/                   — swarmAg domain projections (job-views.ts)
     │   ├── widgets/                 — swarmAg-suite widgets (e.g. BrandWidget)
     │   │   └── widget-registry.ts   — exports AppWidgetRegistry; app-tier catalog only
-    │   └── shell/                   — branded chrome and application wiring (*)
-    │       ├── notes-editor.tsx     — stock notes Index-Detail editor
-    │       ├── table-cells.tsx      — LabelCell, the notes editor's row label
-    │       ├── user-picker.tsx      — role-filtered User assignment
-    │       └── user-provider.ts     — prepared domain User proxy
+    │   └── shell/                   — suite features and application wiring, by namespace
+    │       ├── startup/             — what an application wires before its first screen
+    │       ├── notes/               — the stock notes editor
+    │       ├── field-binder/        — the Field Binder reader and its Helm bindings
+    │       ├── display/             — the screens and marks the shell presents
+    │       └── retrieval/           — getting to a reference: a document, a link, a User
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
@@ -79,10 +79,6 @@ source/
     │   └── job-runner/              — guided job execution engine
     └── app-style-guide/             — design-system demonstration harness
 ```
-
-(*) `shell/` holds `about-box`, `brand-hero`, `login`, `notes-editor`, `user-picker`, and
-`user-provider`; the maker wrapper binding `ux/shell`'s generic makers to swarmAg branding;
-and `session-coordinator.ts`.
 
 Everything in `source/ux/` must be adaptive and portable beyond swarmAg — mobile-only or desktop-only components do not belong there, and neither does anything that assumes swarmAg branding or swarmAg's own domain. `source/front/app/` carries that narrower scope instead: adaptive across all three swarmAg apps and all viewport sizes, but not required to generalize past swarmAg itself.
 
@@ -309,7 +305,7 @@ an editable reader. Remote access is governed by storage policies.
 
 Admin registers `/field-binder-manager` with the stock Manager and one Detail step: on Add, a
 Source toggle (Upload, Library, Chemicals) chooses the document. Library and Chemicals each open
-a picker sheet over their documents. Chemicals walks three numbered steps: select a chemical's
+a `DrillDialog` over their documents. Chemicals walks three numbered steps: select a chemical's
 SDS or label link, which becomes the source URL; open it and save the file; upload that file.
 The step shows the document's name and kind and edits its description and source URL. Edit
 renames the document and never replaces it. A row is pending until its document is on the
@@ -426,9 +422,9 @@ app.tsx
 ```
 
 The shell composition is described in CONVENTIONS §16.1. `Login` is swarmAg-branded presentation
-in `source/front/app/shell/`; `source/front/app/shell/shell-makers.tsx` re-exports the generic
-makers pre-bound to swarmAg's `Login` and `AboutBox`, and every app root imports the app-tier
-maker. Each app package declares a complete `Application`: a common anonymous shell, a dashboard
+in `source/front/app/shell/display/`; `source/front/app/shell/startup/shell-makers.tsx` re-exports
+the generic makers pre-bound to swarmAg's `Login` and `AboutDialog`, and every app root imports the
+app-tier maker. Each app package declares a complete `Application`: a common anonymous shell, a dashboard
 shell receiving its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`),
 the merged widget registry (§10.3), and app-specific route presentations, plus the
 application-owned session coordinator.
@@ -449,7 +445,7 @@ The dashboard is the primary navigation surface (`ux-design-archetypes.md` §4.3
 ### 9.2 Routing
 
 Routing follows the shell route grammar (CONVENTIONS §16.2). Common routes come from the shared
-makers, which app roots import pre-bound from `source/front/app/shell/shell-makers.tsx`. Each app
+makers, which app roots import pre-bound from `source/front/app/shell/startup/shell-makers.tsx`. Each app
 root declares its complete shell collection in `app.tsx`, including app-specific dashboard
 presentations. Examples: `/user/list`, `/user/get/{id}`, `/job-runner/{id}`.
 
@@ -469,19 +465,19 @@ domain `validateUser` method.
 The generic session contracts and their life cycle are in CONVENTIONS §16.4 and the
 `@ux/shell/runtime/session-contracts.ts` header.
 
-The application supplies `SessionCoordinator` from `source/front/app/shell/session-coordinator.ts`.
+The application supplies `SessionCoordinator` from `source/front/app/shell/startup/session-coordinator.ts`.
 `init()` starts persisted-session resolution, subscribes to `api.Auth.onAuthStateChange`, and
 registers cleanup with the current Solid owner: unsubscribe, then `clear()`. `clear()` clears
 `UserProvider` before clearing `SessionState`. The coordinator owns user hydration and eligibility;
 the shell owns the lifecycle invocation and baseline session state.
 
-The application supplies the concrete `UserProvider` from `front/app/shell/user-provider.ts`, a
+The application supplies the concrete `UserProvider` from `front/app/shell/startup/user-provider.ts`, a
 reactive proxy over its domain User. Session preparation policy is defined in
 `architecture-core.md` §9.5.
 
 #### 9.3.2 OTP and Session Flow
 
-Login (`source/front/app/shell/login.tsx`) is the application's passwordless email OTP surface. It
+Login (`source/front/app/shell/display/login.tsx`) is the application's passwordless email OTP surface. It
 checks `api.Users.hasAccess` before sending a code, then verifies the submitted code through
 `api.Auth.verifyOtp`. Auth events and the initial `getSession()` resolution enter the coordinator
 through one path:
@@ -599,22 +595,26 @@ The `ux/` toolkit's structure is described in CONVENTIONS §16.1.
 ```text
 app/
 ├── assets/     — swarmAg brand assets (logo files, flat — one asset kind today)
-├── components/ — swarmAg-specific reusable UI controls (placeholder — none yet)
-├── shell/      — branded chrome and application wiring (*)
-│   ├── notes-editor.tsx — stock notes Index-Detail editor
-│   ├── table-cells.tsx — LabelCell, the notes editor's row label
-│   ├── user-picker.tsx — role-filtered User assignment
-│   └── user-provider.ts — prepared domain User proxy
+├── shell/      — suite features and application wiring, by namespace
+│   ├── startup/
+│   ├── notes/
+│   ├── field-binder/
+│   ├── display/
+│   └── retrieval/
 ├── stores/     — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
 ├── views/      — swarmAg domain projections (job-views.ts)
 └── widgets/    — swarmAg-suite widget catalog (e.g. BrandWidget)
 ```
 
-(*) `shell/` holds `about-box`, `brand-hero`, `login`, `notes-editor`, `user-picker`, and
-`user-provider`; the maker wrapper binding `ux/shell`'s generic makers to swarmAg branding;
-and `session-coordinator.ts`.
+`startup/` holds the maker wrapper that binds `ux/shell`'s generic makers to swarmAg branding, the
+root services, `SessionCoordinator`, and `UserProvider`; it renders nothing. `notes/` holds
+`NotesEditor`, its `AttachmentList`, its `LabelCell` row label, and `makeAttachmentSave`.
+`field-binder/` holds `FieldBinderDialog`, the reader, and `FieldBinderHelm`. `display/` holds
+`Login`, `AboutDialog`, `BrandHero`, and `StatusBadge`. `retrieval/` holds `UrlField`,
+`UserPicker`, the Drill family (`DrillNavigator`, `DrillDialog`, and their `DrillLevel`
+declarations), and `LibraryLevels`, the Library's topic, record, and document levels.
 
-`NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
+`NotesEditor` in `front/app/shell/notes/` is the stock notes Index-Detail pair. It takes
 `notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
 `drill: DrillContract`, and `attach`, which adds a chosen file's row at once and starts its upload
 task, with optional `attachmentKinds`. It edits Content and the note's attachments, and preserves
@@ -682,7 +682,7 @@ and confirmed soft Delete through the existing Customer API.
   identity, status, account-manager assignment, billing address, sites, and account notes.
 - Clearing an optional stored address field uses the existing explicit-null update protocol.
 
-`UserPicker` in `front/app/shell/user-picker.tsx` receives a non-empty roles tuple, the stored
+`UserPicker` in `front/app/shell/retrieval/user-picker.tsx` receives a non-empty roles tuple, the stored
 assignment separately from the draft value, and a change callback. Customer Detail passes `sales`.
 Eligible Users load through the declared role/status query and `listAll` under TanStack Query's
 default behavior. `USER_PICKER_QUERY_KEY` is `['users', 'picker']`; eligible keys append
