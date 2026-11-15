@@ -43,6 +43,7 @@ panes are divided by tone, not framed.
   **Tonal panes.** In a workbench dialog, the panel kinds render `elevation='tonal'`. Each pane kind
   picks its tone: the Aside a step lighter than Main.
 - _[Amended by the amendment "After ACE review", items 1 and 2: workbench dialogs only; clipping.]_
+  _[Amended by the amendment "After screen review": the dialog pads the panes; they stay attached.]_
   **Flush placement.** In a workbench dialog, the panel container has no gap and the dialog does not
   pad the panes; the panes meet edge to edge and run to the dialog's edges, clipped by its radius.
   The dialog's header row keeps its own pad. Placement is the container's, not the card's.
@@ -138,7 +139,8 @@ Production scope, and Acceptance.
    `PanelList` (`front/app/shell/retrieval/drill-navigator.tsx`). Sheets and retrieval keep their
    presentation, so the panel kinds do not switch to `tonal` unconditionally; the workbench dialog
    decides. Acceptance adds: a Lister sheet and the retrieval dialog are unchanged.
-2. **Clipping.** The workbench dialog is `overflow: visible` (`ui.css`); flush panes need its radius
+2. _[Superseded by the amendment "After screen review": no clipping is needed.]_
+   **Clipping.** The workbench dialog is `overflow: visible` (`ui.css`); flush panes need its radius
    to clip them. Acceptance adds: focus rings at the panes' edges, each pane's scrolling, and
    floating controls (select menus, popovers) are intact under the clipping.
 3. **Threshold: 660px.** With no gap the floor is the Aside's 280px plus Main's 380px. `manager.css`
@@ -163,7 +165,8 @@ passage in Target design and adds to Production scope.
    <CollectionTable elevation='tonal' …>    // forwards to PanelList; Lister passes nothing
    ```
 
-2. **Clipping targets the workbench size only.** `[data-ui='dialog'][data-ui-size='workbench']` is
+2. _[Superseded by the amendment "After screen review": no clipping is needed.]_
+   **Clipping targets the workbench size only.** `[data-ui='dialog'][data-ui-size='workbench']` is
    used only by the Managers and the Onboarding Wizard (`front/app-admin/app.tsx`), so it is the
    hook for flush placement and clipping. In `ui.css` the workbench and sheet sizes share one rule
    block, `overflow: visible` included; the clipping change splits it, so sheets are not clipped.
@@ -209,5 +212,20 @@ documentation leads code. They are no longer in ACE's production scope.
    example of both tones.
 3. **Remains in production:** `ux-components-internals.md` catalogs component-specified tokens; its
    Card row and the tonal tone tokens are named there when ACE creates them in `themes.css`.
+
+## Amendment — 2026-11-15 — After screen review
+
+The CA reviewed the production on screen beside the Library sheet: flush panes made the workbench
+dialog too different from every other dialog. This amendment supersedes the marked passage in
+Target design and the clipping items of the "After ACE review" and "After ACE scoping" amendments.
+
+1. **The dialog pads the panes.** The workbench dialog keeps its `--sa-dialog-pad` on every side,
+   as other dialogs do; the panes no longer run to its edges.
+2. **The panes stay attached.** The panel container keeps no gap; the Aside's light tone meets
+   Main's dark tone directly. Tonal cards stay square-cornered.
+3. **No clipping.** With the pad restored the panes do not reach the dialog's radius, so the
+   workbench dialog's overflow and its rule block shared with sheets are unchanged.
+4. **Unchanged:** reach (workbench dialogs only), the `variant` and `tone` props, the 660px
+   threshold, and the full-bleed dialog below 480px.
 
 _End of Brief_
