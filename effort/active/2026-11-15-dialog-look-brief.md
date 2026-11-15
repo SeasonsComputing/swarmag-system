@@ -222,10 +222,36 @@ Target design and the clipping items of the "After ACE review" and "After ACE sc
 1. **The dialog pads the panes.** The workbench dialog keeps its `--sa-dialog-pad` on every side,
    as other dialogs do; the panes no longer run to its edges.
 2. **The panes stay attached.** The panel container keeps no gap; the Aside's light tone meets
-   Main's dark tone directly. Tonal cards stay square-cornered.
-3. **No clipping.** With the pad restored the panes do not reach the dialog's radius, so the
+   Main's dark tone directly. Tonal cards stay square-cornered. _[Amended by the amendment
+   "Rounded pair": the pair's outside corners are rounded.]_
+3. **No clipping.** _[Amended by the amendment "Rounded pair": each pane clips to its own corners.]_ With the pad restored the panes do not reach the dialog's radius, so the
    workbench dialog's overflow and its rule block shared with sheets are unchanged.
 4. **Unchanged:** reach (workbench dialogs only), the `variant` and `tone` props, the 660px
    threshold, and the full-bleed dialog below 480px.
 
+## Amendment — 2026-11-15 — Rounded pair
+
+The CA's direction to ACE with the padding change, recorded here. It amends items 2 and 3 of the
+"After screen review" amendment.
+
+1. **The attached pair rounds its outside corners** with the card radius: the Aside's start corners
+   and Main's end corners. The seam between the panes stays square, and the tonal cards themselves
+   stay square-cornered; the panes clip them. Collapsed to one pane, or a single-step Wizard, the
+   visible pane rounds all four corners.
+2. **Each pane clips to its own corners** (`overflow: hidden` on Aside and Main in a workbench). The
+   dialog's overflow is unchanged. Acceptance adds: focus rings at the panes' edges are intact.
+
+## Amendment — 2026-11-15 — After AA review
+
+The AI Architect reviewed ACE's production under the strict scrutiny `ux/` carries. Two fixes,
+each within the approved scope.
+
+1. **Workbench rules live with the workbenches.** The attached-pair rules (gap, corners, clipping,
+   the single-pane and collapsed cases) name `[data-shell='manager']` and `[data-shell='wizard']`,
+   so they belong in `manager.css` and `wizard.css`, beside each workbench's 660px threshold, not
+   in `panel-container.css`: a panel does not know its consumers. Each file then holds its own
+   collapsed-corner rule under its own threshold, and no third `660` literal exists.
+2. **Only the columns lose their gap.** `column-gap: 0` replaces `gap: 0`, so the row gap between
+   the dialog's header and the panes stays. The header and accessory padding added to restore that
+   spacing, including the below-480px rule, are removed.
 _End of Brief_
