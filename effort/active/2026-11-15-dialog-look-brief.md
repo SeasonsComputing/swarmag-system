@@ -235,6 +235,8 @@ Target design and the clipping items of the "After ACE review" and "After ACE sc
 
 ## Amendment — 2026-11-15 — Rounded pair
 
+_[Amended by the amendment "Rounded like the others": the cards round; the workbench squares the seam.]_
+
 The CA's direction to ACE with the padding change, recorded here. It amends items 2 and 3 of the
 "After screen review" amendment.
 
@@ -279,5 +281,23 @@ amendment and the props described in the "Documentation amended" amendment.
    `tonal-light` for the Aside and `tonal-dark` for Main.
 3. **Documentation follows.** ux-design-language §4.6, ux-components-guide §4.4, and
    ux-components-internals name the two variant values; the Tone table is gone.
+
+## Amendment — 2026-11-15 — Rounded like the others
+
+The CA, reviewing the style guide: a standalone tonal card with square corners looks unfinished.
+Tonal cards work like the other cards. This amendment supersedes every passage that makes tonal
+cards square-cornered, and the "Rounded pair" amendment's clipping.
+
+1. **A tonal card has the card radius,** as framed cards do. `ui.css` drops the tonal variants'
+   `border-radius: 0`; they keep no border, no shadow, and no backdrop blur.
+2. **The workbench squares the seam.** In `manager.css` and `wizard.css`, while both panes show, the
+   Aside's end corners and Main's start corners have no radius; the pair reads as one rounded
+   surface divided by tone.
+3. **Collapse needs nothing.** Below 660px, or in a single-step Wizard, one pane shows and keeps the
+   card's own corners. The collapsed-corner and single-pane rules go.
+4. **No clipping.** The panes' `overflow: hidden` goes; each card rounds itself.
+5. **Documentation** says the same: ux-design-language §4.6 (rounded like any card; attached
+   regions square their shared seam) and ux-components-guide §4.4's Variant table, amended by the
+   AI Architect.
 
 _End of Brief_
