@@ -1,6 +1,6 @@
 # Dialog Look — Brief
 
-**Backlog, not dispatched.** Recorded 2026-11-15 from a CA + AI Architect exploration session, after
+**Parked, not dispatched** (parking lot P-16: its reach is undecided). Recorded 2026-11-15 from a CA + AI Architect exploration session, after
 the CA reviewed the Workflow Builder mockup's dialogs (the Question library and a recast User
 Manager, held on the CA's mockup canvas). A look-and-feel change to the workbench dialog. At its
 foundation it is a `ux/ui` change: the dialog surface, the action button, the table head, and the
