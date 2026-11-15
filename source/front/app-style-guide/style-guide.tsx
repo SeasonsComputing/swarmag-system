@@ -185,209 +185,213 @@ export const StyleGuide = (): UiComponent => {
       <SgMain>
         <UiLayout gap='loose'>
           <SgSection title='Typography'>
-            <UiFieldset variant='unframed' legend='Typefaces'>
-              <UiTable>
-                <UiTableHeader>
-                  <UiTableCell>Role</UiTableCell>
-                  <UiTableCell>Example</UiTableCell>
-                </UiTableHeader>
-                <UiTableBody>
-                  <UiTableRow variant='section'>
-                    <UiTableCell>Comfortaa</UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow>
-                    <UiTableCell>Heading</UiTableCell>
-                    <UiTableCell>
-                      <span data-app='style-guide-font-heading'>
-                        Operations briefing schedule confirmed
-                      </span>
-                    </UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow>
-                    <UiTableCell>Body</UiTableCell>
-                    <UiTableCell>
-                      <span data-app='style-guide-font-body'>
-                        Inspect field boundaries and document hazard zones
-                      </span>
-                    </UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow variant='section'>
-                    <UiTableCell>Lexend</UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow>
-                    <UiTableCell>Label</UiTableCell>
-                    <UiTableCell>
-                      <span data-app='style-guide-font-label'>Service window 06:00–09:00</span>
-                    </UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow>
-                    <UiTableCell>Annotation</UiTableCell>
-                    <UiTableCell>
-                      <span data-app='style-guide-font-annotation'>Caption or Legend</span>
-                    </UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow>
-                    <UiTableCell>UI</UiTableCell>
-                    <UiTableCell>
-                      <span data-app='style-guide-font-ui'>
-                        Assign crew and assets for spray mission
-                      </span>
-                    </UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow variant='section'>
-                    <UiTableCell>Cascadia Mono</UiTableCell>
-                  </UiTableRow>
-                  <UiTableRow>
-                    <UiTableCell>Data</UiTableCell>
-                    <UiTableCell>
-                      <samp>service.status = 'ready'; acres = 142</samp>
-                    </UiTableCell>
-                  </UiTableRow>
-                </UiTableBody>
-              </UiTable>
-            </UiFieldset>
-            <UiFieldset variant='unframed' legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
-              <h1>H1 Operations Command</h1>
-              <h2>H2 Field Service Planning</h2>
-              <h3>H3 Aerial Application Window</h3>
-              <h4>H4 Ground Crew Assignment</h4>
-              <h5>H5 Chemical Label Review</h5>
-            </UiFieldset>
-            <UiFieldset variant='unframed' legend='<body>, <p>, <blockquote>'>
-              <p>
-                Body copy should inherit the product typography without local component styling. Weather,
-                acreage, crew availability, and service windows remain scannable.
-              </p>
-              <blockquote>
-                Service logs are records of field reality and must remain clear, durable, and auditable.
-              </blockquote>
-            </UiFieldset>
-            <UiFieldset variant='unframed' legend='<code>, <kbd>, <samp>, <pre>'>
-              <p>
-                Inline code sample: <code>service.category === 'aerial-drone-services'</code>
-              </p>
-              <p>
-                Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.
-              </p>
-              <p>
-                Job assessment bid: <samp>$14,000.00</samp>
-              </p>
-              <span>Block code sample:</span>
-              <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
-            </UiFieldset>
+            <UiLayout gap='loose'>
+              <UiFieldset variant='unframed' legend='Typefaces'>
+                <UiTable>
+                  <UiTableHeader>
+                    <UiTableCell>Role</UiTableCell>
+                    <UiTableCell>Example</UiTableCell>
+                  </UiTableHeader>
+                  <UiTableBody>
+                    <UiTableRow variant='section'>
+                      <UiTableCell>Comfortaa</UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow>
+                      <UiTableCell>Heading</UiTableCell>
+                      <UiTableCell>
+                        <span data-app='style-guide-font-heading'>
+                          Operations briefing schedule confirmed
+                        </span>
+                      </UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow>
+                      <UiTableCell>Body</UiTableCell>
+                      <UiTableCell>
+                        <span data-app='style-guide-font-body'>
+                          Inspect field boundaries and document hazard zones
+                        </span>
+                      </UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow variant='section'>
+                      <UiTableCell>Lexend</UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow>
+                      <UiTableCell>Label</UiTableCell>
+                      <UiTableCell>
+                        <span data-app='style-guide-font-label'>Service window 06:00–09:00</span>
+                      </UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow>
+                      <UiTableCell>Annotation</UiTableCell>
+                      <UiTableCell>
+                        <span data-app='style-guide-font-annotation'>Caption or Legend</span>
+                      </UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow>
+                      <UiTableCell>UI</UiTableCell>
+                      <UiTableCell>
+                        <span data-app='style-guide-font-ui'>
+                          Assign crew and assets for spray mission
+                        </span>
+                      </UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow variant='section'>
+                      <UiTableCell>Cascadia Mono</UiTableCell>
+                    </UiTableRow>
+                    <UiTableRow>
+                      <UiTableCell>Data</UiTableCell>
+                      <UiTableCell>
+                        <samp>service.status = 'ready'; acres = 142</samp>
+                      </UiTableCell>
+                    </UiTableRow>
+                  </UiTableBody>
+                </UiTable>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
+                <h1>H1 Operations Command</h1>
+                <h2>H2 Field Service Planning</h2>
+                <h3>H3 Aerial Application Window</h3>
+                <h4>H4 Ground Crew Assignment</h4>
+                <h5>H5 Chemical Label Review</h5>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='<body>, <p>, <blockquote>'>
+                <p>
+                  Body copy should inherit the product typography without local component styling. Weather,
+                  acreage, crew availability, and service windows remain scannable.
+                </p>
+                <blockquote>
+                  Service logs are records of field reality and must remain clear, durable, and auditable.
+                </blockquote>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='<code>, <kbd>, <samp>, <pre>'>
+                <p>
+                  Inline code sample: <code>service.category === 'aerial-drone-services'</code>
+                </p>
+                <p>
+                  Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.
+                </p>
+                <p>
+                  Job assessment bid: <samp>$14,000.00</samp>
+                </p>
+                <span>Block code sample:</span>
+                <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
+              </UiFieldset>
+            </UiLayout>
           </SgSection>
 
           <SgSection title='HTML'>
-            <UiFieldset variant='unframed' legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
-              <UiField
-                label='UiTable, UiTableHeader, UiTableBody, UiTableRow, UiTableCell, UiTableSection'
-                variant='caption'
-              >
-                <UiTable overflow='scroll'>
-                  <UiTableHeader>
-                    <UiTableCell>Equipment</UiTableCell>
-                    <UiTableCell>Application</UiTableCell>
-                    <UiTableCell align='end'>Price</UiTableCell>
-                    <UiTableCell align='end'>Cost</UiTableCell>
-                  </UiTableHeader>
-                  <UiTableBody>
-                    <For each={EQUIPMENT}>
-                      {e => (
-                        <>
-                          <UiTableRow variant='section'>
-                            <UiTableCell>{e.section}</UiTableCell>
-                          </UiTableRow>
-                          <For each={e.items}>
-                            {i => (
-                              <UiTableRow>
-                                <UiTableCell>{i.name}</UiTableCell>
-                                <UiTableCell>{i.application}</UiTableCell>
-                                <UiTableCell align='end'>
-                                  <samp>{i.price}</samp>
-                                </UiTableCell>
-                                <UiTableCell align='end'>
-                                  <samp>{i.cost}</samp>
-                                </UiTableCell>
-                              </UiTableRow>
-                            )}
-                          </For>
-                        </>
-                      )}
-                    </For>
-                  </UiTableBody>
-                </UiTable>
-              </UiField>
-            </UiFieldset>
-            <UiFieldset variant='unframed' legend='<ul>, <ol>, <li>'>
-              <UiLayout variant='inline-wrap'>
-                <UiField label='UiList (default)' variant='caption'>
-                  <UiList>
-                    <UiListItem>Wind speed 12 km/h</UiListItem>
-                    <UiListItem>Precipitation 0%</UiListItem>
-                    <UiListItem>Visibility 18 km</UiListItem>
-                    <UiListItem>Temperature 21°C</UiListItem>
-                  </UiList>
+            <UiLayout gap='loose'>
+              <UiFieldset variant='unframed' legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
+                <UiField
+                  label='UiTable, UiTableHeader, UiTableBody, UiTableRow, UiTableCell, UiTableSection'
+                  variant='caption'
+                >
+                  <UiTable overflow='scroll'>
+                    <UiTableHeader>
+                      <UiTableCell>Equipment</UiTableCell>
+                      <UiTableCell>Application</UiTableCell>
+                      <UiTableCell align='end'>Price</UiTableCell>
+                      <UiTableCell align='end'>Cost</UiTableCell>
+                    </UiTableHeader>
+                    <UiTableBody>
+                      <For each={EQUIPMENT}>
+                        {e => (
+                          <>
+                            <UiTableRow variant='section'>
+                              <UiTableCell>{e.section}</UiTableCell>
+                            </UiTableRow>
+                            <For each={e.items}>
+                              {i => (
+                                <UiTableRow>
+                                  <UiTableCell>{i.name}</UiTableCell>
+                                  <UiTableCell>{i.application}</UiTableCell>
+                                  <UiTableCell align='end'>
+                                    <samp>{i.price}</samp>
+                                  </UiTableCell>
+                                  <UiTableCell align='end'>
+                                    <samp>{i.cost}</samp>
+                                  </UiTableCell>
+                                </UiTableRow>
+                              )}
+                            </For>
+                          </>
+                        )}
+                      </For>
+                    </UiTableBody>
+                  </UiTable>
                 </UiField>
-                <UiField label='UiList (bullet)' variant='caption'>
-                  <UiList variant='bullet'>
-                    <UiListItem>Lead operator certified.</UiListItem>
-                    <UiListItem>Equipment pre-check.</UiListItem>
-                    <UiListItem>Safety brief conducted.</UiListItem>
-                    <UiListItem>Flight plan filed.</UiListItem>
-                  </UiList>
-                </UiField>
-                <UiField label='UiList (numbered)' variant='caption'>
-                  <UiList variant='numbered'>
-                    <UiListItem>Assess site.</UiListItem>
-                    <UiListItem>Plan service.</UiListItem>
-                    <UiListItem>Execute work.</UiListItem>
-                  </UiList>
-                </UiField>
-              </UiLayout>
-            </UiFieldset>
-            <UiFieldset variant='unframed' legend='<input>, <textarea>, <select>, <option>'>
-              <UiLayout variant='inline-wrap'>
-                <UiField label='UiInput' for='field-name-1'>
-                  <UiInput
-                    name='field-name-1'
-                    value='North Field'
-                    error={inputError()}
-                    onInput={() => undefined}
-                    placeholder='Enter service location'
-                  />
-                </UiField>
-                <UiField label='UiTextArea' for='application-notes-1'>
-                  <UiTextArea
-                    name='application-notes-1'
-                    error={inputError()}
-                    onInput={() => undefined}
-                    value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
-                    placeholder='Wind break along west ridge; verify drift boundary before launch.'
-                    rows={6}
-                  />
-                </UiField>
-              </UiLayout>
-              <UiLayout variant='inline-wrap'>
-                <UiField label='UiSingleSelect' for='service-status'>
-                  <UiSingleSelect
-                    name='service-status'
-                    placeholder='Select service status'
-                    error={selectError()}
-                    options={STATUSES}
-                  />
-                </UiField>
-                <UiField label='UiMultiSelect' variant='caption'>
-                  <UiMultiSelect
-                    options={SERVICES}
-                    defaultValue={[...DEFAULT_SERVICES]}
-                  />
-                </UiField>
-              </UiLayout>
-            </UiFieldset>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='<ul>, <ol>, <li>'>
+                <UiLayout variant='inline-wrap'>
+                  <UiField label='UiList (default)' variant='caption'>
+                    <UiList>
+                      <UiListItem>Wind speed 12 km/h</UiListItem>
+                      <UiListItem>Precipitation 0%</UiListItem>
+                      <UiListItem>Visibility 18 km</UiListItem>
+                      <UiListItem>Temperature 21°C</UiListItem>
+                    </UiList>
+                  </UiField>
+                  <UiField label='UiList (bullet)' variant='caption'>
+                    <UiList variant='bullet'>
+                      <UiListItem>Lead operator certified.</UiListItem>
+                      <UiListItem>Equipment pre-check.</UiListItem>
+                      <UiListItem>Safety brief conducted.</UiListItem>
+                      <UiListItem>Flight plan filed.</UiListItem>
+                    </UiList>
+                  </UiField>
+                  <UiField label='UiList (numbered)' variant='caption'>
+                    <UiList variant='numbered'>
+                      <UiListItem>Assess site.</UiListItem>
+                      <UiListItem>Plan service.</UiListItem>
+                      <UiListItem>Execute work.</UiListItem>
+                    </UiList>
+                  </UiField>
+                </UiLayout>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='<input>, <textarea>, <select>, <option>'>
+                <UiLayout variant='inline-wrap'>
+                  <UiField label='UiInput' for='field-name-1'>
+                    <UiInput
+                      name='field-name-1'
+                      value='North Field'
+                      error={inputError()}
+                      onInput={() => undefined}
+                      placeholder='Enter service location'
+                    />
+                  </UiField>
+                  <UiField label='UiTextArea' for='application-notes-1'>
+                    <UiTextArea
+                      name='application-notes-1'
+                      error={inputError()}
+                      onInput={() => undefined}
+                      value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
+                      placeholder='Wind break along west ridge; verify drift boundary before launch.'
+                      rows={6}
+                    />
+                  </UiField>
+                </UiLayout>
+                <UiLayout variant='inline-wrap'>
+                  <UiField label='UiSingleSelect' for='service-status'>
+                    <UiSingleSelect
+                      name='service-status'
+                      placeholder='Select service status'
+                      error={selectError()}
+                      options={STATUSES}
+                    />
+                  </UiField>
+                  <UiField label='UiMultiSelect' variant='caption'>
+                    <UiMultiSelect
+                      options={SERVICES}
+                      defaultValue={[...DEFAULT_SERVICES]}
+                    />
+                  </UiField>
+                </UiLayout>
+              </UiFieldset>
+            </UiLayout>
           </SgSection>
 
           <SgSection title='Color'>
-            <UiLayout>
+            <UiLayout gap='loose'>
               <For each={COLOR_SWATCHES}>
                 {s => (
                   <UiFieldset variant='unframed' legend={s.legend}>
@@ -399,25 +403,25 @@ export const StyleGuide = (): UiComponent => {
                   </UiFieldset>
                 )}
               </For>
+              <UiFieldset variant='unframed' legend='Gradients'>
+                <UiLayout variant='inline-wrap' data-app='style-guide-color-gradients'>
+                  <For each={COLOR_GRADIENTS}>
+                    {g => <SgGradient value={g.value} label={g.label} token={g.token} />}
+                  </For>
+                </UiLayout>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='Text'>
+                <UiLayout variant='inline-wrap' data-app='style-guide-color-text'>
+                  <For each={TEXT_TOKENS}>
+                    {t => (
+                      <span data-app='style-guide-color-text-token' style={{ color: `var(${t})` }}>
+                        {t}
+                      </span>
+                    )}
+                  </For>
+                </UiLayout>
+              </UiFieldset>
             </UiLayout>
-            <UiFieldset variant='unframed' legend='Gradients'>
-              <UiLayout variant='inline-wrap' data-app='style-guide-color-gradients'>
-                <For each={COLOR_GRADIENTS}>
-                  {g => <SgGradient value={g.value} label={g.label} token={g.token} />}
-                </For>
-              </UiLayout>
-            </UiFieldset>
-            <UiFieldset variant='unframed' legend='Text'>
-              <UiLayout variant='inline-wrap' data-app='style-guide-color-text'>
-                <For each={TEXT_TOKENS}>
-                  {t => (
-                    <span data-app='style-guide-color-text-token' style={{ color: `var(${t})` }}>
-                      {t}
-                    </span>
-                  )}
-                </For>
-              </UiLayout>
-            </UiFieldset>
           </SgSection>
 
           <SgSection title='Decorations'>
