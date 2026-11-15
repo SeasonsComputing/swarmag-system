@@ -1290,18 +1290,27 @@ for non-labelable controls such as lists, tables, and composite listboxes.
 
 ### 5.6 UiFieldset
 
-Semantic group boundary with legend.
+Semantic group boundary with legend: a framed group by default, or an unframed section.
 
 **Use When**
 
-Use when a form has a named group of related fields.
+Use when a form has a named group of related fields. A form's top-level sections are unframed,
+inside `PanelSections`; a group within a section keeps the frame.
 
 **Props**
 
-| Prop       | Type          | Required | Default | Description     |
-| ---------- | ------------- | -------- | ------- | --------------- |
-| `legend`   | `string`      | yes      | —       | Group name.     |
-| `children` | `UiComponent` | yes      | —       | Group contents. |
+| Prop       | Type          | Required | Default | Description                                  |
+| ---------- | ------------- | -------- | ------- | -------------------------------------------- |
+| `legend`   | `string`      | yes      | —       | Group name.                                  |
+| `variant`  | `'unframed'`  | no       | unset   | A section: no border, background, or shadow. |
+| `children` | `UiComponent` | yes      | —       | Group contents.                              |
+
+**Variant**
+
+| Value        | Effect                                                               |
+| ------------ | -------------------------------------------------------------------- |
+| unset        | Framed group: border, radius, background, and its own padding.       |
+| `'unframed'` | Section: no frame or padding; the legend is a small uppercase label. |
 
 **Example**
 
@@ -1316,6 +1325,16 @@ Use when a form has a named group of related fields.
     </UiField>
   </UiLayout>
 </UiFieldset>
+```
+
+A form's sections, divided by a rule:
+
+```tsx
+<PanelSections>
+  <UiFieldset variant='unframed' legend='Identity'>…</UiFieldset>
+  <UiFieldset variant='unframed' legend='Contact Preferences'>…</UiFieldset>
+  <NotesEditor … />
+</PanelSections>
 ```
 
 ### 5.7 UiCollectionCursor

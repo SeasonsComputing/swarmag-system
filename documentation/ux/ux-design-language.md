@@ -338,6 +338,10 @@ themes alike. Where a window holds an Aside and a Main, the Aside takes the dark
 light, and the two attach: the corners at their shared seam are square, so the pair reads as one
 rounded surface divided by tone.
 
+**Sections divide a region.** Inside a region, a form's sections are divided by a rule, not boxed:
+each section is an unframed fieldset whose legend is a small uppercase label, and a hairline
+separates it from the next. A frame is kept for what is a separate thing, not for what is a group.
+
 ## 5. Geometry, Layout, And Motion
 
 ### 5.1 Spacing Scale
