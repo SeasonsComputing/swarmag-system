@@ -30,10 +30,8 @@
   color: var(--sa-text-primary);
   font-weight: var(--sa-ui-font-weight-strong);
   justify-self: center;
-  margin-block-end: var(--sa-rhythm-gap);
 }
 
 [data-widget='helm-menu'] > [data-widget='helm-menu-status'] {
   color: var(--sa-text-secondary);
-  margin-block-start: var(--sa-rhythm-gap);
 }

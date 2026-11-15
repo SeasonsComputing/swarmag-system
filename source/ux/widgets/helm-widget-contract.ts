@@ -118,6 +118,7 @@ const readHelmMenu = (record: Dictionary, field: string, bindings: HelmBindings)
       if (command) {
         const item = readHelmCommand(entry, childField, bindings)
         if (item.command === '@tasks') notValid(`${childField} @tasks belongs in the toolbar`)
+        if (item.command === '@theme') notValid(`${childField} @theme belongs in the toolbar`)
         return item
       }
       if (Object.keys(entry).length !== 1) notValid(`${childField} status only accepts a binding name`)

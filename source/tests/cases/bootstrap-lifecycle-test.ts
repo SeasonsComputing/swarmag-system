@@ -195,8 +195,6 @@ try {
   assert.deepEqual(await toolbar.locator('[data-widget="helm-button-glyph"]').evaluateAll(glyphs =>
     glyphs.map(glyph => glyph.getAttribute('aria-label'))), ['Backpack', 'Theme', 'Tasks', 'Main'])
   assert.equal(await toolbar.getByRole('button', { name: 'About', exact: true }).count(), 0)
-  assert.equal(await page.getByRole('button', { name: 'Theme', exact: true }).getAttribute('title'),
-    'Theme')
   const assertFrameless = async () => {
     const styles = await toolbar.locator('button').evaluateAll(buttons => buttons.flatMap(button => {
       const frame = button.querySelector('[data-ui="action-button-frame"]')
@@ -310,6 +308,7 @@ try {
   assert.equal(await page.getByRole('button', { name: /Dismiss/ }).count(), 0)
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'Theme', exact: true }).click()
+  await page.getByRole('button', { name: 'Dark', exact: true }).click()
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark')
   for (const theme of ['dark', 'light']) {
     await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)

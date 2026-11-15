@@ -58,6 +58,7 @@ Deno.test('Helm rejects label modes, misplaced items, nested menus, and absent b
     toolbar({ ...Menu, items: [Menu] }),
     toolbar({ ...Menu, items: [{}] }),
     toolbar({ ...Menu, items: [Tasks] }),
+    toolbar({ ...Menu, items: [{ command: '@theme', label: 'Theme', icon: 'moon' }] }),
     toolbar({ ...Menu, items: [{ ...Route, labelMode: 'visible' }] }),
     toolbar({ ...Menu, items: [{ ...Route, status: 'ready' }] }),
     toolbar({ ...Menu, items: [{ status: 'missing' }] }),
