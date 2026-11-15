@@ -1,133 +1,119 @@
 # Dialog Look — Brief
 
-**Parked, not dispatched** (parking lot P-16: its reach is undecided). Recorded 2026-11-15 from a CA + AI Architect exploration session, after
-the CA reviewed the Workflow Builder mockup's dialogs (the Question library and a recast User
-Manager, held on the CA's mockup canvas). A look-and-feel change to the workbench dialog. At its
-foundation it is a `ux/ui` change: the dialog surface, the action button, the table head, and the
-fieldset are design-language controls. Foundation mode; `ux/` is locked. Not part of M-7.
+**Backlog, not dispatched** (B-50). Recorded 2026-11-15 from a CA + AI Architect exploration
+session, after the CA reviewed the Workflow Builder mockups (held on the CA's mockup canvas). The
+workbench dialog's panes become tonal regions flush to the dialog; how panels work does not change.
+Foundation mode: `ux/ui` and `ux/shell` are locked. The CA has ACE review it before deciding.
 
 ## Escalation: `ux/ui`, `ux/shell` (requested)
 
-- `ux/ui/css/ui.css`, `themes.css`: the dialog surface, a primary action button, the table head, the
-  fieldset as a section.
-- `ux/ui/components/ui-action-button.tsx`: a `primary` variant, if taken (Open 3).
-- `ux/shell/panel`, `ux/shell/workbench`: the split, the selected row, and the collapse rules that
-  follow from them.
-
-Panels keep working as they do: the same slots, the same Manager behavior, the same collapse.
+- `ux/ui`: `UiCard` gains a `tonal` elevation.
+- `ux/shell/panel`, `ux/shell/workbench`: the panes use it; the workbench dialog's panes sit flush;
+  the collapse rules follow.
 
 ## Current behavior
 
 Verified against the code on 2026-11-15, with a read-only census by a delegate:
 
-- **Dialog:** `[data-ui='dialog']` has the `--sa-bg-control` background, `--sa-shadow-card`, and
-  `--sa-dialog-pad` (`ui.css`). The deep shadow and inset top highlight already exist.
-- **Panes:** the panel container is a grid with `--sa-rhythm-gap` between Aside and Main
-  (`panel-container.css`). Each pane is a raised `UiCard` (`PanelList`, `PanelForm`).
-- **Headings:** three tiers. The container header's title ("User Manager") and Cancel; each pane's
-  title ("Users" with New; "New User" with Save); fieldset legends.
-- **Actions:** `UiActionButton` is a label, a divider, and a ringed icon. Variants are `default` and
-  `danger`; there is no primary.
-- **Collection:** a table whose head is the brand gradient (`--sa-table-bg-head`). Row identity is
-  title, subtitle, annotation; status and actions are columns. No row is marked selected:
-  `CollectionTable` is not told which Item is open.
-- **Form:** bordered fieldsets with teal legends.
-- **Collapse:** at `@container (max-width: 676px)` one pane shows, chosen by `data-shell-mode`
-  (`manager.css`; the same literal in `wizard.css`). Below 480px the workbench dialog goes
+- `UiCardElevation` is `'none' | 'raised' | 'floating'` (`ux/ui/components/ui-card.tsx`), styled in
+  `ui.css` by `data-ui-elevation`.
+- `PanelList`, `PanelForm`, and `PanelStepflow` each render `<UiCard elevation='raised'>`: a
+  translucent fill, a border, a radius, and a shadow, inside a dialog that has its own fill,
+  border, radius, and shadow.
+- The panel container is a grid with `--sa-rhythm-gap` between Aside and Main
+  (`panel-container.css`); the dialog pads its content with `--sa-dialog-pad`.
+- Collapse: at `@container (max-width: 676px)` one pane shows, chosen by `data-shell-mode`
+  (`manager.css`; the same literal in `wizard.css`). Below 480px the workbench dialog is
   full-bleed with no pad.
 
 ## Target design
 
-As the mockup draws it:
+**Frame the window; divide its contents.** The dialog is the one framed surface. Inside it, the
+panes are divided by tone, not framed.
 
-1. **One surface.** The dialog is the only raised surface: the popup tone (`--sa-bg-popup`), its
-   existing shadow and highlight. The panes are regions of it, not cards; they keep the pane
-   interior pad.
-2. **The split.** The Aside is tinted and meets Main at a single 1px rule. No gap between panes.
-   The tint reaches the dialog's edges.
-3. **The header line.** One header per pane. The container's title reads as an eyebrow, small and
-   uppercase, above the pane's title. Save shares Main's title line, as it does today.
-4. **Actions.** A filled primary for the commit (Save, or a caller's action such as Add), a quiet outline for Cancel, an
-   outlined tint for New.
-5. **The Collection.** A quiet table head, not the gradient. The open Item's row is marked: tint and
-   one outline.
-6. **Form sections.** A fieldset reads as a section: a small uppercase teal legend, no box, a
-   hairline between sections.
+- **A tonal card.** `UiCardElevation` gains `tonal`: a filled tone, no border, no shadow, no radius.
+  The card owns its look.
 
-Both themes, from existing tokens.
+  ```ts
+  export type UiCardElevation = 'none' | 'raised' | 'floating' | 'tonal'
+  ```
+
+- **Tonal panes.** In a workbench dialog, the panel kinds render `elevation='tonal'`. Each pane kind
+  picks its tone: the Aside a step lighter than Main.
+- **Flush placement.** In a workbench dialog, the panel container has no gap and the dialog does not
+  pad the panes; the panes meet edge to edge and run to the dialog's edges, clipped by its radius.
+  The dialog's header row keeps its own pad. Placement is the container's, not the card's.
+- **Unchanged.** The dialog's title and Cancel, each pane's header and actions, the action buttons,
+  the table, and the fieldsets. Panes keep their interior pad.
+
+Both themes; the tones are tokens in `themes.css`.
 
 ## Collapse and spacing
 
-The look changes; the behavior does not.
-
-- **The rule** between panes exists only above the threshold; a single visible pane shows no edge.
-- **The threshold** is re-solved for no gap (about 660px) in `manager.css` and `wizard.css`
-  together, or left conservative. Either way the two stay equal.
-- **Edge bleed** resets below 480px, where the dialog has no pad.
-- **Spacing roles hold:** pad for the dialog and pane interiors, gap between sections, no gutter.
-  `--sa-dialog-pad` also enters dialog sizing; it is used as it is, not replaced.
+- **The threshold** is re-solved for no gap in `manager.css` and `wizard.css` together, which stay
+  equal.
+- **Below 480px** the full-bleed dialog stays correct with the flush panes; nothing overflows.
+- **One visible pane** reads correctly alone: its tone, no stray edge.
+- **Spacing roles hold:** pad for pane interiors and the header row, no gutter.
 
 ## Governing documents to amend
 
 Amended first, since documentation leads code:
 
-- **ux-design-language:** the dialog as one surface; fieldset as section; the primary action.
-- **ux-components-guide:** `UiActionButton` (a primary variant, if taken), `UiFieldset`, `UiTable`
-  head, the dialog.
+- **ux-design-language:** tonal elevation; frame the window, divide its contents.
+- **ux-components-guide:** `UiCard`'s `tonal` elevation.
 
 ## Production scope
 
-To be drawn when the brief is chosen; the census below sets its reach.
+Paths are under `source/`.
 
-- `ux/ui/css/ui.css`, `themes.css`; `ux/ui/components/ui-action-button.tsx` (Open 3).
-- `ux/shell/panel/panel-container.css`, `panel-list.css`, `panel-form.css`.
-- `ux/shell/workbench/manager.css`, `wizard.css`, `collection-table.tsx`, `manager.tsx`.
-- `front/app-style-guide/`: the examples follow the controls.
-- `tests/cases/…`: the selected-row marker.
+| Files                                                             | Work                                     |
+| ----------------------------------------------------------------- | ---------------------------------------- |
+| `ux/ui/components/ui-card.tsx`, `ux/ui/css/ui.css`, `themes.css`  | `tonal` elevation; tone tokens per theme |
+| `ux/shell/panel/panel-list.*`, `panel-form.*`, `panel-stepflow.*` | tonal panes; each kind's tone            |
+| `ux/shell/panel/panel-container.css`, `ux/shell/workbench/*.css`  | flush placement; collapse thresholds     |
+| `front/app-style-guide/`                                          | the `tonal` card example                 |
 
-**Reach.** A change at the `ux/ui` level reaches every consumer: the Wizard, the Lister and sheets,
-CollectionPanel and the notes and attachments editors (fieldsets), the confirm and content dialogs,
-and the style guide. Each target point is decided at the design-language level or scoped to the
-Manager (Open 1).
+Out of scope: how panels work; Cancel's placement; action-button variants; list rows; eyebrows;
+the table head; fieldsets; the selected row (B-5); dialogs other than the workbench dialog.
+
+**Reach:** every Manager and Wizard. Lister sheets, if they share the panel kinds; to confirm when
+scoped.
+
+Escalate any change outside this scope.
 
 ## Acceptance
 
-- The User Manager, in both themes, matches the mockup's points 1–6.
-- Collapse below the threshold shows one pane, no stray rule, and the return as today; below 480px
-  the dialog is full-bleed with nothing overflowing.
-- The open Item's row is marked.
-- The Wizard, the Lister, and the confirm dialog look as intended under whatever reach Open 1 sets.
-- CA verifies on screen.
+- A Manager and a Wizard, in both themes, show tonal panes flush to the dialog, the Aside a step
+  lighter than Main.
+- Collapse below the threshold shows one pane and the return as today; below 480px the dialog is
+  full-bleed with nothing overflowing.
+- Confirm and content dialogs are unchanged.
+- CA verifies on screen in both themes, wide and collapsed.
 
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, `guard:css`, and
 STYLE_AUDIT.
 
-## Open
-
-1. **Reach.** The design language for every dialog, panel, fieldset, and table head; or the Manager
-   only, by scoped rules. The mockup is the Manager's.
-2. **Cancel.** It stays in the container header, restyled as the quiet outline; or it joins Save on
-   Main's title line, which also needs a Cancel in the Aside header for the collapsed list view,
-   where Main is hidden. The first keeps collapse untouched.
-3. **Primary action.** A `primary` variant on `UiActionButton`, additive; or scoped CSS over the
-   default variant.
-4. **Pane eyebrows.** Nothing supplies one per pane today; the container's title can become the
-   eyebrow in place. Whether a per-pane eyebrow is wanted.
-5. **Status on the row.** The mockup puts the Active badge on the row's second line. In the table it
-   is its own column; moving it means each Manager's provider supplies it in the row identity.
-
 ## Records
 
-- **A `ux/ui` change at its foundation.** The surface, the action, the table head, and the fieldset
-  are design-language controls; the Manager is where the look was first seen, not where it belongs.
-- **Most of it is styling.** The delegate's census found about four fifths reachable by CSS and
-  tokens alone; the structural pieces are the selected-row marker, Cancel's placement, per-pane
-  eyebrows, and status on the row.
-- **The selected row is a real gap.** The open Item is not marked today, whatever the look.
+- **Frames inside frames.** The shipped dialog frames every region; the eye reads the frames before
+  the content. Framing once, at the window, keeps the CA's interaction and gives a contemporary
+  surface.
+- **Elevation, not a new axis.** Material 3's tonal elevation is elevation by tone; `UiCard`
+  already has the axis, so `tonal` joins it additively.
+- **Card look, container placement.** What a card looks like is the card's; that panes sit flush is
+  the container's.
 
 ## Design history
 
-- The mockup's first dialog was the Question library opened to pick; the CA preferred it to the
-  shipped Manager, and the User Manager was recast in it for comparison.
+- The first draft recast the whole dialog flat: one surface, a single rule between panes, Cancel
+  beside Save, a filled primary action, list rows with badges, eyebrows, and fieldsets as sections.
+  The CA preferred its look but parked it (P-16) because its reach was undecided and it was not
+  near-term.
+- A hybrid mockup then kept the CA's dialog and made only the panes tonal, without rounding or
+  padding. The CA chose it as a simple tweak that keeps the interaction with a contemporary
+  surface; P-16 was retired in favor of this backlog entry.
+- A delegate's census of the flat draft found about four fifths reachable by CSS alone, and named
+  the collapse traps this brief keeps.
 
 _End of Brief_

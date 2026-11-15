@@ -393,22 +393,4 @@ dashboard as the primary navigation (UX design archetypes §4.3).
 grammar and archetypes §4.3. Decide it beside P-5, since both concern where navigation lives;
 the Library's Helm button is app-specific navigation that P-5 would move out of the Helm.
 
-## P-16 · Should the workbench dialog become one flat surface, and across which controls?
-
-**Parked:** 2026-11-15 — CA, after reviewing the Workflow Builder mockups: the Question library
-and a recast User Manager drawn as one surface, preferred to the shipped Manager.
-
-**What it is:** The dialog as the only raised surface; a tinted Aside meeting Main at a single
-rule; one header per pane; a filled primary commit; a quiet table head with the open row marked;
-fieldsets read as sections. At its foundation a `ux/ui` change. The design, a census of what CSS
-alone reaches, and the collapse and spacing consequences are in
-`effort/pending/2026-11-15-dialog-look-brief.md`.
-
-**Why parked:** The look is wanted; its reach is undecided: the design language for every dialog,
-panel, fieldset, and table head, or the Manager only. Cancel's placement and a primary action
-variant are open with it. `ux/` is locked, and it is not near-term work.
-
-**Picking this up:** Foundation Mode. Decide the reach first; the brief's Open list follows from
-it. P-4's table-head gradient is moot if the head goes quiet.
-
 _End of Feature Parking Lot Document_
