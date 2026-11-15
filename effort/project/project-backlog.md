@@ -640,7 +640,7 @@ state.
 
 **Observed:** 2026-11-15 · normal
 
-Design record: [Dialog Look — Brief](../pending/2026-11-15-dialog-look-brief.md).
+Design record: [Dialog Look — Brief](../active/2026-11-15-dialog-look-brief.md).
 
 ## Document Storage
 

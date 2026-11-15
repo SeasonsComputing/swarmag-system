@@ -1,6 +1,6 @@
 # Dialog Look — Brief
 
-**Backlog, not dispatched** (B-50). Recorded 2026-11-15 from a CA + AI Architect exploration
+**Active, not dispatched** (B-50). Selected 2026-11-15 for ACE review. Recorded 2026-11-15 from a CA + AI Architect exploration
 session, after the CA reviewed the Workflow Builder mockups (held on the CA's mockup canvas). The
 workbench dialog's panes become tonal regions flush to the dialog; how panels work does not change.
 Foundation mode: `ux/ui` and `ux/shell` are locked. The CA has ACE review it before deciding.
