@@ -38,12 +38,11 @@ import { PanelSequenceProgress } from '@ux/shell/panel/panel-sequence-progress.t
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
 import { PanelStepflow } from '@ux/shell/panel/panel-stepflow.tsx'
-import { UiActionButton } from '@ux/ui'
+import { UiActionButton, UiConfirmDialog } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { FORM_FEEDBACK_MESSAGE } from './use-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
 import { createWorkbenchContext } from './workbench-context.ts'
-import { WorkbenchDiscard } from './workbench-discard.tsx'
 import { copyDraft, isDraftChanged } from './workbench-draft.ts'
 import './wizard.css'
 
@@ -160,7 +159,13 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
         }
       />
       <Show when={discard()}>
-        <WorkbenchDiscard onCancel={() => setDiscard(false)} onDiscard={props.onCancel} />
+        <UiConfirmDialog
+          title='Discard unsaved changes?'
+          message='Unsaved changes in this workbench will be discarded.'
+          action={{ label: 'Discard' }}
+          onConfirm={props.onCancel}
+          onCancel={() => setDiscard(false)}
+        />
       </Show>
     </>
   )

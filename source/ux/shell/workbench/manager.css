@@ -13,16 +13,6 @@
   width: 1%;
 }
 
-[data-shell='manager-confirmation'] {
-  display: grid;
-  gap: var(--sa-rhythm-gap);
-}
-
-[data-shell='manager-confirmation'] h2,
-[data-shell='manager-confirmation'] p {
-  margin: 0;
-}
-
 [data-shell='manager-collapse-action'] {
   display: none;
 }

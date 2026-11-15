@@ -44,7 +44,7 @@ import {
   runWithOwner,
   Show
 } from '@solid-js'
-import { UiActionButton, UiButton, UiDialog, UiFormActions, UiLayout } from '@ux/ui'
+import { UiActionButton, UiConfirmDialog } from '@ux/ui'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 import type {
   DrillContract,
@@ -198,22 +198,13 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
       </Show>
       <Show when={pendingDiscard()}>
         {target => (
-          <UiDialog
-            open
-            size='content'
-            onOpenChange={open => {
-              if (!open) setPendingDiscard(null)
-            }}
-          >
-            <UiLayout>
-              <h2>Discard unsaved changes?</h2>
-              <p>Changes to this item will be discarded.</p>
-              <UiFormActions>
-                <UiButton variant='ghost' onClick={() => setPendingDiscard(null)}>Cancel</UiButton>
-                <UiButton variant='danger' onClick={() => returnToParent(target())}>Discard</UiButton>
-              </UiFormActions>
-            </UiLayout>
-          </UiDialog>
+          <UiConfirmDialog
+            title='Discard unsaved changes?'
+            message='Changes to this item will be discarded.'
+            action={{ label: 'Discard' }}
+            onConfirm={() => returnToParent(target())}
+            onCancel={() => setPendingDiscard(null)}
+          />
         )}
       </Show>
     </section>

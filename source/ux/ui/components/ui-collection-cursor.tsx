@@ -27,8 +27,7 @@ UiCollectionCursorProps  Cursor surface over a bounded collection: position and 
 
 import { createMemo, createSignal, For, Show, untrack } from '@solid-js'
 import { UiActionButton } from './ui-action-button.tsx'
-import { UiButton } from './ui-button.tsx'
-import { UiDialog } from './ui-dialog.tsx'
+import { UiConfirmDialog } from './ui-confirm-dialog.tsx'
 import { UiFormActions } from './ui-form-actions.tsx'
 import type { UiComponent } from './ui-helpers.ts'
 import { UiLayout } from './ui-layout.tsx'
@@ -202,20 +201,17 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
           {body()}
         </Show>
       </div>
-      <UiDialog
-        open={deleteOpen()}
-        onOpenChange={setDeleteOpen}
-        size='content'
-      >
-        <div data-ui='collection-cursor-confirm'>
-          <h2 data-ui='collection-cursor-confirm-title'>{currentDeleteCopy()?.title}</h2>
-          <p data-ui='collection-cursor-confirm-message'>{currentDeleteCopy()?.message}</p>
-          <UiFormActions>
-            <UiButton variant='ghost' onClick={() => setDeleteOpen(false)}>Cancel</UiButton>
-            <UiButton variant='danger' disabled={!hasItems()} onClick={deleteItem}>Delete</UiButton>
-          </UiFormActions>
-        </div>
-      </UiDialog>
+      <Show when={deleteOpen() ? currentDeleteCopy() : undefined}>
+        {copy => (
+          <UiConfirmDialog
+            title={copy().title}
+            message={copy().message}
+            action={{ label: 'Delete' }}
+            onConfirm={deleteItem}
+            onCancel={() => setDeleteOpen(false)}
+          />
+        )}
+      </Show>
     </section>
   )
 }

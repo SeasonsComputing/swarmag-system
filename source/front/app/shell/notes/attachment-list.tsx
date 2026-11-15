@@ -30,6 +30,7 @@ import {
   UiActionButton,
   UiAlert,
   UiButton,
+  UiConfirmDialog,
   UiDialog,
   UiField,
   UiFieldset,
@@ -195,24 +196,16 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
         </UiLayout>
       </UiFieldset>
       <Show when={remove() !== null}>
-        <UiDialog open size='content' onOpenChange={open => !open && setRemove(null)}>
-          <UiLayout>
-            <h2>Remove attachment?</h2>
-            <p>This attachment will be removed from the note.</p>
-            <UiFormActions>
-              <UiButton variant='ghost' onClick={() => setRemove(null)}>Cancel</UiButton>
-              <UiButton
-                variant='danger'
-                onClick={() => {
-                  props.onChange(props.attachments().filter((_, i) => i !== remove()))
-                  setRemove(null)
-                }}
-              >
-                Remove
-              </UiButton>
-            </UiFormActions>
-          </UiLayout>
-        </UiDialog>
+        <UiConfirmDialog
+          title='Remove attachment?'
+          message='This attachment will be removed from the note.'
+          action={{ label: 'Remove' }}
+          onConfirm={() => {
+            props.onChange(props.attachments().filter((_, i) => i !== remove()))
+            setRemove(null)
+          }}
+          onCancel={() => setRemove(null)}
+        />
       </Show>
       <Show when={rename() !== null}>
         <UiDialog open size='panel' onOpenChange={open => !open && setRename(null)}>

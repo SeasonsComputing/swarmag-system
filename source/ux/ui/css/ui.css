@@ -317,20 +317,6 @@
   margin: 0;
 }
 
-[data-ui='collection-cursor-confirm'] {
-  display: grid;
-  gap: var(--sa-rhythm-gap);
-}
-
-[data-ui='collection-cursor-confirm-title'] {
-  margin: 0;
-}
-
-[data-ui='collection-cursor-confirm-message'] {
-  color: var(--sa-text-secondary);
-  margin: 0;
-}
-
 /* ─────────────────────────────────────────────────────────────────────────── */
 /* INPUT / TEXTAREA / SELECT                                                   */
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -1363,6 +1349,24 @@
     padding: 0;
     transform: none;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* CONFIRM DIALOG                                                              */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+[data-ui='confirm-dialog'] {
+  display: grid;
+  gap: var(--sa-rhythm-gap);
+}
+
+[data-ui='confirm-dialog-title'] {
+  margin: 0;
+}
+
+[data-ui='confirm-dialog-message'] {
+  color: var(--sa-text-secondary);
+  margin: 0;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

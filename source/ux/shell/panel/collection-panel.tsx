@@ -19,10 +19,8 @@ import { createSignal, For, Show } from '@solid-js'
 import type { UiComponent } from '@ux/ui'
 import {
   UiActionButton,
-  UiButton,
-  UiDialog,
+  UiConfirmDialog,
   UiFieldset,
-  UiFormActions,
   UiTable,
   UiTableBody,
   UiTableCell,
@@ -138,22 +136,13 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
       </UiFieldset>
       <Show when={pendingRemove()}>
         {target => (
-          <UiDialog
-            open
-            size='content'
-            onOpenChange={open => {
-              if (!open) setPendingRemove(null)
-            }}
-          >
-            <div data-shell='collection-panel-confirmation'>
-              <h2>{target().title}</h2>
-              <p>{target().message}</p>
-              <UiFormActions>
-                <UiButton variant='ghost' onClick={() => setPendingRemove(null)}>Cancel</UiButton>
-                <UiButton variant='danger' onClick={confirmRemove}>Delete</UiButton>
-              </UiFormActions>
-            </div>
-          </UiDialog>
+          <UiConfirmDialog
+            title={target().title}
+            message={target().message}
+            action={{ label: 'Delete' }}
+            onConfirm={confirmRemove}
+            onCancel={() => setPendingRemove(null)}
+          />
         )}
       </Show>
     </div>

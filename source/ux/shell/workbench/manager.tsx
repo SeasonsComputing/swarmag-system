@@ -44,14 +44,13 @@ import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
 import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
-import { UiActionButton, UiAlert, UiButton, UiDialog, UiFormActions } from '@ux/ui'
+import { UiActionButton, UiConfirmDialog } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { CollectionTable } from './collection-table.tsx'
 import type { ManagerAction, ManagerCollectionAction, ManagerContract } from './manager-contract.ts'
 import { FORM_FEEDBACK_MESSAGE } from './use-form-feedback.ts'
 import { focusFirstField } from './use-form-keyboard.ts'
 import { createWorkbenchContext } from './workbench-context.ts'
-import { WorkbenchDiscard } from './workbench-discard.tsx'
 import { copyDraft, isDraftChanged } from './workbench-draft.ts'
 
 import './manager.css'
@@ -71,20 +70,21 @@ type PendingAction<T extends Instance> = {
   item: T
 }
 
+/** What the open editor's session tells Manager before it exits or saves. */
+type SessionTransitions<Draft> = {
+  draft: () => Draft
+  complete: () => boolean
+  isDirty: () => boolean
+  isDrilled: () => boolean
+}
+
 /** Generic item list and editor-panel manager. */
 export const Manager = <T extends Instance, Draft>(
   props: ManagerProps<T, Draft>
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<ManagerMode>('list')
-  const [session, setSession] = createSignal<
-    {
-      draft: () => Draft
-      complete: () => boolean
-      isDirty: () => boolean
-      isDrilled: () => boolean
-    } | null
-  >(null)
+  const [session, setSession] = createSignal<SessionTransitions<Draft> | null>(null)
   const [pendingExit, setPendingExit] = createSignal<(() => void) | null>(null)
   const [editorFeedback, setEditorFeedback] = createSignal<PanelFeedback | null>(null)
   const [savePending, setSavePending] = createSignal(false)
@@ -100,7 +100,6 @@ export const Manager = <T extends Instance, Draft>(
     if (mode() === 'editor' && focusOnEpoch()) focusFirstField(() => panelRef)
   })
   const [pendingAction, setPendingAction] = createSignal<PendingAction<T> | null>(null)
-  const [actionError, setActionError] = createSignal<string | null>(null)
   const [actionPending, setActionPending] = createSignal(false)
   const [collectionError, setCollectionError] = createSignal<string | null>(null)
 
@@ -212,7 +211,6 @@ export const Manager = <T extends Instance, Draft>(
       void runAction(action, item)
       return
     }
-    setActionError(null)
     setPendingAction({ action, item })
   }
 
@@ -221,12 +219,9 @@ export const Manager = <T extends Instance, Draft>(
     const target = pendingAction()
     if (!target || actionPending()) return
     setActionPending(true)
-    setActionError(null)
     try {
       await runAction(target.action, target.item)
       setPendingAction(null)
-    } catch (error) {
-      setActionError(error instanceof Error ? error.message : `${target.action.label} failed.`)
     } finally {
       setActionPending(false)
     }
@@ -400,46 +395,32 @@ export const Manager = <T extends Instance, Draft>(
       />
       <Show when={pendingExit()}>
         {action => (
-          <WorkbenchDiscard
-            onCancel={() => setPendingExit(null)}
-            onDiscard={() => {
+          <UiConfirmDialog
+            title='Discard unsaved changes?'
+            message='Unsaved changes in this workbench will be discarded.'
+            action={{ label: 'Discard' }}
+            onConfirm={() => {
               const proceed = action()
               setPendingExit(null)
               proceed()
             }}
+            onCancel={() => setPendingExit(null)}
           />
         )}
       </Show>
       <Show when={pendingAction()}>
         {target => (
-          <UiDialog
-            open
-            size='content'
-            onOpenChange={open => {
-              if (!open && !actionPending()) setPendingAction(null)
-            }}
-          >
-            <div data-shell='manager-confirmation'>
-              <h2>{target().action.confirmation?.title}</h2>
-              <p>{target().action.confirmation?.message(target().item)}</p>
-              <Show when={actionError()}>
-                {message => <UiAlert variant='danger'>{message()}</UiAlert>}
-              </Show>
-              <UiFormActions>
-                <UiButton disabled={actionPending()} onClick={() => setPendingAction(null)}>
-                  Cancel
-                </UiButton>
-                <UiButton
-                  disabled={actionPending()}
-                  loading={actionPending()}
-                  variant='danger'
-                  onClick={() => void confirmAction()}
-                >
-                  {target().action.label}
-                </UiButton>
-              </UiFormActions>
-            </div>
-          </UiDialog>
+          <Show when={target().action.confirmation}>
+            {confirmation => (
+              <UiConfirmDialog
+                title={confirmation().title}
+                message={confirmation().message(target().item)}
+                action={{ label: target().action.label }}
+                onConfirm={confirmAction}
+                onCancel={() => setPendingAction(null)}
+              />
+            )}
+          </Show>
         )}
       </Show>
     </>

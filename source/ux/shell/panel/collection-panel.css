@@ -37,8 +37,3 @@
   padding: var(--sa-space-lg) 0 0 0;
   text-align: center;
 }
-
-[data-shell='collection-panel-confirmation'] {
-  display: grid;
-  gap: var(--sa-space-sm);
-}
