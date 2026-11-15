@@ -1,6 +1,6 @@
 # Dialog Look — Brief
 
-**Active, not dispatched** (B-50). Selected 2026-11-15 for ACE review. Recorded 2026-11-15 from a CA + AI Architect exploration
+**Active, dispatched for ACE review 2026-11-15** (B-50); amended after that review. Recorded 2026-11-15 from a CA + AI Architect exploration
 session, after the CA reviewed the Workflow Builder mockups (held on the CA's mockup canvas). The
 workbench dialog's panes become tonal regions flush to the dialog; how panels work does not change.
 Foundation mode: `ux/ui` and `ux/shell` are locked. The CA has ACE review it before deciding.
@@ -40,7 +40,8 @@ panes are divided by tone, not framed.
 
 - **Tonal panes.** In a workbench dialog, the panel kinds render `elevation='tonal'`. Each pane kind
   picks its tone: the Aside a step lighter than Main.
-- **Flush placement.** In a workbench dialog, the panel container has no gap and the dialog does not
+- _[Amended by the amendment "After ACE review", items 1 and 2: workbench dialogs only; clipping.]_
+  **Flush placement.** In a workbench dialog, the panel container has no gap and the dialog does not
   pad the panes; the panes meet edge to edge and run to the dialog's edges, clipped by its radius.
   The dialog's header row keeps its own pad. Placement is the container's, not the card's.
 - **Unchanged.** The dialog's title and Cancel, each pane's header and actions, the action buttons,
@@ -50,7 +51,8 @@ Both themes; the tones are tokens in `themes.css`.
 
 ## Collapse and spacing
 
-- **The threshold** is re-solved for no gap in `manager.css` and `wizard.css` together, which stay
+- _[Amended by the amendment "After ACE review", item 3: exactly 660px.]_
+  **The threshold** is re-solved for no gap in `manager.css` and `wizard.css` together, which stay
   equal.
 - **Below 480px** the full-bleed dialog stays correct with the flush panes; nothing overflows.
 - **One visible pane** reads correctly alone: its tone, no stray edge.
@@ -77,12 +79,15 @@ Paths are under `source/`.
 Out of scope: how panels work; Cancel's placement; action-button variants; list rows; eyebrows;
 the table head; fieldsets; the selected row (B-5); dialogs other than the workbench dialog.
 
+_[Amended by the amendment "After ACE review", item 1: workbench dialogs only.]_
 **Reach:** every Manager and Wizard. Lister sheets, if they share the panel kinds; to confirm when
 scoped.
 
 Escalate any change outside this scope.
 
 ## Acceptance
+
+_[Amended by the amendment "After ACE review", items 1 and 2: sheets unchanged; clipping checks.]_
 
 - A Manager and a Wizard, in both themes, show tonal panes flush to the dialog, the Aside a step
   lighter than Main.
@@ -115,5 +120,23 @@ STYLE_AUDIT.
   surface; P-16 was retired in favor of this backlog entry.
 - A delegate's census of the flat draft found about four fifths reachable by CSS alone, and named
   the collapse traps this brief keeps.
+
+## Amendment — 2026-11-15 — After ACE review
+
+ACE's exploration review raised three points, each verified against the code. The CA settled the
+first. This amendment supersedes the marked passages in Target design, Collapse and spacing,
+Production scope, and Acceptance.
+
+1. **Reach: workbench dialogs only.** Tonal panes and flush placement apply to the Manager and
+   Wizard dialogs. `PanelList` is shared beyond them: Lister renders `CollectionTable → PanelList`
+   in a sheet (`ux/shell/workbench/lister.tsx`), and retrieval's `DrillNavigator` renders
+   `PanelList` (`front/app/shell/retrieval/drill-navigator.tsx`). Sheets and retrieval keep their
+   presentation, so the panel kinds do not switch to `tonal` unconditionally; the workbench dialog
+   decides. Acceptance adds: a Lister sheet and the retrieval dialog are unchanged.
+2. **Clipping.** The workbench dialog is `overflow: visible` (`ui.css`); flush panes need its radius
+   to clip them. Acceptance adds: focus rings at the panes' edges, each pane's scrolling, and
+   floating controls (select menus, popovers) are intact under the clipping.
+3. **Threshold: 660px.** With no gap the floor is the Aside's 280px plus Main's 380px. `manager.css`
+   and `wizard.css` both use 660, and both are verified on either side of it.
 
 _End of Brief_
