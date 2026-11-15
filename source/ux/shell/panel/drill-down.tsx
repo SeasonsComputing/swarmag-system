@@ -184,11 +184,11 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
       <Show when={!props.context && frame().parent !== undefined}>
         <div data-shell='drill-down-return'>
           <UiActionButton
+            align='start'
+            density='dense'
             icon='corner-top-left'
             label={frame().parent?.title ?? props.rootTitle}
             labelMode='visible'
-            align='start'
-            density='dense'
             onClick={requestReturn}
           />
         </div>

@@ -126,10 +126,10 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
       <UiFormActions>
         <UiLayout variant='inline-fit' gap='tight'>
           <UiActionButton
-            icon='chevron-left'
-            label='Previous'
             density='dense'
             disabled={count() < 2 || cursor() <= 0}
+            icon='chevron-left'
+            label='Previous'
             onClick={() => moveCursor(Math.max(0, cursor() - 1))}
           />
           <div
@@ -154,27 +154,27 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
             </Show>
           </div>
           <UiActionButton
-            icon='chevron-right'
-            label='Next'
             density='dense'
             disabled={count() < 2 || cursor() >= count() - 1}
+            icon='chevron-right'
+            label='Next'
             onClick={() => moveCursor(Math.min(count() - 1, cursor() + 1))}
           />
         </UiLayout>
         <UiLayout variant='inline-fit'>
           <UiActionButton
+            density='dense'
+            disabled={!hasItems()}
             icon='minus'
             label='Delete'
             labelMode='visible'
-            density='dense'
-            disabled={!hasItems()}
             onClick={() => setDeleteOpen(true)}
           />
           <UiActionButton
+            density='dense'
             icon='plus'
             label='New'
             labelMode='visible'
-            density='dense'
             onClick={addItem}
           />
         </UiLayout>

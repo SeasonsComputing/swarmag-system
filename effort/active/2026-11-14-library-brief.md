@@ -1,6 +1,6 @@
 # Library — Brief
 
-**Active 2026-11-14. Draft, not dispatched.** Not on the roadmap: chosen directly at the CA's
+**Active 2026-11-14. Dispatched to ACE 2026-11-14.** Not on the roadmap: chosen directly at the CA's
 direction. Feature mode inside established architecture; no locked namespace changes. It builds
 into the tree the Shell Namespaces brief established (`608a3a4`).
 The documents are already amended (Governing documents).
@@ -117,7 +117,8 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent
 </PanelSheet>
 ```
 
-- **Launchers.** One row of `UiActionButton`s with visible labels, at the top of the content, in
+- _[Amended by the amendment "At scope review", item 1: the row is a `cluster-wrap` layout.]_
+  **Launchers.** One row of `UiActionButton`s with visible labels, at the top of the content, in
   the order Asset Types, Assets, Chemicals, Services, with the icons `layers`, `cube`, `opacity`,
   and `target`, chosen by the CA. Each calls `redirect` from `useShellNavigate()` with its
   manager's route.
@@ -254,5 +255,17 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   a sibling feature; moving them up a tier removed that dependency.
 - The generic machinery was first kept in `app-admin/`; it moved to the suite tier as one picker
   idiom with Admin as its first user.
+
+## Amendment — 2026-11-14 — At scope review
+
+1. **The launcher row is `<UiLayout variant='cluster-wrap'>`.** The brief named the buttons but not
+   their container. `cluster-wrap` is the components guide's wrapping compact action group: the
+   four launchers sit in one row and wrap on a narrow device. Each launcher sets `align='start'`,
+   so its icon leads its label. `LibraryDialog` writes no CSS for the row.
+2. **A failed document open is shown in the sheet.** As `AttachmentList` does around
+   `UiWindow.openResolved`, `LibraryDialog` catches a window or link failure and shows it in a
+   danger `UiAlert`; the sheet stays open.
+3. **`LibraryLevels` imports `UiText` from `ui-helpers.ts`,** not the `@ux/ui` barrel, so the
+   module and its unit test carry no JSX. If `guard:imports` rejects the path, fix it in scope.
 
 _End of Library Brief_

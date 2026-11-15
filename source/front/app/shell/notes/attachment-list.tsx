@@ -106,12 +106,12 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
         <UiLayout>
           <UiLayout variant='inline-fit'>
             <UiActionButton
-              icon='plus'
-              label='Add Attachment'
-              labelMode='visible'
               align='start'
               density='dense'
               disabled={busy()}
+              icon='plus'
+              label='Add Attachment'
+              labelMode='visible'
               onClick={() => setPickerOpen(true)}
             />
           </UiLayout>
@@ -167,9 +167,10 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
                         </UiTableCell>
                         <UiTableCell align='end'>
                           <UiActionButton
+                            density='dense'
+                            disabled={busy()}
                             icon='pencil-1'
                             label='Rename'
-                            disabled={busy()}
                             onClick={event => {
                               event.stopPropagation()
                               setFilename(attachment.filename)
@@ -177,9 +178,10 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
                             }}
                           />
                           <UiActionButton
+                            density='dense'
+                            disabled={busy()}
                             icon='minus'
                             label='Remove'
-                            disabled={busy()}
                             onClick={event => {
                               event.stopPropagation()
                               setRemove(index())

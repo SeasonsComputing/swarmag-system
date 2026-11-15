@@ -297,7 +297,7 @@ const openWindowResolved = async (
   }
 }
 
-/** Browser window services.ß */
+/** Browser window services. */
 export const UiWindow = {
   open: openWindow,
   openResolved: openWindowResolved

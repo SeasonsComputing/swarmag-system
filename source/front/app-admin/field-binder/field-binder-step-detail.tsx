@@ -45,8 +45,8 @@ import {
   UiToggleItem
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { FieldBinderChemicalPicker } from './field-binder-chemical-picker.tsx'
-import { FieldBinderLibraryPicker } from './field-binder-library-picker.tsx'
+import { FieldBinderChemicalDialog } from './field-binder-chemical-dialog.tsx'
+import { FieldBinderLibraryDialog } from './field-binder-library-dialog.tsx'
 import type { FieldBinderState } from './field-binder-state.ts'
 
 /** Retained draft and workbench-owned validation/feedback services. */
@@ -145,7 +145,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
                 when={state.source() === 'library'}
                 fallback={chooseFile()}
               >
-                <FieldBinderLibraryPicker
+                <FieldBinderLibraryDialog
                   disabled={props.context.busy()}
                   name='document'
                   error={validation.isInvalid('document')}
@@ -155,7 +155,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
             </Show>
             <Show when={chemicals()}>
               <UiField label='1. Select chemical document' variant='caption'>
-                <FieldBinderChemicalPicker
+                <FieldBinderChemicalDialog
                   disabled={props.context.busy()}
                   name='link'
                   error={validation.isInvalid('link')}

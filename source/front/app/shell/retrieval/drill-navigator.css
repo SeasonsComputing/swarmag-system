@@ -1,15 +1,10 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Field Binder picker styles                                                   ║
-║ The right arrow on a picker row that opens another level.                    ║
+║ Drill navigator styles                                                       ║
+║ Secondary color for a branch indicator.                                      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-app='field-binder-drill-mark'] {
-  background: currentColor;
-  block-size: var(--sa-space-md);
+[data-app='drill-mark'] {
   color: var(--sa-text-secondary);
-  display: inline-block;
-  inline-size: var(--sa-space-md);
-  mask: var(--sa-icon) center / contain no-repeat;
 }

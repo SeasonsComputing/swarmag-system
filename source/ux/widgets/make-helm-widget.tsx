@@ -113,12 +113,12 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
     }
     return (
       <UiActionButton
+        align='start'
         density='dense'
+        disabled={disabled(item)}
         icon={icon(item)}
         label={item.label}
         labelMode='visible'
-        align='start'
-        disabled={disabled(item)}
         onClick={() => execute(item)}
       />
     )

@@ -84,11 +84,11 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
       <UiFieldset legend={props.legend}>
         <div data-shell='collection-panel-action'>
           <UiActionButton
+            align='start'
+            density='dense'
             icon='plus'
             label={props.newLabel}
             labelMode='visible'
-            align='start'
-            density='dense'
             onClick={addItem}
           />
         </div>

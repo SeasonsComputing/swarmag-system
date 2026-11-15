@@ -50,10 +50,11 @@ export const BackgroundTaskList = (): UiComponent => (
                 <Show when={task().error}>{error => <p role='alert'>{error()}</p>}</Show>
                 <Show when={task().phase === 'failed' && !task().blocksExit}>
                   <UiActionButton
+                    align='start'
+                    density='dense'
                     icon='cross-2'
                     label={`Dismiss ${task().label}`}
                     labelMode='visible'
-                    align='start'
                     onClick={() => BackgroundTasks.clear(key)}
                   />
                 </Show>

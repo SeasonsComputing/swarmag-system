@@ -18,6 +18,7 @@ import { AssetManager } from '@front/app-admin/assets/asset-manager.tsx'
 import { ChemicalManager } from '@front/app-admin/chemicals/chemical-manager.tsx'
 import { CustomerManager } from '@front/app-admin/customers/customer-manager.tsx'
 import { FieldBinderManager } from '@front/app-admin/field-binder/field-binder-manager.tsx'
+import { LibraryDialog } from '@front/app-admin/library/library-dialog.tsx'
 import { OnboardingWizard } from '@front/app-admin/onboarding/onboarding-wizard.tsx'
 import { ServiceManager } from '@front/app-admin/services/service-manager.tsx'
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
@@ -57,7 +58,8 @@ void bootstrap(
           Routes.workbench('/chemicals', ChemicalManager),
           Routes.workbench('/services', ServiceManager),
           Routes.workbench('/field-binder-manager', FieldBinderManager),
-          Routes.sheet('/field-binder', FieldBinderDialog)
+          Routes.sheet('/field-binder', FieldBinderDialog),
+          Routes.sheet('/library', LibraryDialog)
         ]
       )
     ],

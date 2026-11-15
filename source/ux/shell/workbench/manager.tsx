@@ -331,11 +331,11 @@ export const Manager = <T extends Instance, Draft>(
             leading={<h1>{props.provider.formTitle}</h1>}
             trailing={
               <UiActionButton
+                density='dense'
+                disabled={savePending() || actionPending()}
                 icon='cross-1'
                 label='Cancel'
                 labelMode='visible'
-                density='dense'
-                disabled={savePending() || actionPending()}
                 onClick={cancelDialog}
               />
             }
@@ -351,22 +351,22 @@ export const Manager = <T extends Instance, Draft>(
                 <For each={props.provider.collectionActions}>
                   {action => (
                     <UiActionButton
-                      name={action.name}
+                      density='dense'
+                      disabled={savePending() || actionPending()}
                       icon={action.icon}
                       label={action.label}
                       labelMode='visible'
-                      density='dense'
-                      disabled={savePending() || actionPending()}
+                      name={action.name}
                       onClick={() => void runCollectionAction(action)}
                     />
                   )}
                 </For>
                 <UiActionButton
+                  density='dense'
+                  disabled={savePending() || actionPending()}
                   icon='plus'
                   label={`New ${props.provider.entityLabel}`}
                   labelMode='visible'
-                  density='dense'
-                  disabled={savePending() || actionPending()}
                   onClick={onNew}
                 />
               </>
@@ -375,11 +375,11 @@ export const Manager = <T extends Instance, Draft>(
               <For each={props.provider.actions}>
                 {action => (
                   <UiActionButton
+                    density='dense'
+                    disabled={savePending() || actionPending()}
                     icon={action.icon}
                     label={action.label}
                     variant={action.variant}
-                    disabled={savePending() || actionPending()}
-                    density='dense'
                     onClick={event => {
                       event.stopPropagation()
                       requestAction(action, item)

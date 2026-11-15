@@ -90,11 +90,11 @@ export const PanelSequenceHeader = (props: {
               when={props.sequence.isLast()}
               fallback={
                 <UiActionButton
+                  density='dense'
+                  disabled={props.busy}
                   icon='arrow-right'
                   label='Next'
                   labelMode='visible'
-                  density='dense'
-                  disabled={props.busy}
                   onClick={props.onNext}
                 />
               }

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Field Binder chemical picker                                                 ║
+║ Field Binder chemical dialog                                                 ║
 ║ Chooses one chemical document link: chemical, then its SDS or a label.       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -17,36 +17,36 @@ ChemicalDocument                A chosen chemical document link.
 ├ chemical                      The chemical's id.
 ├ name                          Chemical name and document kind, for display.
 └ url                           The document's link.
-FieldBinderChemicalPickerProps  Picker inputs.
+FieldBinderChemicalDialogProps  Dialog inputs.
 ├ disabled                      The host is busy.
 ├ name                          The form field the picker fills.
 ├ error                         The field is shown invalid.
 └ onChoose                      Receives the chosen document.
-FieldBinderChemicalPicker       Add-chemical-document button and sheet.
+FieldBinderChemicalDialog       Add-chemical-document button and sheet.
 */
 
 import type { Id } from '@core/std'
 import { listAll } from '@core/stdx'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import { api } from '@front/api/api.ts'
+import { DrillDialog } from '@front/app/shell/retrieval/drill-dialog.tsx'
+import type { DrillLevel } from '@front/app/shell/retrieval/drill-navigator.tsx'
 import type { UiComponent } from '@ux/ui'
-import { FieldBinderPicker } from './field-binder-picker.tsx'
-import type { PickerLevel } from './field-binder-picker.tsx'
 
-/** A chemical document link, as the picker hands it back. */
+/** A chemical document link, as the dialog hands it back. */
 export type ChemicalDocument = { chemical: Id; name: string; url: string }
 
 /** The host's busy state and the chosen document's receiver. */
-export type FieldBinderChemicalPickerProps = {
+export type FieldBinderChemicalDialogProps = {
   disabled: boolean
   name: string
   error: boolean
   onChoose: (document: ChemicalDocument) => void
 }
 
-/** A picker over the chemicals, then a chemical's documents; choosing one closes it. */
-export const FieldBinderChemicalPicker = (props: FieldBinderChemicalPickerProps): UiComponent => {
-  const documents = (chemical: Chemical): PickerLevel => ({
+/** A dialog over the chemicals, then a chemical's documents; choosing one closes it. */
+export const FieldBinderChemicalDialog = (props: FieldBinderChemicalDialogProps): UiComponent => {
+  const documents = (chemical: Chemical): DrillLevel => ({
     column: 'Document',
     detail: 'Kind',
     empty: 'This chemical has no documents.',
@@ -60,7 +60,7 @@ export const FieldBinderChemicalPicker = (props: FieldBinderChemicalPickerProps)
       )
   })
 
-  const chemicals: PickerLevel = {
+  const chemicals: DrillLevel = {
     column: 'Chemical',
     empty: 'No chemicals.',
     load: async () =>
@@ -71,7 +71,7 @@ export const FieldBinderChemicalPicker = (props: FieldBinderChemicalPickerProps)
   }
 
   return (
-    <FieldBinderPicker
+    <DrillDialog
       label='Add Chemical Document'
       title='Chemicals'
       disabled={props.disabled}

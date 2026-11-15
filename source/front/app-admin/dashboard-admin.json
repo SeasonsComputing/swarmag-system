@@ -25,6 +25,11 @@
                 "icon": "id-card"
               },
               {
+                "command": "/library",
+                "label": "Library",
+                "icon": "archive"
+              },
+              {
                 "command": "@theme",
                 "label": "Theme",
                 "icon": "moon"
@@ -71,26 +76,6 @@
                     "command": "/customers",
                     "label": "Customers",
                     "icon": "id-card"
-                  },
-                  {
-                    "command": "/asset-types",
-                    "label": "Asset Types",
-                    "icon": "gear"
-                  },
-                  {
-                    "command": "/assets",
-                    "label": "Assets",
-                    "icon": "gear"
-                  },
-                  {
-                    "command": "/chemicals",
-                    "label": "Chemicals",
-                    "icon": "exclamation-triangle"
-                  },
-                  {
-                    "command": "/services",
-                    "label": "Services",
-                    "icon": "gear"
                   },
                   {
                     "command": "/logout",
