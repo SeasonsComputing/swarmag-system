@@ -65,9 +65,16 @@ the application's toolbar already has. Leaving the route gives the frame back.
 
 A Manager opened to choose an Item returns it.
 
-- `ManagerProps` gains an optional `onPick(item)`. Without it, a Manager behaves as today.
-- With it, the selected Item offers Pick. Picking returns the Item and closes the Manager.
-- New works as it does today; saving a new Item picks it.
+- `ManagerProps` gains an optional `pick`. Without it, a Manager behaves as today.
+- With it, the selected Item offers the caller's action. Taking it returns the Item and closes the
+  Manager.
+- New works as it does today; saving a new Item returns it.
+- **The verb is the caller's.** Manager knows only that it returns an Item; the caller names what
+  that does to its work. The Builder says "Add". "Pick" never appears on screen.
+
+```ts
+<Manager provider={QuestionProvider} onCancel={close} pick={{ label: 'Add', onPick: addQuestion }} />
+```
 
 The caller hosts the Manager as it hosts any workbench.
 
@@ -87,7 +94,7 @@ Paths are under `source/`.
 | `ux/shell/runtime/shell.ts`, `shell-compiler.tsx`, `shell-makers.tsx` | the feature route               |
 | `ux/shell/dashboard/*`                                    | the frame a feature takes over           |
 | `ux/widgets/*` (Brand, Helm)                              | show the feature's brand and toolbar     |
-| `ux/shell/workbench/manager.tsx`, its contract            | `onPick`                                 |
+| `ux/shell/workbench/manager.tsx`, its contract            | `pick`                                   |
 | `tests/cases/…`                                           | takeover and exit; Manager pick          |
 
 Out of scope:
@@ -103,8 +110,8 @@ Escalate any change outside this scope.
 - Opening a feature route shows its brand, toolbar, and body; the header stays fixed and the
   footer follows the body.
 - Exit restores the application's Brand, Helm, and rows.
-- A Manager given `onPick` returns the Item picked, including one just created; without it, it
-  behaves as today.
+- A Manager given `pick` shows the caller's label and returns the Item, including one just
+  created; without it, it behaves as today.
 - CA verifies on screen in Admin.
 
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYLE_AUDIT.
@@ -121,6 +128,8 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
 - **The frame stays.** Taking over the header's content keeps the application branded and familiar;
   a separate page would lose it.
 - **Returning a value is obvious.** A Manager opened to choose returns the choice; it is additive.
+- **The caller names the action.** What a returned Item does is the caller's to say: Add in the
+  Builder, something else elsewhere.
 
 ## Design history
 
@@ -128,5 +137,7 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
   overlay.
 - The Task and Question pickers were first framed as a drill-picker dialog. They are Managers,
   which already list and create; they gain a return value.
+- The action was first labelled "Pick" in the mockups. The CA rejected the verb: it names the
+  mechanism, not what happens to the person's work. The caller supplies the label.
 
 _End of Brief_

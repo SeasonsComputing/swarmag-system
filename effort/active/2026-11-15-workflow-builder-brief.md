@@ -68,8 +68,8 @@ Two regions side by side: the stack, and a fixed inspector on the right.
 
 ### The libraries
 
-- The **Task library** and **Question library** are Managers, opened with `onPick`. Picking adds
-  the item to the stack at the chosen place; New creates one and adds it.
+- The **Task library** and **Question library** are Managers, opened with `pick` labelled
+  **Add**. Add puts the item in the stack at the chosen place; New creates one and adds it.
 - A stack holds an item at most once (each junction's key is the pair). The library says so rather
   than failing.
 
