@@ -21,11 +21,15 @@
   display: block;
 }
 
-/* PanelContainer owns the track floors: aside --sa-size-wrap (280) plus main
-   --sa-size-min (380). At this threshold --sa-rhythm-gap resolves to 15.75, making the
-   minimum 675.75. A container query cannot take var(), so 676 is the literal;
-   change either shared floor and re-solve this threshold. */
-@container (max-width: 676px) {
+/* Attached panes share a square seam and round only the group's outside edge. */
+[data-shell='manager'][data-shell-panel='container'] {
+  column-gap: 0;
+}
+
+/* With attached panes the track floors are aside --sa-size-wrap (280) plus main
+   --sa-size-min (380), with no column gap. Container queries cannot take var(), so 660
+   is the literal; change either shared floor and re-solve both workbenches. */
+@container (max-width: 660px) {
   [data-shell='manager'][data-shell-panel='container'] {
     grid-template-columns: 1fr;
   }
@@ -79,5 +83,18 @@
 
   [data-shell='manager-expanded-title'] {
     display: none;
+  }
+}
+
+/* Only the shared seam changes the cards' own corners, while both panes show. */
+@container (width > 660px) {
+  [data-shell='manager'] > [data-shell-panel='aside'] > [data-shell-panel] > [data-ui='card'] {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  [data-shell='manager'] > [data-shell-panel='main'] > [data-shell-panel] > [data-ui='card'] {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
   }
 }

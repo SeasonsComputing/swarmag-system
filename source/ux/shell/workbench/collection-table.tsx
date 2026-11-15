@@ -17,7 +17,8 @@ CollectionTableProps  Props for the shared Collection presentation.
 ├ activate            Handles row activation.
 ├ headingActions      Optional controls beside the heading.
 ├ renderActions       Optional Actions column content for each Item.
-└ error               Optional host action failure copy.
+├ error               Optional host action failure copy.
+└ variant             Optional light or dark tonal surface; defaults to a raised card.
 CollectionTable       Collection heading, feedback, and table.
 */
 
@@ -26,18 +27,21 @@ import { For, Show } from '@solid-js'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
 import { UiAlert, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import type { UiCardProps } from '@ux/ui/components/ui-card.tsx'
 import type { CollectionContract } from './collection-contract.ts'
 
 import './collection-table.css'
 
 /** Props for the shared Collection presentation. */
-export type CollectionTableProps<T extends Instance> = {
-  provider: CollectionContract<T>
-  activate: (item: T) => void
-  headingActions?: UiComponent
-  renderActions?: (item: T) => UiComponent
-  error?: string | null
-}
+export type CollectionTableProps<T extends Instance> =
+  & {
+    provider: CollectionContract<T>
+    activate: (item: T) => void
+    headingActions?: UiComponent
+    renderActions?: (item: T) => UiComponent
+    error?: string | null
+  }
+  & Pick<UiCardProps, 'variant'>
 
 /** Renders a Collection with host-owned activation and optional actions. */
 export const CollectionTable = <T extends Instance>(props: CollectionTableProps<T>): UiComponent => {
@@ -49,6 +53,7 @@ export const CollectionTable = <T extends Instance>(props: CollectionTableProps<
 
   return (
     <PanelList
+      variant={props.variant}
       header={{
         leading: <h2>{props.provider.entityLabel}s</h2>,
         trailing: props.headingActions

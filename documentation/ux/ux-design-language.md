@@ -330,11 +330,13 @@ tone, not framed again, so the eye reads the content before the structure.
 | Surface      | Treatment                                                                   |
 | ------------ | --------------------------------------------------------------------------- |
 | Framed card  | Border, radius, and an elevation shadow; stands apart from its surroundings |
-| Tonal region | Filled with a tone; borderless, shadowless, square-cornered                 |
+| Tonal region | Filled with a tone and rounded like any card; borderless and shadowless     |
 
-The tonal variant has two tones, light and dark. Each theme owns both values, as `--sa-card-*`
-tokens, so adjacent regions remain distinct in light and dark themes alike. Where a window holds an
-Aside and a Main, the Aside takes the light tone and Main the dark.
+The `tonal-light` and `tonal-dark` variants select the lighter and darker surface tones. Each theme
+owns both values, as `--sa-card-*` tokens, so adjacent regions remain distinct in light and dark
+themes alike. Where a window holds an Aside and a Main, the Aside takes the light tone and Main the
+dark, and the two attach: the corners at their shared seam are square, so the pair reads as one
+rounded surface divided by tone.
 
 ## 5. Geometry, Layout, And Motion
 

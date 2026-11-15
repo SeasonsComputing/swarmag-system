@@ -22,25 +22,29 @@ only specifies the component implementation boundary:
 Component-specified tokens live in `themes.css` and are consumed by `ui.css`, shell CSS, or
 component-local CSS.
 
-| Component      | Tokens                                                        | Consumer                      |
-| -------------- | ------------------------------------------------------------- | ----------------------------- |
-| Button         | `--sa-button-*`                                               | `UiButton`                    |
-| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments   |
-| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts  |
-| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls               |
-| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels       |
-| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content    |
-| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders          |
-| Card           | `--sa-card-*`                                                 | Card decoration and elevation |
-| Table          | `--sa-table-*`                                                | Table parts                   |
-| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries     |
-| Progress       | `--sa-progress-*`                                             | Progress track and fill       |
-| List           | `--sa-list-*`                                                 | List and list item parts      |
-| Avatar         | `--sa-avatar-*`                                               | Avatar marker                 |
-| Alert          | `--sa-alert-*`                                                | Alert treatment               |
-| Separator      | `--sa-separator-*`                                            | Separator primitive           |
-| Shell          | `--sa-shell-*`                                                | Header and footer chrome      |
-| Footer         | `--sa-footer-*`                                               | Footer logo treatment         |
+| Component      | Tokens                                                        | Consumer                                    |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| Button         | `--sa-button-*`                                               | `UiButton`                                  |
+| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments                 |
+| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts                |
+| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls                             |
+| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels                     |
+| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content                  |
+| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders                        |
+| Card           | `--sa-card-*`                                                 | Card decoration, elevation, and tonal tones |
+| Table          | `--sa-table-*`                                                | Table parts                                 |
+| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries                   |
+| Progress       | `--sa-progress-*`                                             | Progress track and fill                     |
+| List           | `--sa-list-*`                                                 | List and list item parts                    |
+| Avatar         | `--sa-avatar-*`                                               | Avatar marker                               |
+| Alert          | `--sa-alert-*`                                                | Alert treatment                             |
+| Separator      | `--sa-separator-*`                                            | Separator primitive                         |
+| Shell          | `--sa-shell-*`                                                | Header and footer chrome                    |
+| Footer         | `--sa-footer-*`                                               | Footer logo treatment                       |
+
+The card's `--sa-card-tonal-light-bg` and `--sa-card-tonal-dark-bg` tokens own the lighter and
+darker tonal region fills in each theme. `UiCard` emits its `variant='tonal-light'` or
+`variant='tonal-dark'` as `data-ui-variant`; framed cards emit no variant.
 
 Shell chrome is a first-class component token family. It lets app frame surfaces diverge from
 card surfaces without changing generic panel or card roles.
@@ -153,6 +157,7 @@ Variants are only valid where explicitly declared.
 | `badge`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`, `color`                              |
 | `button`        | `data-ui-variant`    | `primary`, `secondary`, `ghost`, `danger`                                    |
 | `card`          | `data-ui-decoration` | `gradient`                                                                   |
+| `card`          | `data-ui-variant`    | `tonal-light`, `tonal-dark`                                                  |
 | `card`          | `data-ui-elevation`  | `raised`, `floating`                                                         |
 | `field`         | `data-ui-variant`    | `caption`, `inline`                                                          |
 | `layout`        | `data-ui-variant`    | `block-fill`, `block-fit`, `cluster`, `inline`, `inline-fill`, `inline-wrap` |
@@ -400,16 +405,16 @@ This selector shape is invalid because one element cannot hold two different `da
 
 ### 5.2 Display Controls
 
-| Control     | Intent                                                       |
-| ----------- | ------------------------------------------------------------ |
-| `badge`     | Inline semantic status or named-color category pill          |
-| `alert`     | Inline feedback message with left-border accent              |
-| `avatar`    | User or entity initials/avatar marker                        |
-| `card`      | Framed content surface with decoration and elevation control |
-| `separator` | Horizontal or vertical visual rule                           |
-| `spinner`   | Indeterminate loading indicator                              |
-| `skeleton`  | Loading placeholder shimmer                                  |
-| `icon`      | Icon catalog glyph painted in the current color              |
+| Control     | Intent                                                           |
+| ----------- | ---------------------------------------------------------------- |
+| `badge`     | Inline semantic status or named-color category pill              |
+| `alert`     | Inline feedback message with left-border accent                  |
+| `avatar`    | User or entity initials/avatar marker                            |
+| `card`      | Framed content surface or tonal region with light and dark tones |
+| `separator` | Horizontal or vertical visual rule                               |
+| `spinner`   | Indeterminate loading indicator                                  |
+| `skeleton`  | Loading placeholder shimmer                                      |
+| `icon`      | Icon catalog glyph painted in the current color                  |
 
 ### 5.3 Layout Controls
 

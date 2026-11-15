@@ -958,29 +958,22 @@ Content surface: a framed card by default, or a tonal region of the surface that
 
 Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Prop         | Type                               | Default  | Description                                |
-| ------------ | ---------------------------------- | -------- | ------------------------------------------ |
-| `decoration` | `'gradient' \| 'none'`             | `'none'` | Gradient stripe on the card edge.          |
-| `elevation`  | `'none' \| 'raised' \| 'floating'` | `'none'` | Shadow depth of a framed card.             |
-| `variant`    | `'tonal'`                          | unset    | Tonal region instead of a framed card.     |
-| `tone`       | `'light' \| 'dark'`                | unset    | Tone of a tonal card. Required with tonal. |
+| Prop         | Type                               | Default  | Description                                          |
+| ------------ | ---------------------------------- | -------- | ---------------------------------------------------- |
+| `decoration` | `'gradient' \| 'none'`             | `'none'` | Gradient stripe on the card edge.                    |
+| `elevation`  | `'none' \| 'raised' \| 'floating'` | `'none'` | Shadow depth of a framed card.                       |
+| `variant`    | `'tonal-light' \| 'tonal-dark'`    | unset    | Light or dark tonal region instead of a framed card. |
 
-`tone` applies only to `variant='tonal'`, and `elevation` only to framed cards; the props enforce
-these alternatives. Without `variant`, a card is framed, as before.
+The tonal variants and framed-card `elevation` are alternatives enforced by the props.
+Without `variant`, a card is framed, as before.
 
 **Variant**
 
-| Value     | Effect                                                                    |
-| --------- | ------------------------------------------------------------------------- |
-| unset     | Framed card: border, radius, and the shadow its elevation sets.           |
-| `'tonal'` | Tonal region: filled with its tone; no border, no shadow, square corners. |
-
-**Tone**
-
-| Value     | Effect                                              |
-| --------- | --------------------------------------------------- |
-| `'light'` | The lighter of the theme's two tonal surface tones. |
-| `'dark'`  | The darker of the theme's two tonal surface tones.  |
+| Value           | Effect                                                          |
+| --------------- | --------------------------------------------------------------- |
+| unset           | Framed card: border, radius, and the shadow its elevation sets. |
+| `'tonal-light'` | Lighter theme fill and card radius; no border, no shadow.       |
+| `'tonal-dark'`  | Darker theme fill and card radius; no border, no shadow.        |
 
 **Decoration**
 
@@ -1009,10 +1002,10 @@ these alternatives. Without `variant`, a card is framed, as before.
 Tonal cards divide a framed surface into regions, such as the two panes of a workbench:
 
 ```tsx
-<UiCard variant='tonal' tone='light'>
+<UiCard variant='tonal-light'>
   <h3>Users</h3>
 </UiCard>
-<UiCard variant='tonal' tone='dark'>
+<UiCard variant='tonal-dark'>
   <h3>New User</h3>
 </UiCard>
 ```

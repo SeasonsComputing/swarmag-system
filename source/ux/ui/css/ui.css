@@ -1273,6 +1273,21 @@
   opacity: var(--sa-card-decoration-stripe-opacity);
 }
 
+[data-ui='card'][data-ui-variant='tonal-light'],
+[data-ui='card'][data-ui-variant='tonal-dark'] {
+  backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+}
+
+[data-ui='card'][data-ui-variant='tonal-light'] {
+  background: var(--sa-card-tonal-light-bg);
+}
+
+[data-ui='card'][data-ui-variant='tonal-dark'] {
+  background: var(--sa-card-tonal-dark-bg);
+}
+
 [data-ui='card'][data-ui-elevation='raised'] {
   box-shadow: var(--sa-card-elevation-raised-shadow);
 }

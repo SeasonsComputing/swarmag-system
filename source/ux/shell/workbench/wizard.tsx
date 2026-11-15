@@ -120,6 +120,7 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
         aside={props.contract.steps.length > 1
           ? (
             <PanelStepflow
+              variant='tonal-light'
               items={props.contract.steps.map((step, index) => ({
                 title: step.title,
                 state: index < sequence.index()
@@ -133,6 +134,7 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
           : undefined}
         main={
           <PanelForm
+            variant='tonal-dark'
             feedback={banner()}
             header={
               <PanelSequenceHeader

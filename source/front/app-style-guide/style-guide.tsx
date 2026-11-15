@@ -935,6 +935,14 @@ export const StyleGuide = (): UiComponent => {
                   </p>
                 </UiLayout>
               </UiCard>
+              <UiCard variant='tonal-light'>
+                <h3>Light tonal card</h3>
+                <p>The lighter region of a shared surface.</p>
+              </UiCard>
+              <UiCard variant='tonal-dark'>
+                <h3>Dark tonal card</h3>
+                <p>The darker region of a shared surface.</p>
+              </UiCard>
             </UiLayout>
           </SgSection>
 

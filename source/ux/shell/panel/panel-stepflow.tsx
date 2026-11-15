@@ -16,6 +16,7 @@ PanelStepflow  Read-only stage index.
 
 import { For } from '@solid-js'
 import { UiCard, type UiComponent, UiList, UiListItem } from '@ux/ui'
+import type { UiCardProps } from '@ux/ui/components/ui-card.tsx'
 import type { PanelHeaderProps } from './panel-contract.ts'
 import { PanelHeader } from './panel-header.tsx'
 
@@ -31,15 +32,21 @@ type PanelStepflowItem = {
 }
 
 /** Represents the props for the PanelStepflow component. */
-type PanelStepflowProps = {
-  header?: PanelHeaderProps
-  items: PanelStepflowItem[]
-}
+type PanelStepflowProps =
+  & {
+    header?: PanelHeaderProps
+    items: PanelStepflowItem[]
+  }
+  & Pick<UiCardProps, 'variant'>
 
 /** Renders a card-backed, read-only stepflow panel. */
 export const PanelStepflow = (props: PanelStepflowProps): UiComponent => (
   <section data-shell-panel='stepflow'>
-    <UiCard elevation='raised'>
+    <UiCard
+      {...(props.variant
+        ? { variant: props.variant }
+        : { elevation: 'raised' as const })}
+    >
       {props.header && <PanelHeader {...props.header} />}
       <div data-shell-panel='body' data-shell-panel-kind='stepflow'>
         <UiList data-shell-panel='stepflow-list'>
