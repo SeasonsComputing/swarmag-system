@@ -39,6 +39,7 @@ UiActionButtonProps      Action button control props; extends filtered button at
 import { Button } from '@kobalte/core/button'
 import { type JSX, splitProps } from '@solid-js'
 import { controlState, type UiComponent } from './ui-helpers.ts'
+import { UiIcon } from './ui-icon.tsx'
 
 /** Action button variants. */
 export type UiActionButtonVariant = 'default' | 'danger'
@@ -121,7 +122,6 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       data-ui='action-button'
       data-ui-align={local.align ?? 'end'}
       data-ui-density={local.density ?? 'standard'}
-      data-ui-icon={local.icon}
       data-ui-label-mode={local.labelMode ?? 'hidden'}
       data-ui-state={controlState(local)}
       data-ui-variant={local.variant}
@@ -130,7 +130,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       type={others.type ?? 'button'}
     >
       <span aria-hidden='true' data-ui='action-button-frame'>
-        <span data-ui='action-button-icon' />
+        <UiIcon name={local.icon} />
       </span>
       <span aria-hidden='true' data-ui='action-button-label'>{local.label}</span>
     </Button>

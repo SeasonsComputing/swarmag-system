@@ -25,7 +25,7 @@ HelmButtonGlyph       Glyph content for a Helm button or popover trigger.
 
 import { splitProps } from '@solid-js'
 import type { JSX } from '@solid-js'
-import { UiButton } from '@ux/ui'
+import { UiButton, UiIcon } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './helm-button.css'
@@ -75,5 +75,5 @@ export const HelmButton = (props: HelmButtonProps): UiComponent => {
 
 /** One glyph; its containing command or popover provides the semantic button. */
 export const HelmButtonGlyph = (props: HelmButtonGlyphProps): UiComponent => (
-  <span role='img' aria-label={props.label} data-widget='helm-button-glyph' data-ui-icon={props.icon} />
+  <UiIcon name={props.icon} label={props.label} data-widget='helm-button-glyph' />
 )

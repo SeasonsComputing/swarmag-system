@@ -30,6 +30,7 @@ import { UiActionButton } from './ui-action-button.tsx'
 import { UiConfirmDialog } from './ui-confirm-dialog.tsx'
 import { UiFormActions } from './ui-form-actions.tsx'
 import type { UiComponent } from './ui-helpers.ts'
+import { UiIcon } from './ui-icon.tsx'
 import { UiLayout } from './ui-layout.tsx'
 
 /** Cursor surface over a bounded collection: position and lifecycle. */
@@ -189,11 +190,7 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
           when={hasItems()}
           fallback={
             <div data-ui='collection-cursor-empty'>
-              <span
-                aria-hidden='true'
-                data-ui='collection-cursor-empty-icon'
-                data-ui-icon={props.empty.icon}
-              />
+              <UiIcon name={props.empty.icon} size='xl' />
               <p data-ui='collection-cursor-empty-message'>{props.empty.message}</p>
             </div>
           }

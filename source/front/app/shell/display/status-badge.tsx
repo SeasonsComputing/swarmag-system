@@ -14,10 +14,8 @@ StatusBadgeProps  Caller-owned status tone, glyph, and accessible label.
 StatusBadge       Accessible icon status badge.
 */
 
-import { UiBadge } from '@ux/ui'
+import { UiBadge, UiIcon } from '@ux/ui'
 import type { UiBadgeVariant, UiComponent } from '@ux/ui'
-
-import './status-badge.css'
 
 /** Caller-owned status tone, catalog glyph, and accessible label. */
 export type StatusBadgeProps = {
@@ -30,13 +28,7 @@ export type StatusBadgeProps = {
 export const StatusBadge = (props: StatusBadgeProps): UiComponent => (
   <span data-app='status-badge'>
     <UiBadge variant={props.variant}>
-      <span
-        data-app='status-badge-icon'
-        data-ui-icon={props.icon}
-        role='img'
-        aria-label={props.label}
-        title={props.label}
-      />
+      <UiIcon name={props.icon} label={props.label} title={props.label} />
     </UiBadge>
   </span>
 )

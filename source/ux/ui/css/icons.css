@@ -2,10 +2,10 @@
  * Icon catalog
  *
  * The single, explicit name -> glyph mapping for [data-ui-icon]. Each entry
- * sets the inheriting --sa-icon custom property, which the generic mask rules
- * in ui.css consume on the icon span and its ::before. Add one line here to
- * expose a new icon; the consuming control needs no change. Names are semantic
- * aliases over the icon files in ../icons/.
+ * sets the inheriting --sa-icon custom property, which UiIcon's mask rule in
+ * ui.css paints in the current color. Add one line here to expose a new icon;
+ * the consuming control needs no change. Names are semantic aliases over the
+ * icon files in ../icons/.
  */
 
 [data-ui-icon='accessibility'] {

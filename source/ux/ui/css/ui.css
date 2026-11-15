@@ -167,12 +167,9 @@
   border-color: var(--sa-color-primary);
 }
 
-[data-ui='action-button-icon'] {
-  background: currentColor;
-  flex: 0 0 auto;
-  height: var(--sa-action-button-icon-size);
-  mask: var(--sa-icon) center / contain no-repeat;
-  width: var(--sa-action-button-icon-size);
+[data-ui='action-button'] [data-ui='icon'] {
+  block-size: var(--sa-action-button-icon-size);
+  inline-size: var(--sa-action-button-icon-size);
 }
 
 [data-ui='action-button-label'] {
@@ -301,13 +298,6 @@
   min-block-size: calc(var(--sa-touch-target-sm) * 3);
   padding: var(--sa-rhythm-pad);
   text-align: center;
-}
-
-[data-ui='collection-cursor-empty-icon'] {
-  background: currentColor;
-  block-size: var(--sa-space-xl);
-  inline-size: var(--sa-space-xl);
-  mask: var(--sa-icon) center / contain no-repeat;
 }
 
 [data-ui='collection-cursor-empty-message'] {
@@ -1200,6 +1190,35 @@
   border: none;
   display: block;
   margin: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* ICON                                                                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* A control that sizes its icon by its own token does so from its own part. */
+[data-ui='icon'] {
+  background: currentColor;
+  block-size: var(--sa-space-md);
+  display: inline-block;
+  flex: 0 0 auto;
+  inline-size: var(--sa-space-md);
+  mask: var(--sa-icon) center / contain no-repeat;
+}
+
+[data-ui='icon'][data-ui-size='sm'] {
+  block-size: var(--sa-space-sm);
+  inline-size: var(--sa-space-sm);
+}
+
+[data-ui='icon'][data-ui-size='lg'] {
+  block-size: var(--sa-space-lg);
+  inline-size: var(--sa-space-lg);
+}
+
+[data-ui='icon'][data-ui-size='xl'] {
+  block-size: var(--sa-space-xl);
+  inline-size: var(--sa-space-xl);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

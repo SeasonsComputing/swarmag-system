@@ -81,6 +81,7 @@ This is a design-system boundary, not a stylistic preference.
 | `UiDialog`, `UiConfirmDialog`, `UiPopover`, `UiTooltip` | ad hoc overlays and confirmations                       |
 | `UiProgress`                                            | raw progress markup                                     |
 | `UiBadge`, `UiAlert`, `UiAvatar`                        | ad hoc status display markup                            |
+| `UiIcon`                                                | ad hoc masked glyph spans                               |
 | `UiCard`                                                | ad hoc panel wrappers                                   |
 | `UiList`, `UiListItem`                                  | `<ul>`, `<ol>`, `<li>`                                  |
 | `UiTable`                                               | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
@@ -848,8 +849,8 @@ Extends native button attributes, excluding styling and semantic hook props.
 
 **Emitted Attributes**
 
-`data-ui='action-button'`, `data-ui-align`, `data-ui-density`, `data-ui-icon`,
-`data-ui-label-mode`, `data-ui-state`, `data-ui-variant`.
+`data-ui='action-button'`, `data-ui-align`, `data-ui-density`, `data-ui-label-mode`,
+`data-ui-state`, `data-ui-variant`. Its glyph is a `UiIcon` (§4.8).
 
 `density` scales the circular button and glyph together. Use `standard` for ordinary
 actions and `dense` for constrained action rows.
@@ -1050,6 +1051,33 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 <Show when={job()} fallback={<UiSkeleton aria-label='Loading job' />}>
   <h2>{job().title}</h2>
 </Show>
+```
+
+### 4.8 UiIcon
+
+A glyph from the icon catalog, painted in the current color.
+
+**Props**
+
+Extends native `span` attributes, excluding styling and semantic hook props.
+
+| Prop    | Type                           | Required | Default | Description                                                   |
+| ------- | ------------------------------ | -------- | ------- | ------------------------------------------------------------- |
+| `name`  | `string`                       | yes      | —       | Icon catalog name.                                            |
+| `size`  | `'sm' \| 'md' \| 'lg' \| 'xl'` | no       | `'md'`  | Square size from the matching `--sa-space-*` token.           |
+| `label` | `string`                       | no       | unset   | Names the icon for assistive technology; unset, it is hidden. |
+
+An icon takes its color from its container. A host colors it from its own namespace by descending
+into it: `[data-app='label-cell'] [data-ui='icon']`. A control that sizes its icon by its own token
+does the same from its own part.
+
+Emitted attributes: `data-ui='icon'`, `data-ui-icon`, `data-ui-size`.
+
+**Example**
+
+```tsx
+<UiIcon name='chevron-right' />
+<UiIcon name='check-circled' label='Ready' title='Ready' />
 ```
 
 ## 5. Layout & Form Controls
@@ -1307,9 +1335,8 @@ update.
 `data-ui-current`, `data-ui='collection-cursor-count'`,
 `data-ui='collection-cursor-actions'`, `data-ui='collection-cursor-rule'`,
 `data-ui='collection-cursor-body'`, `data-ui='collection-cursor-empty'`,
-`data-ui='collection-cursor-empty-icon'`, `data-ui-icon`,
-`data-ui='collection-cursor-empty-message'`. Its delete confirmation is a
-`UiConfirmDialog` (§3.12).
+`data-ui='collection-cursor-empty-message'`. Its empty-state glyph is a `UiIcon` (§4.8), and its
+delete confirmation is a `UiConfirmDialog` (§3.12).
 
 **Example**
 

@@ -20,6 +20,7 @@ LabelCell       Cell content, without a table-cell wrapper or action.
 */
 
 import { Show } from '@solid-js'
+import { UiIcon } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './table-cells.css'
@@ -31,13 +32,7 @@ export type LabelCellProps = { text: string; icon?: string; iconLabel?: string }
 export const LabelCell = (props: LabelCellProps): UiComponent => (
   <span data-app='label-cell'>
     <Show when={props.icon}>
-      <span
-        data-app='label-cell-icon'
-        data-ui-icon={props.icon}
-        role={props.iconLabel ? 'img' : undefined}
-        aria-label={props.iconLabel}
-        aria-hidden={props.iconLabel ? undefined : true}
-      />
+      {icon => <UiIcon name={icon()} label={props.iconLabel} data-app='label-cell-icon' />}
     </Show>
     <span data-app='label-cell-text'>{props.text}</span>
   </span>

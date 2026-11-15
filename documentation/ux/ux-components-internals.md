@@ -72,7 +72,6 @@ accordion-content
 accordion-item
 accordion-trigger
 action-button
-action-button-icon
 action-button-label
 alert
 avatar
@@ -90,6 +89,7 @@ fieldset
 footer
 footer-logo
 form-actions
+icon
 input
 layout
 list
@@ -409,6 +409,7 @@ This selector shape is invalid because one element cannot hold two different `da
 | `separator` | Horizontal or vertical visual rule                           |
 | `spinner`   | Indeterminate loading indicator                              |
 | `skeleton`  | Loading placeholder shimmer                                  |
+| `icon`      | Icon catalog glyph painted in the current color              |
 
 ### 5.3 Layout Controls
 

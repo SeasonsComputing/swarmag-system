@@ -56,12 +56,3 @@
   opacity: 0.4;
   transform: none;
 }
-
-[data-widget='helm-button-glyph'] {
-  background: currentColor;
-  block-size: 1rem;
-  display: block;
-  flex: 0 0 auto;
-  inline-size: 1rem;
-  mask: var(--sa-icon) center / contain no-repeat;
-}

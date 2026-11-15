@@ -20,12 +20,7 @@
 }
 
 [data-app='label-cell'] [data-app='label-cell-icon'] {
-  background: currentColor;
-  block-size: var(--sa-space-md);
   color: var(--sa-text-primary);
-  flex-shrink: 0;
-  inline-size: var(--sa-space-md);
-  mask: var(--sa-icon) center / contain no-repeat;
 }
 
 [data-app='label-cell']:is([data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible) *) {

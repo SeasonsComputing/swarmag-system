@@ -85,8 +85,9 @@ export const DrillDialog = (props: DrillDialogProps): UiComponent
 ```
 
 - `DrillNavigator` is the old picker's `PanelList`, back-path header, `DrillDown`, and level table,
-  unchanged in behavior. Its drill mark is `data-app='drill-mark'`, styled in
-  `drill-navigator.css`.
+  unchanged in behavior. Its drill mark is `<UiIcon name='chevron-right' data-app='drill-mark' />`
+  (components guide §4.8); `drill-navigator.css` only colors it, with `--sa-text-secondary`. No
+  mask rule is written.
 - `DrillDialog` is the old picker's trigger and sheet. It passes its own close as `onChoose`, so
   choosing a leaf closes the dialog, then runs the leaf, as today.
 - The types are the old `Picker*` types renamed; their shapes do not change.
@@ -216,7 +217,8 @@ Escalate any change outside this scope.
   activating a document opens it in a secondary window, and the sheet stays open.
 - The Field Binder Manager's Library and Chemicals sources behave as before: same labels, same
   levels, choosing closes the dialog and fills the step.
-- No `Picker*` drill type, `FieldBinderPicker`, or `field-binder-drill-mark` remains.
+- No `Picker*` drill type, `FieldBinderPicker`, or `field-binder-drill-mark` remains, and no CSS
+  outside `UiIcon` writes `mask: var(--sa-icon)`.
 - The CA verifies on screen.
 
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYLE_AUDIT.
