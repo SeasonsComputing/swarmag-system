@@ -1,6 +1,8 @@
 # Facets & Workflow Seeding — Brief
 
-**Backlog, not dispatched.** Recorded 2026-10-06 from a CA + AI Architect exploration session as
+**Active, not dispatched.** Selected 2026-11-15 with M-7, where facets on Workflow ride along
+with the Workflow Builder (`2026-11-15-workflow-builder-brief.md`); seeding itself is built in M-8.
+Recorded 2026-10-06 from a CA + AI Architect exploration session as
 design input for roadmap §7 (Workflow, Task, Question & Service). It carries the seeding questions
 handed off by `effort/completed/2026-10-06-tags-classification-brief.md`, which decided the facet
 catalog and its references. The CA describes the vision as rough at the edges: details may need rethinking when §6 is designed in full.

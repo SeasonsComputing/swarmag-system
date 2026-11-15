@@ -290,7 +290,7 @@ unreferenced documents stays backlog B-42, the document store CLI B-44, and load
 
 Seeding filters the Workflow library by the selected Services' facets, and the rep chooses from the
 result. Design input, including the open questions on facet values, curation, and Service versus
-Service Category: `effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
+Service Category: `effort/active/2026-10-06-facets-workflow-seeding-brief.md`.
 
 Assessment and planning edit job-specific Workflow clones with the Workflow builder
 (`architecture-front.md` §11.2.3), so this milestone is expected to produce the job assessment and
