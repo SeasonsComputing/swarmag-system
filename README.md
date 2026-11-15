@@ -54,6 +54,63 @@ profiles are in
 [Architecture Front §3](documentation/architecture/architecture-front.md#3-application-runtime-profiles),
 and edge functions in [Architecture Back](documentation/architecture/architecture-back.md).
 
+### 1.4 Layered Namespace Structure
+
+The application namespaces form a composition hierarchy. `app-admin`, `app-ops`, and
+`app-customer` own their routes, dashboards, and features. They share swarmAg-specific branding,
+session coordination, views, and widgets through `front/app/`. The portable `ux/` toolkit supplies
+shells, state, workbenches, and UI controls beneath that suite layer; it never imports `front/`.
+
+All three applications consume the single API namespace composed in `front/api/`. This boundary
+binds domain abstractions, validators, and adapters to client makers from `core/`; application
+features consume the resulting operations without selecting storage providers or importing domain
+adapters. `domain/` owns business meaning and depends only on `core/`, which supplies standard
+contracts, utilities, configuration, and infrastructure implementations. `front/config/`
+initializes each application package before its dependencies load; generic libraries use the
+`core/cfg/` configuration contract without importing package configuration.
+
+The diagram shows the application composition. Backend orchestration is a separate consumer of
+`domain/` and `core/`, alongside the frontend. `devops/` owns packaging, deployment, and guards;
+`tests/` verifies those layers. Dependencies flow downward: lower layers never import their
+consumers, and one application never imports another application's local modules.
+
+See [Architecture Core §7](documentation/architecture/architecture-core.md#7-dependency-direction)
+for dependency rules,
+[Architecture Front §10.1](documentation/architecture/architecture-front.md#101-common-component-boundaries)
+for toolkit, suite, and app placement,
+[Architecture Back §3](documentation/architecture/architecture-back.md#3-supabase-edge-functions)
+for orchestration boundaries, and
+[Architecture DevOps §3](documentation/architecture/architecture-devops.md#3-deployable-packages)
+for deployment units.
+
+```text
+┌─ front ─────────────────────────────────────────────┐
+│        ┌─────────┐ ┌─────────┐ ┌──────────┐         │
+│        │  admin  │ │   ops   │ │ customer │         │
+│        └─────────┘ └─────────┘ └──────────┘         │
+│        ┌──────────────────────────────────┐         │
+│        │               app                │         │
+│        └──────────────────────────────────┘         │
+│   ┌─────────────────────────────────────────────┐   │
+│   │                    api                      │   │
+│   └─────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+┌─ domain ────────────────┐ ┌─ ux ────────────────────┐
+│  + abstractions         │ │  + shell                │
+│  + adapters             │ │  + ui                   │
+│  + protocols            │ │                         │
+│  + validators           │ │                         │
+└─────────────────────────┘ └─────────────────────────┘
+┌── core ─────────────────────────────────────────────┐
+│   ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
+│   │   cfg   │ │   cli   │ │   db    │ │   svc   │   │
+│   └─────────┘ └─────────┘ └─────────┘ └─────────┘   │
+│   ┌─────────────────────────────────────────────┐   │
+│   │                    std                      │   │
+│   └─────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+```
+
 ## 2. Repository Structure
 
 ### 2.1 Top-level Namespaces
