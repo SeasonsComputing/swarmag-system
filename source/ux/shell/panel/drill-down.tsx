@@ -16,7 +16,8 @@ PUBLIC
 DrillDownProps  Props for the drill-down host.
 ├ rootTitle     The root panel's title, and the first return label.
 ├ root          Renders the root panel, given the DrillContract.
-└ context       Optional hosting surface; takes the return control and header.
+├ context       Optional hosting surface; takes the return control and header.
+└ axis          Travel axis of the entry motion: block (default) or inline.
 DrillDown       Render the drill-down host surface.
 
 SEMANTICS
@@ -60,6 +61,7 @@ export type DrillDownProps = {
   rootTitle: string
   root: (drill: DrillContract) => UiComponent
   context?: DrillHostContext
+  axis?: 'block' | 'inline'
 }
 
 /** Direction of the current drill panel transition. */
@@ -180,7 +182,12 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
   })
 
   return (
-    <section ref={hostRef} data-shell='drill-down' data-shell-direction={direction() ?? undefined}>
+    <section
+      ref={hostRef}
+      data-shell='drill-down'
+      data-shell-axis={props.axis ?? 'block'}
+      data-shell-direction={direction() ?? undefined}
+    >
       <Show when={!props.context && frame().parent !== undefined}>
         <div data-shell='drill-down-return'>
           <UiActionButton

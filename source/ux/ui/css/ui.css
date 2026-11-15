@@ -377,10 +377,13 @@
   gap: var(--sa-space-sm);
   justify-content: space-between;
   min-height: var(--sa-touch-target-sm);
+  max-inline-size: 100%;
+  /* A select sizes to its choices, not its column: at least the wrap floor, never past the field. */
+  min-inline-size: min(var(--sa-size-wrap), 100%);
   padding-inline: var(--sa-space-sm);
   text-align: start;
   transition: var(--sa-transition-fast);
-  width: 100%;
+  width: fit-content;
 }
 
 [data-ui='single-select-icon'] {

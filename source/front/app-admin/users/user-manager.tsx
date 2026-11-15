@@ -62,20 +62,15 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
         label: 'User',
         render: user => (
           <PanelRowIdentity
+            pill={
+              <StatusBadge
+                variant={user.status === 'active' ? 'success' : 'warning'}
+                label={UiText.label(user.status)}
+              />
+            }
             title={user.displayName}
             subtitle={user.primaryEmail}
             annotation={<UserListIdentity user={user} />}
-          />
-        )
-      },
-      {
-        label: 'Active',
-        align: 'center',
-        render: user => (
-          <StatusBadge
-            variant={user.status === 'active' ? 'success' : 'warning'}
-            icon={user.status === 'active' ? 'check' : 'minus'}
-            label={UiText.label(user.status)}
           />
         )
       }

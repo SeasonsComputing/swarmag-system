@@ -12,6 +12,7 @@ style; providers own content and may supply components for styling within a line
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 PanelRowIdentityProps  Content for one collection row's identity.
+├ pill                 Optional status pill, left of the title.
 ├ title                Primary identifying content.
 ├ subtitle             Optional secondary identifying content.
 └ annotation           Optional annotating content.
@@ -26,6 +27,7 @@ import './panel-row-identity.css'
 
 /** Provider-owned content for one collection row's identity. */
 export type PanelRowIdentityProps = {
+  pill?: UiComponent
   title: UiComponent | string
   subtitle?: UiComponent | string
   annotation?: UiComponent | string
@@ -36,7 +38,10 @@ export const PanelRowIdentity = (props: PanelRowIdentityProps): UiComponent => (
   <div data-shell-panel='row-identity'>
     <UiLayout variant='block-fit' gap='tight'>
       <UiLayout variant='block-fit' gap='none'>
-        <span data-shell-panel='row-title'>{props.title}</span>
+        <span data-shell-panel='row-headline'>
+          <Show when={props.pill !== undefined}>{props.pill}</Show>
+          <span data-shell-panel='row-title'>{props.title}</span>
+        </span>
         <Show when={props.subtitle !== undefined}>
           <span data-shell-panel='row-subtitle'>{props.subtitle}</span>
         </Show>

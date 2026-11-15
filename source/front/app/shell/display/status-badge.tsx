@@ -1,34 +1,33 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Status badge                                                                 ║
-║ Named status graphic composed from the shared badge and icon catalog.        ║
+║ Named status pill composed from the shared badge.                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Presents a caller-defined status using UiBadge tone and a catalog glyph.
+Presents a caller-defined status as a UiBadge pill: its tone and its name.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-StatusBadgeProps  Caller-owned status tone, glyph, and accessible label.
-StatusBadge       Accessible icon status badge.
+StatusBadgeProps  Caller-owned status tone and label.
+StatusBadge       Status pill naming the status.
 */
 
-import { UiBadge, UiIcon } from '@ux/ui'
+import { UiBadge } from '@ux/ui'
 import type { UiBadgeVariant, UiComponent } from '@ux/ui'
 
-/** Caller-owned status tone, catalog glyph, and accessible label. */
+/** Caller-owned status tone and label. */
 export type StatusBadgeProps = {
   variant: UiBadgeVariant
-  icon: string
   label: string
 }
 
-/** Accessible status graphic with the shared badge's variant treatment. */
+/** Status pill with the shared badge's variant treatment. */
 export const StatusBadge = (props: StatusBadgeProps): UiComponent => (
   <span data-app='status-badge'>
     <UiBadge variant={props.variant}>
-      <UiIcon name={props.icon} label={props.label} title={props.label} />
+      {props.label}
     </UiBadge>
   </span>
 )

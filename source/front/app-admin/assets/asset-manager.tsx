@@ -25,6 +25,7 @@ import { makeAttachmentSave } from '@front/app/shell/notes/make-attachment-save.
 import type { AttachmentSave } from '@front/app/shell/notes/make-attachment-save.ts'
 import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
+import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiText } from '@ux/ui'
@@ -55,15 +56,17 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
     formTitle: 'Asset Manager',
     entityLabel: 'Asset',
     listColumns: [
-      { label: 'Asset', render: item => <span>{item.label}</span> },
       {
-        label: 'Status',
-        align: 'center',
+        label: 'Asset',
         render: item => (
-          <StatusBadge
-            variant={AssetStatusBadges[item.status].variant}
-            icon={AssetStatusBadges[item.status].icon}
-            label={UiText.label(item.status)}
+          <PanelRowIdentity
+            pill={
+              <StatusBadge
+                variant={AssetStatusBadges[item.status].variant}
+                label={UiText.label(item.status)}
+              />
+            }
+            title={item.label}
           />
         )
       }
@@ -124,9 +127,9 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
 }
 
 /** Every Asset status has a named tone and glyph. */
-const AssetStatusBadges: Record<AssetStatus, { variant: UiBadgeVariant; icon: string }> = {
-  active: { variant: 'success', icon: 'check' },
-  maintenance: { variant: 'warning', icon: 'gear' },
-  retired: { variant: 'info', icon: 'minus' },
-  reserved: { variant: 'info', icon: 'clock' }
+const AssetStatusBadges: Record<AssetStatus, { variant: UiBadgeVariant }> = {
+  active: { variant: 'success' },
+  maintenance: { variant: 'warning' },
+  retired: { variant: 'info' },
+  reserved: { variant: 'info' }
 }

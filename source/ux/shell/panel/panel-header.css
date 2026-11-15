@@ -53,6 +53,12 @@
   min-inline-size: 0;
 }
 
+/* The title line is as tall with its Back command as without, so drilling in shifts the title
+   right by the command's width and never down. */
+[data-shell-panel='header-title'] {
+  min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
+}
+
 [data-shell-panel='header-leading'] > h1 {
   font-size: calc(var(--sa-font-size-md) * 1);
 }

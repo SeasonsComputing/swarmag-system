@@ -25,6 +25,7 @@ import { makeAttachmentSave } from '@front/app/shell/notes/make-attachment-save.
 import type { AttachmentSave } from '@front/app/shell/notes/make-attachment-save.ts'
 import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
+import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiText } from '@ux/ui'
@@ -55,19 +56,21 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
     formTitle: 'Chemical Manager',
     entityLabel: 'Chemical',
     listColumns: [
-      { label: 'Chemical', render: item => <span>{item.name}</span> },
-      { label: 'Usage', render: item => <span>{UiText.label(item.usage)}</span> },
       {
-        label: 'Signal word',
-        align: 'center',
+        label: 'Chemical',
         render: item => (
-          <StatusBadge
-            variant={ChemicalSignalBadges[item.signalWord].variant}
-            icon={ChemicalSignalBadges[item.signalWord].icon}
-            label={UiText.label(item.signalWord)}
+          <PanelRowIdentity
+            pill={
+              <StatusBadge
+                variant={ChemicalSignalBadges[item.signalWord].variant}
+                label={UiText.label(item.signalWord)}
+              />
+            }
+            title={item.name}
           />
         )
-      }
+      },
+      { label: 'Usage', render: item => <span>{UiText.label(item.usage)}</span> }
     ],
     list: () => query.data ?? [],
     isListLoading: () => query.isPending,
@@ -125,9 +128,9 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
 }
 
 /** Signal word presentations cover the complete domain vocabulary. */
-const ChemicalSignalBadges: Record<ChemicalSignalWord, { variant: UiBadgeVariant; icon: string }> = {
-  none: { variant: 'info', icon: 'minus' },
-  danger: { variant: 'danger', icon: 'exclamation-triangle' },
-  warning: { variant: 'warning', icon: 'exclamation-triangle' },
-  caution: { variant: 'warning', icon: 'exclamation-triangle' }
+const ChemicalSignalBadges: Record<ChemicalSignalWord, { variant: UiBadgeVariant }> = {
+  none: { variant: 'info' },
+  danger: { variant: 'danger' },
+  warning: { variant: 'warning' },
+  caution: { variant: 'warning' }
 }

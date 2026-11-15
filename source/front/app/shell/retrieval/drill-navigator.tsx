@@ -98,6 +98,7 @@ export const DrillNavigator = (props: DrillNavigatorProps): UiComponent => {
       }}
     >
       <DrillDown
+        axis='inline'
         rootTitle={props.title}
         context={context}
         root={drill => <DrillTable level={props.root} drill={drill} onChoose={props.onChoose} />}
@@ -112,22 +113,46 @@ export const DrillNavigator = (props: DrillNavigatorProps): UiComponent => {
 
 /** One level's table: loading, then its rows or its empty text. */
 const DrillTable = (
-  props: { level: DrillLevel; drill: DrillContract; onChoose?: () => void }
+  props: {
+    level: DrillLevel
+    drill: DrillContract
+    onChoose?: () => void
+    preloaded?: readonly DrillRow[]
+  }
 ): UiComponent => {
-  const [rows] = createResource(() => props.level, level => level.load())
+  // A level opened from a row arrives loaded, so the drill's entry motion plays on its rows,
+  // not on a spinner. The root, or a level whose load failed, loads here.
+  const [loaded] = createResource(
+    () => (props.preloaded === undefined ? props.level : false),
+    level => level.load()
+  )
+  const rows = (): readonly DrillRow[] | undefined => props.preloaded ?? loaded()
+  const loading = (): boolean => props.preloaded === undefined && loaded.loading
+  const descend = async (row: DrillBranch): Promise<void> => {
+    const level = row.open()
+    const preloaded = await level.load().catch(() => undefined)
+    props.drill.open(
+      () => (
+        <DrillTable
+          level={level}
+          drill={props.drill}
+          onChoose={props.onChoose}
+          preloaded={preloaded}
+        />
+      ),
+      row.label
+    )
+  }
   const activate = (row: DrillRow): void => {
     if ('open' in row) {
-      props.drill.open(
-        () => <DrillTable level={row.open()} drill={props.drill} onChoose={props.onChoose} />,
-        row.label
-      )
+      void descend(row)
       return
     }
     props.onChoose?.()
     row.choose()
   }
   return (
-    <Show when={!rows.loading} fallback={<UiSpinner aria-label={`Loading ${props.level.column}`} />}>
+    <Show when={!loading()} fallback={<UiSpinner aria-label={`Loading ${props.level.column}`} />}>
       <UiTable>
         <UiTableHeader>
           <UiTableCell>{props.level.column}</UiTableCell>

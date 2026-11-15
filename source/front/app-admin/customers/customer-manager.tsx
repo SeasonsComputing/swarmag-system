@@ -64,20 +64,15 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
         label: 'Customer',
         render: customer => (
           <PanelRowIdentity
+            pill={
+              <StatusBadge
+                variant={CustomerStatusBadges[customer.status].variant}
+                label={UiText.label(customer.status)}
+              />
+            }
             title={customer.name}
             subtitle={demandOne(customer.primaryContact).displayName}
             annotation={customerAddress(customer)}
-          />
-        )
-      },
-      {
-        label: 'Status',
-        align: 'center',
-        render: customer => (
-          <StatusBadge
-            variant={CustomerStatusBadges[customer.status].variant}
-            icon={CustomerStatusBadges[customer.status].icon}
-            label={UiText.label(customer.status)}
           />
         )
       }
@@ -149,8 +144,8 @@ const customerAddress = (customer: Customer): string =>
   ].filter(Boolean).join(', ')
 
 /** Status tones and glyphs cover every Customer status. */
-const CustomerStatusBadges: Record<CustomerStatus, { variant: UiBadgeVariant; icon: string }> = {
-  active: { variant: 'success', icon: 'check' },
-  inactive: { variant: 'warning', icon: 'minus' },
-  prospect: { variant: 'info', icon: 'target' }
+const CustomerStatusBadges: Record<CustomerStatus, { variant: UiBadgeVariant }> = {
+  active: { variant: 'success' },
+  inactive: { variant: 'warning' },
+  prospect: { variant: 'info' }
 }

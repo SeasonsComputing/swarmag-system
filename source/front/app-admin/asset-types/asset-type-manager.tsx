@@ -20,6 +20,7 @@ import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { StatusBadge } from '@front/app/shell/display/status-badge.tsx'
 import { useAssetTypes } from '@front/app/stores/asset-types-state.ts'
+import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import type { UiComponent } from '@ux/ui'
@@ -42,15 +43,17 @@ export const AssetTypeManager = (props: AssetTypeManagerProps): UiComponent => {
     formTitle: 'Asset Type Manager',
     entityLabel: 'Asset Type',
     listColumns: [
-      { label: 'Asset Type', render: item => <span>{item.label}</span> },
       {
-        label: 'Active',
-        align: 'center',
+        label: 'Asset Type',
         render: item => (
-          <StatusBadge
-            variant={item.active ? 'success' : 'warning'}
-            icon={item.active ? 'check' : 'minus'}
-            label={item.active ? 'Active' : 'Inactive'}
+          <PanelRowIdentity
+            pill={
+              <StatusBadge
+                variant={item.active ? 'success' : 'warning'}
+                label={item.active ? 'Active' : 'Inactive'}
+              />
+            }
+            title={item.label}
           />
         )
       }

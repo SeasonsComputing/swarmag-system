@@ -18,3 +18,9 @@
   color: var(--sa-color-accent);
   font-size: var(--sa-ui-font-size-compact);
 }
+
+[data-shell-panel='row-identity'] [data-shell-panel='row-headline'] {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--sa-rhythm-gap-tight);
+}
