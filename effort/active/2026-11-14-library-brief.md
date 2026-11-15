@@ -196,6 +196,7 @@ Paths are under `source/`.
 | `front/app-admin/field-binder/field-binder-step-detail.tsx`     | Imports and element names                  |
 | `front/app-admin/app.tsx`                                       | `/library` route                           |
 | `front/app-admin/dashboard-admin.json`                          | Library command; Administration menu items |
+| `tests/cases/library-levels-test.ts`                            | New: `LibraryLevels` unit test             |
 
 Out of scope:
 
@@ -220,6 +221,15 @@ Escalate any change outside this scope.
 - No `Picker*` drill type, `FieldBinderPicker`, or `field-binder-drill-mark` remains, and no CSS
   outside `UiIcon` writes `mask: var(--sa-icon)`.
 - The CA verifies on screen.
+
+- `library-levels-test.ts` passes, with the topic, record, and document APIs stubbed as
+  `session-coordinator-test.ts` stubs API members. It pins `LibraryLevels`' behavior:
+  1. the root level lists `LIBRARY_TOPICS`, and a topic's level is titled `Asset`, `Chemical`, or
+     `Service`;
+  2. a topic's records are sorted by label;
+  3. a record's documents are its notes' attachments, flattened, with the attachment kind as the
+     detail;
+  4. choosing a document calls `onDocument` with the attachment and `{ topic, id }`.
 
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYLE_AUDIT.
 
