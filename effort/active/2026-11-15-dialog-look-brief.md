@@ -38,7 +38,8 @@ panes are divided by tone, not framed.
   export type UiCardElevation = 'none' | 'raised' | 'floating' | 'tonal'
   ```
 
-- **Tonal panes.** In a workbench dialog, the panel kinds render `elevation='tonal'`. Each pane kind
+- _[Amended by the amendment "After ACE scoping", item 1: the opt-in is a prop.]_
+  **Tonal panes.** In a workbench dialog, the panel kinds render `elevation='tonal'`. Each pane kind
   picks its tone: the Aside a step lighter than Main.
 - _[Amended by the amendment "After ACE review", items 1 and 2: workbench dialogs only; clipping.]_
   **Flush placement.** In a workbench dialog, the panel container has no gap and the dialog does not
@@ -138,5 +139,28 @@ Production scope, and Acceptance.
    floating controls (select menus, popovers) are intact under the clipping.
 3. **Threshold: 660px.** With no gap the floor is the Aside's 280px plus Main's 380px. `manager.css`
    and `wizard.css` both use 660, and both are verified on either side of it.
+
+## Amendment — 2026-11-15 — After ACE scoping
+
+ACE's production scope follows this brief. Two points it implies are stated here, verified against
+the code, so the scope's escalation boundaries read cleanly. This amendment supersedes the marked
+passage in Target design and adds to Production scope.
+
+1. **The opt-in is an additive prop.** The workbench context is a factory, not a provider
+   (`ux/shell/workbench/workbench-context.ts`), so nothing reaches the panels implicitly. `PanelList`,
+   `PanelForm`, and `PanelStepflow` gain an optional `elevation`, defaulting to `'raised'`;
+   `CollectionTable` forwards it to `PanelList`. Manager and Wizard pass `'tonal'`; Lister and
+   retrieval pass nothing and keep today's look. This shared API addition is in scope; it is not
+   the "new shared abstraction" the scope's escalation boundary names.
+
+   ```ts
+   <PanelList elevation='tonal' …>          // default 'raised'
+   <CollectionTable elevation='tonal' …>    // forwards to PanelList; Lister passes nothing
+   ```
+
+2. **Clipping targets the workbench size only.** `[data-ui='dialog'][data-ui-size='workbench']` is
+   used only by the Managers and the Onboarding Wizard (`front/app-admin/app.tsx`), so it is the
+   hook for flush placement and clipping. In `ui.css` the workbench and sheet sizes share one rule
+   block, `overflow: visible` included; the clipping change splits it, so sheets are not clipped.
 
 _End of Brief_
