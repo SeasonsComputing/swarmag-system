@@ -8,7 +8,8 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Renders transient reports independently without combining units or inventing
 progress for unknown work. Only non-blocking failures can be dismissed here;
-operations own clearing other reports and all retry/cancel execution.
+operations own clearing other reports and all retry/cancel execution. With no
+reports, it shows an empty state.
 The list is the items of the Helm's Tasks menu: Helm owns the trigger, the
 popover, and its title. This list has no navigation responsibility.
 
@@ -19,7 +20,7 @@ BackgroundTaskList  Reactive task reports, the items of the Helm's Tasks menu.
 
 import { For, Show } from '@solid-js'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
-import { UiActionButton, UiLayout, UiList, UiListItem } from '@ux/ui'
+import { UiActionButton, UiIcon, UiLayout, UiList, UiListItem } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './background-task-list.css'
@@ -27,6 +28,12 @@ import './background-task-list.css'
 /** Each report retains its own units, phase, and exit responsibility. */
 export const BackgroundTaskList = (): UiComponent => (
   <UiLayout data-widget='background-task-list' gap='tight'>
+    <Show when={Object.keys(BackgroundTasks.store).length === 0}>
+      <UiLayout variant='inline-fit' data-widget='background-task-empty'>
+        <UiIcon name='check' />
+        <span>No background tasks</span>
+      </UiLayout>
+    </Show>
     <UiList>
       <For each={Object.keys(BackgroundTasks.store)}>
         {key => {

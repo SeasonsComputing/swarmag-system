@@ -190,7 +190,7 @@ try {
   await page.goto('http://127.0.0.1:' + server.httpServer.address().port)
   await page.waitForSelector('body[data-ready="true"]')
   assert.deepEqual(await page.evaluate(() => Harness.events), ['session', 'mount'])
-  assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true }).isDisabled(), true)
+  assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true }).isDisabled(), false)
   const toolbar = page.locator('[data-widget="helm-widget"]')
   assert.deepEqual(await toolbar.locator('[data-widget="helm-button-glyph"]').evaluateAll(glyphs =>
     glyphs.map(glyph => glyph.getAttribute('aria-label'))), ['Backpack', 'Theme', 'Tasks', 'Main'])
@@ -290,7 +290,7 @@ try {
   await page.getByRole('button', { name: 'Tasks', exact: true }).click()
   await page.getByRole('button', { name: 'Dismiss Binder Sync', exact: true }).click()
   assert.deepEqual(await page.evaluate(() => Harness.reports()), [])
-  assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true }).isDisabled(), true)
+  assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true }).isDisabled(), false)
   await page.waitForFunction(() => document.activeElement?.closest('[data-widget="helm-widget"]'))
   await page.getByRole('button', { name: 'Backpack', exact: true }).click()
   await page.evaluate(() => Harness.mode('unexpected'))

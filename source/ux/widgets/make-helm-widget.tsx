@@ -10,8 +10,8 @@ Binds application behavior without importing application APIs. The toolbar
 renders its items inline and in order: a command as its icon, named and titled
 by its label; a menu as its icon, the trigger of a popover headed by its label,
 then its commands and status lines. The @tasks item is a menu whose
-items are the current reports; it is disabled while none exist and closes when
-the last one clears. Popovers are mutually exclusive and commands close before
+items are the current reports, or an empty state while none exist; it closes
+when the last one clears. Popovers are mutually exclusive and commands close before
 execution. Status readers and disabled predicates stay reactive. Expected
 command failures belong to the operation; unexpected async rejections are
 observed and raised as programming errors, never converted into task reports.
@@ -23,7 +23,7 @@ makeHelmWidget  Bind commands/status and return a dashboard widget component.
 
 import { isNonEmptyString, notValid } from '@core/std'
 import type { Dictionary } from '@core/std'
-import { createEffect, createMemo, createSignal, For } from '@solid-js'
+import { createEffect, createMemo, createSignal, For, untrack } from '@solid-js'
 import type { WidgetComponent } from '@ux/shell/dashboard/widget-contract.ts'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
@@ -58,15 +58,18 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
   }
   const hasReports = () => Object.keys(BackgroundTasks.store).length > 0
   const isTasks = (item: HelmToolbarItem): boolean => 'command' in item && item.command === '@tasks'
-  createEffect(() => {
-    const surface = open()
-    if (surface === undefined || !isTasks(surface) || hasReports()) return
+  // An open Tasks menu closes when its last report clears; opened empty, it shows its empty state.
+  createEffect((had: boolean) => {
+    const has = hasReports()
+    const surface = untrack(open)
+    if (!had || has || surface === undefined || !isTasks(surface)) return has
     setOpen(undefined)
     queueMicrotask(() => {
       const target = navigation.querySelector<HTMLButtonElement>('button:not([disabled])') ?? navigation
       target.focus()
     })
-  })
+    return has
+  }, hasReports())
   const toolbar = createMemo(() => readHelmToolbar(props.settings.toolbar, bindings))
   const themes = createMemo(() => {
     const isTheme = (item: HelmToolbarItem | HelmMenuItem) =>
@@ -152,7 +155,7 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
               : isTasks(item)
               ? menu(item, {
                 icon: 'update',
-                disabled: () => !hasReports(),
+                disabled: () => false,
                 content: () => <BackgroundTaskList />
               })
               : (

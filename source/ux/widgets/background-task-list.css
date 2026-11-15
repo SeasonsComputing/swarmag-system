@@ -20,6 +20,11 @@
   padding-block: var(--sa-space-xs);
 }
 
+[data-widget='background-task-list'] [data-widget='background-task-empty'] {
+  align-items: center;
+  color: var(--sa-text-secondary);
+}
+
 [data-widget='background-task-list'] [data-widget-task-phase] {
   color: var(--sa-text-secondary);
 }
