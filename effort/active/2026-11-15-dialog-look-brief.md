@@ -173,6 +173,8 @@ passage in Target design and adds to Production scope.
 
 ## Amendment — 2026-11-15 — Tonal is a variant
 
+_[Amended by the amendment "Tone in the variant": `variant='tonal-light' | 'tonal-dark'`, no `tone` prop.]_
+
 The CA's direction. It supersedes the marked passages in Target design, Governing documents to
 amend, and the "After ACE scoping" amendment's item 1. Existing card and panel defaults are
 unchanged.
@@ -200,6 +202,8 @@ unchanged.
      tonal; elevation applies to the existing cards. Examples show both tonal tones.
 
 ## Amendment — 2026-11-15 — Documentation amended
+
+_[Amended by the amendment "Tone in the variant": `variant='tonal-light' | 'tonal-dark'`, no `tone` prop.]_
 
 The AI Architect amended the governing documents at the CA's direction, ahead of production, since
 documentation leads code. They are no longer in ACE's production scope.
@@ -254,4 +258,26 @@ each within the approved scope.
 2. **Only the columns lose their gap.** `column-gap: 0` replaces `gap: 0`, so the row gap between
    the dialog's header and the panes stays. The header and accessory padding added to restore that
    spacing, including the below-480px rule, are removed.
+## Amendment — 2026-11-15 — Tone in the variant
+
+The CA's direction to ACE during production, recorded here. It supersedes the "Tonal is a variant"
+amendment and the props described in the "Documentation amended" amendment.
+
+1. **The tone is the variant's value.** `UiCard`'s `variant` is `'tonal-light' | 'tonal-dark'`; there
+   is no `tone` prop. A tonal variant and `elevation` are alternatives the props enforce; without
+   `variant` a card is framed, as before. The card emits its variant as `data-ui-variant`, within
+   `guard-css`'s attribute set.
+
+   ```ts
+   <UiCard elevation='raised'>…</UiCard>     // framed, as today
+   <UiCard variant='tonal-light'>…</UiCard>  // Aside
+   <UiCard variant='tonal-dark'>…</UiCard>   // Main
+   ```
+
+2. **Panels pass `variant` only.** `PanelList`, `PanelForm`, and `PanelStepflow` take `UiCard`'s
+   optional `variant`, raised without it; `CollectionTable` forwards it. Manager and Wizard pass
+   `tonal-light` for the Aside and `tonal-dark` for Main.
+3. **Documentation follows.** ux-design-language §4.6, ux-components-guide §4.4, and
+   ux-components-internals name the two variant values; the Tone table is gone.
+
 _End of Brief_
