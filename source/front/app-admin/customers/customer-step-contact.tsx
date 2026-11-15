@@ -19,6 +19,7 @@ import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import type { ContactPreferredChannel } from '@domain/abstractions/common.ts'
 import { onCleanup } from '@solid-js'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -46,7 +47,7 @@ export const CustomerStepContact = (props: CustomerStepContactProps): UiComponen
 
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout data-app='customer-step-contact'>
+      <PanelSections>
         <UiFieldset variant='unframed' legend='Primary Contact'>
           <UiLayout>
             <UiField for='displayName' label='Name' required>
@@ -102,7 +103,7 @@ export const CustomerStepContact = (props: CustomerStepContactProps): UiComponen
             </UiField>
           </UiLayout>
         </UiFieldset>
-      </UiLayout>
+      </PanelSections>
     </form>
   )
 }

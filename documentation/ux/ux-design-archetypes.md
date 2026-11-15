@@ -371,8 +371,8 @@ Address fields are a form composition pattern, not a single compound field.
 
 A form's sections are divided by a rule, never boxed. `PanelSections` holds them, one section per
 direct child, and draws a hairline between each and the next; a section is an unframed
-`UiFieldset` or a section component such as a notes editor. A form with one section has nothing to
-divide. A group inside a section keeps its frame.
+`UiFieldset` or a section component such as a notes editor. A group inside a section keeps its
+frame.
 
 ## 6. Supporting Library
 

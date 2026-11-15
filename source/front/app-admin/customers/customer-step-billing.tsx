@@ -15,6 +15,7 @@ CustomerStepBilling  Billing address step.
 
 import { expectNonEmptyString } from '@core/std'
 import { onCleanup } from '@solid-js'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -40,7 +41,7 @@ export const CustomerStepBilling = (props: {
   useFormKeyboard(() => formRef, field => validation.blurField(field))
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout>
+      <PanelSections>
         <UiFieldset variant='unframed' legend='Billing Address'>
           <UiLayout>
             <CustomerInput state={state} validation={validation} name='line1' label='Address' required />
@@ -76,7 +77,7 @@ export const CustomerStepBilling = (props: {
             </UiLayout>
           </UiLayout>
         </UiFieldset>
-      </UiLayout>
+      </PanelSections>
     </form>
   )
 }

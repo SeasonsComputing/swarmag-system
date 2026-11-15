@@ -18,6 +18,7 @@ AssetTypeStepDetail  Render the single detail Step.
 
 import { expectNonEmptyString } from '@core/std'
 import { onCleanup } from '@solid-js'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -42,8 +43,8 @@ export const AssetTypeStepDetail = (props: AssetTypeStepDetailProps): UiComponen
   useFormKeyboard(() => formRef, field => validation.blurField(field))
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout>
-        <UiFieldset legend='Asset type information'>
+      <PanelSections>
+        <UiFieldset variant='unframed' legend='Asset type information'>
           <UiLayout>
             <UiField for='label' label='Label' required>
               <UiInput
@@ -69,7 +70,7 @@ export const AssetTypeStepDetail = (props: AssetTypeStepDetailProps): UiComponen
             </UiField>
           </UiLayout>
         </UiFieldset>
-      </UiLayout>
+      </PanelSections>
     </form>
   )
 }
