@@ -126,10 +126,13 @@
   inline-size: auto;
 }
 
+/* The frame draws nothing: an action is a glyph, a bar, and a label, not a ring. It keeps its
+   box, sized to the ring, so an icon-only action keeps its touch target. */
 [data-ui='action-button-frame'] {
   align-items: center;
-  background: var(--sa-bg-control);
+  background: transparent;
   border: var(--sa-border-default);
+  border-color: transparent;
   border-radius: var(--sa-radius-full);
   block-size: var(--sa-action-button-ring-size);
   display: inline-flex;
@@ -137,6 +140,34 @@
   inline-size: var(--sa-action-button-ring-size);
   justify-content: center;
   transition: var(--sa-transition-fast);
+}
+
+/* The bar sits midway between glyph and label. A labelled action's frame shrinks to its glyph,
+   since the label already makes the control a large target; each glyph draws about 2px inside
+   its box, so the frame moves that far toward the bar. */
+[data-ui='action-button'][data-ui-label-mode='visible'] [data-ui='action-button-frame'] {
+  border: none;
+  inline-size: auto;
+  margin-inline-start: calc(var(--sa-space-xs) * -0.5);
+}
+
+/* With the glyph leading, the bar is on the frame's other side. */
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-align='start']
+  [data-ui='action-button-frame'] {
+  margin-inline-end: calc(var(--sa-space-xs) * -0.5);
+  margin-inline-start: 0;
+}
+
+/* The glyph rests in the label's color and takes the primary color under the pointer or focus.
+   A danger action keeps its own color, which is its warning. */
+[data-ui='action-button']:not([data-ui-variant='danger']) [data-ui='action-button-frame'] {
+  color: var(--sa-text-secondary);
+}
+
+[data-ui='action-button']:not([data-ui-variant='danger']):not([data-ui-state='disabled']):hover
+  [data-ui='action-button-frame'],
+[data-ui='action-button']:not([data-ui-variant='danger']):focus-visible [data-ui='action-button-frame'] {
+  color: var(--sa-color-primary);
 }
 
 [data-ui='action-button'][data-ui-state='disabled'] {
@@ -163,8 +194,8 @@
 
 [data-ui='action-button']:not([data-ui-state='disabled']):hover [data-ui='action-button-frame'],
 [data-ui='action-button']:focus-visible [data-ui='action-button-frame'] {
-  background: var(--sa-bg-hover);
-  border-color: var(--sa-color-primary);
+  background: transparent;
+  border-color: transparent;
 }
 
 [data-ui='action-button'] [data-ui='icon'] {
@@ -655,6 +686,22 @@
 
 [data-ui='table-cell'] [data-ui='action-button'] + [data-ui='action-button'] {
   margin-inline-start: var(--sa-rhythm-gap-tight);
+}
+
+/* In a table every cell is data; an icon-only action keeps its ring so it reads as a control. */
+[data-ui='table-cell'] [data-ui='action-button'][data-ui-label-mode='hidden']
+  [data-ui='action-button-frame'] {
+  background: var(--sa-bg-control);
+  border: var(--sa-border-default);
+}
+
+[data-ui='table-cell']
+  [data-ui='action-button'][data-ui-label-mode='hidden']:not([data-ui-state='disabled']):hover
+  [data-ui='action-button-frame'],
+[data-ui='table-cell'] [data-ui='action-button'][data-ui-label-mode='hidden']:focus-visible
+  [data-ui='action-button-frame'] {
+  background: var(--sa-bg-hover);
+  border-color: var(--sa-color-primary);
 }
 
 [data-ui='table-cell']:last-child {
@@ -1549,35 +1596,35 @@
 }
 
 [data-ui='fieldset'] {
-  background: var(--sa-fieldset-bg);
-  border: var(--sa-fieldset-border);
-  border-radius: var(--sa-radius-sm);
-  box-shadow: var(--sa-fieldset-shadow);
+  border: none;
   display: grid;
   gap: var(--sa-rhythm-gap);
-  padding: var(--sa-rhythm-gap);
+  padding: 0;
 }
 
 [data-ui='fieldset'] > legend {
   color: var(--sa-text-h3);
   font-family: var(--sa-annotation-font-family);
-  font-size: var(--sa-annotation-font-size);
-  font-weight: var(--sa-annotation-font-weight);
-}
-
-[data-ui='fieldset'][data-ui-variant='unframed'] {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
-}
-
-[data-ui='fieldset'][data-ui-variant='unframed'] > legend {
   font-size: var(--sa-font-size-xs);
+  font-weight: var(--sa-annotation-font-weight);
   letter-spacing: 0.04em;
   padding-block-end: var(--sa-space-sm);
   text-transform: uppercase;
+}
+
+[data-ui='fieldset'][data-ui-variant='framed'] {
+  background: var(--sa-fieldset-bg);
+  border: var(--sa-fieldset-border);
+  border-radius: var(--sa-radius-sm);
+  box-shadow: var(--sa-fieldset-shadow);
+  padding: var(--sa-rhythm-gap);
+}
+
+[data-ui='fieldset'][data-ui-variant='framed'] > legend {
+  font-size: var(--sa-annotation-font-size);
+  letter-spacing: normal;
+  padding-block-end: 0;
+  text-transform: none;
 }
 
 [data-ui='form-actions'] {

@@ -57,7 +57,7 @@ export const AssetStepDetail = (props: AssetStepDetailProps): UiComponent => {
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
           <PanelSections>
-            <UiFieldset variant='unframed' legend='Asset information'>
+            <UiFieldset legend='Asset information'>
               <UiLayout>
                 <UiField for='label' label='Label' required>
                   <UiInput

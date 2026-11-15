@@ -59,7 +59,7 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
           <PanelSections>
-            <UiFieldset variant='unframed' legend='Customer Information'>
+            <UiFieldset legend='Customer Information'>
               <UiLayout>
                 <UiField for='name' label='Name' required>
                   <UiInput
@@ -87,7 +87,7 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset variant='unframed' legend='Account'>
+            <UiFieldset legend='Account'>
               <UiField for='account-manager' label='Manager'>
                 <div data-app='customer-account-manager'>
                   <UserPicker

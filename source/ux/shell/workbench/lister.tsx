@@ -57,6 +57,7 @@ export const Lister = <T extends Instance>(props: ListerProps<T>): UiComponent =
   return (
     <PanelSheet title={props.provider.formTitle} onCancel={props.onCancel} busy={pending()}>
       <CollectionTable
+        variant='tonal-dark'
         provider={props.provider}
         activate={item => void activate(item)}
         error={error()}

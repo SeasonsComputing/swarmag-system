@@ -18,7 +18,7 @@ COMPONENT PROPERTIES
 ───────────────────────────────────────────────────────────────────────────────
 UiFieldsetProps  UiFieldset props; extends UiContainerProps.
 ├ legend         Field group legend.
-└ variant        Framed by default; unframed opts out of the bordered surface.
+└ variant        Unframed by default; framed draws the bordered surface.
 */
 
 import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
@@ -27,7 +27,7 @@ import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
 export type UiFieldsetProps = UiContainerProps & {
   /** Text content of the group legend — names the group, never wraps controls. */
   legend: string
-  variant?: 'unframed'
+  variant?: 'framed'
 }
 
 /** Semantic field group with legend. Compose UiLayout inside for child layout. */

@@ -48,7 +48,7 @@ export const CustomerStepContact = (props: CustomerStepContactProps): UiComponen
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
       <PanelSections>
-        <UiFieldset variant='unframed' legend='Primary Contact'>
+        <UiFieldset legend='Primary Contact'>
           <UiLayout>
             <UiField for='displayName' label='Name' required>
               <UiInput

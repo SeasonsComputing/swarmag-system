@@ -42,7 +42,7 @@ export const CustomerStepBilling = (props: {
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
       <PanelSections>
-        <UiFieldset variant='unframed' legend='Billing Address'>
+        <UiFieldset legend='Billing Address'>
           <UiLayout>
             <CustomerInput state={state} validation={validation} name='line1' label='Address' required />
             <CustomerInput

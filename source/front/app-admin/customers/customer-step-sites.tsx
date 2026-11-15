@@ -166,7 +166,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
       <Show when={siteError()}>
         <UiAlert variant='danger'>Complete the required site fields before saving.</UiAlert>
       </Show>
-      <UiFieldset variant='unframed' legend='Identity'>
+      <UiFieldset legend='Identity'>
         <SiteTextInput
           index={props.index}
           name='siteLabel'
@@ -187,7 +187,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
           onValue={value => setDraft('acreage', UiText.number(value))}
         />
       </UiFieldset>
-      <UiFieldset variant='unframed' legend='Site Location'>
+      <UiFieldset legend='Site Location'>
         <UiToggleGroup<LocationMode> value={mode()} onChange={changeMode}>
           <UiToggleItem value='address'>
             <span>Address</span>

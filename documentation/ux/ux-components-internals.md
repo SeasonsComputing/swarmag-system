@@ -160,7 +160,7 @@ Variants are only valid where explicitly declared.
 | `card`          | `data-ui-variant`    | `tonal-light`, `tonal-dark`                                                  |
 | `card`          | `data-ui-elevation`  | `raised`, `floating`                                                         |
 | `field`         | `data-ui-variant`    | `caption`, `inline`                                                          |
-| `fieldset`      | `data-ui-variant`    | `unframed`                                                                   |
+| `fieldset`      | `data-ui-variant`    | `framed`                                                                     |
 | `layout`        | `data-ui-variant`    | `block-fill`, `block-fit`, `cluster`, `inline`, `inline-fill`, `inline-wrap` |
 | `list`          | `data-ui-variant`    | `bullet`, `numbered`                                                         |
 | `table-row`     | `data-ui-variant`    | `section`                                                                    |
@@ -427,7 +427,7 @@ This selector shape is invalid because one element cannot hold two different `da
 | `table-container` | Optional overflow wrapper emitted by `UiTable`                    |
 | `footer`          | Branded footer primitive using shell chrome and safe-area support |
 | `field`           | Label + control wrapper                                           |
-| `fieldset`        | Semantic group boundary with legend; framed or unframed           |
+| `fieldset`        | Semantic group boundary with legend; a section, or framed         |
 | `form-actions`    | Right-aligned action row for form submission and dismissal        |
 
 ## 6. Chart Controls

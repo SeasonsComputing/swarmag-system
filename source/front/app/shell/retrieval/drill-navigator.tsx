@@ -42,6 +42,7 @@ import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
 import { UiIcon, UiSpinner, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow } from '@ux/ui'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
+import type { UiCardProps } from '@ux/ui/components/ui-card.tsx'
 
 import './drill-navigator.css'
 
@@ -70,6 +71,7 @@ export type DrillNavigatorProps = {
   title: string
   root: DrillLevel
   onChoose?: () => void
+  variant?: UiCardProps['variant']
 }
 
 /** Walk declared levels without owning a dialog. */
@@ -90,6 +92,7 @@ export const DrillNavigator = (props: DrillNavigatorProps): UiComponent => {
   }
   return (
     <PanelList
+      variant={props.variant}
       header={{
         leading: <PanelHeaderTitle title={props.title} path={path()} command={command()} />
       }}

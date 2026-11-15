@@ -102,7 +102,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
       <Show when={error()}>
         <UiAlert variant='danger'>{error()}</UiAlert>
       </Show>
-      <UiFieldset legend='Attachments'>
+      <UiFieldset variant='framed' legend='Attachments'>
         <UiLayout>
           <UiLayout variant='inline-fit'>
             <UiActionButton

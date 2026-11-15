@@ -120,7 +120,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
   return (
     <form ref={form} inert={props.context.busy()} onSubmit={event => event.preventDefault()}>
       <PanelSections>
-        <UiFieldset variant='unframed' legend='Source'>
+        <UiFieldset legend='Source'>
           <UiLayout>
             <Show
               when={state.adding}
@@ -182,7 +182,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
             </Show>
           </UiLayout>
         </UiFieldset>
-        <UiFieldset variant='unframed' legend='Document'>
+        <UiFieldset legend='Document'>
           <UiLayout>
             <UiField for='name' label='Name' required={state.delivered}>
               <UiInput

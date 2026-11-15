@@ -44,7 +44,7 @@ export const AssetTypeStepDetail = (props: AssetTypeStepDetailProps): UiComponen
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
       <PanelSections>
-        <UiFieldset variant='unframed' legend='Asset type information'>
+        <UiFieldset legend='Asset type information'>
           <UiLayout>
             <UiField for='label' label='Label' required>
               <UiInput

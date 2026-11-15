@@ -26,6 +26,8 @@ import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
 import { UiActionButton, UiAlert, UiLayout, UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
+import './library-dialog.css'
+
 /** Sheet close action supplied by its route. */
 export type LibraryDialogProps = { onCancel: () => void }
 
@@ -48,7 +50,7 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent => {
   return (
     <PanelSheet title='Library' onCancel={props.onCancel}>
       <UiLayout variant='block-fill'>
-        <UiLayout variant='cluster-wrap'>
+        <UiLayout variant='cluster-wrap' data-app='library-toolbar'>
           <UiActionButton
             align='start'
             density='dense'
@@ -85,7 +87,7 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent => {
         <Show when={error()}>
           <UiAlert variant='danger'>{error()}</UiAlert>
         </Show>
-        <DrillNavigator title='Documents' root={root} />
+        <DrillNavigator variant='tonal-dark' title='Documents' root={root} />
       </UiLayout>
     </PanelSheet>
   )

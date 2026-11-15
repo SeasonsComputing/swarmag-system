@@ -67,7 +67,7 @@ export const ServiceStepDetail = (props: ServiceStepDetailProps): UiComponent =>
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
           <PanelSections>
-            <UiFieldset variant='unframed' legend='Service information'>
+            <UiFieldset legend='Service information'>
               <UiLayout>
                 <UiField for='name' label='Name' required>
                   <UiInput

@@ -35,3 +35,8 @@
 [data-widget='helm-menu'] > [data-widget='helm-menu-status'] {
   color: var(--sa-text-secondary);
 }
+
+/* Helm commands glow under the pointer, as the Helm's menu triggers do. */
+[data-widget='helm-widget'] [data-ui='action-button']:not([data-ui-state='disabled']):hover {
+  box-shadow: var(--sa-shadow-btn);
+}

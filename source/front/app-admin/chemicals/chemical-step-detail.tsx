@@ -77,7 +77,7 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
           <PanelSections>
-            <UiFieldset variant='unframed' legend='Chemical information'>
+            <UiFieldset legend='Chemical information'>
               <UiLayout>
                 <UiField for='name' label='Name' required>
                   <UiInput
@@ -122,7 +122,7 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset variant='unframed' legend='Handling and reference'>
+            <UiFieldset legend='Handling and reference'>
               <UiLayout>
                 <UiField variant='caption' label='Restricted use'>
                   <UiToggleGroup

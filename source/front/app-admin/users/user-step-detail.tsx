@@ -108,7 +108,7 @@ export function UserStepDetail(props: {
       root={drill => (
         <form id='abstraction-panel-form' ref={formRef} onSubmit={submit}>
           <PanelSections>
-            <UiFieldset variant='unframed' legend='Identity'>
+            <UiFieldset legend='Identity'>
               <UiLayout>
                 <UiField for='displayName' label='Name' required>
                   <UiInput
@@ -156,7 +156,7 @@ export function UserStepDetail(props: {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset variant='unframed' legend='Contact Preferences'>
+            <UiFieldset legend='Contact Preferences'>
               <UiLayout>
                 <UiField for='preferredChannel' label='Preferred Channel'>
                   <UiSingleSelect
@@ -170,7 +170,7 @@ export function UserStepDetail(props: {
               </UiLayout>
             </UiFieldset>
             <NotesEditor attach={props.attach} notes={notes} onChange={setNotes} drill={drill} />
-            <UiFieldset variant='unframed' legend='Access'>
+            <UiFieldset legend='Access'>
               <UiLayout>
                 <UiField variant='caption' label='Roles' required>
                   <UiMultiSelect

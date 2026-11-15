@@ -32,7 +32,7 @@ import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
 import { UiActionButton, UiLayout, UiPopover, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { BackgroundTaskList } from './background-task-list.tsx'
-import { HelmButton, HelmButtonGlyph } from './helm-button.tsx'
+import { HelmButtonGlyph } from './helm-button.tsx'
 import { readHelmToolbar } from './helm-widget-contract.ts'
 import type { HelmBindings, HelmCommand, HelmMenuItem, HelmToolbarItem } from './helm-widget-contract.ts'
 
@@ -190,7 +190,8 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
                 )
               })
               : (
-                <HelmButton
+                <UiActionButton
+                  density='dense'
                   icon={icon(item)}
                   label={item.label}
                   title={item.label}

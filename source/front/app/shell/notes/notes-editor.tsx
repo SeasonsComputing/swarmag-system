@@ -159,7 +159,7 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
           </UiTab>
         </UiTabList>
         <UiTabPanel value='note'>
-          <UiFieldset legend='Note'>
+          <UiFieldset variant='framed' legend='Note'>
             <UiLayout>
               <UiLayout data-app='note-content' gap='none'>
                 <time

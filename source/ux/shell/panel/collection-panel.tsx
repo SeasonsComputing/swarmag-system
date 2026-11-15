@@ -81,7 +81,7 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
 
   return (
     <div data-shell='collection-panel'>
-      <UiFieldset variant='unframed' legend={props.legend}>
+      <UiFieldset legend={props.legend}>
         <div data-shell='collection-panel-action'>
           <UiActionButton
             align='start'

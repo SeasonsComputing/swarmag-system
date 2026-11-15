@@ -1290,32 +1290,32 @@ for non-labelable controls such as lists, tables, and composite listboxes.
 
 ### 5.6 UiFieldset
 
-Semantic group boundary with legend: a framed group by default, or an unframed section.
+Semantic group boundary with legend: a section by default, or a framed group.
 
 **Use When**
 
-Use when a form has a named group of related fields. A form's top-level sections are unframed,
-inside `PanelSections`; a group within a section keeps the frame.
+Use when a form has a named group of related fields. A form's top-level sections use the default,
+inside `PanelSections`; a group within a section is framed.
 
 **Props**
 
-| Prop       | Type          | Required | Default | Description                                  |
-| ---------- | ------------- | -------- | ------- | -------------------------------------------- |
-| `legend`   | `string`      | yes      | —       | Group name.                                  |
-| `variant`  | `'unframed'`  | no       | unset   | A section: no border, background, or shadow. |
-| `children` | `UiComponent` | yes      | —       | Group contents.                              |
+| Prop       | Type          | Required | Default | Description                                         |
+| ---------- | ------------- | -------- | ------- | --------------------------------------------------- |
+| `legend`   | `string`      | yes      | —       | Group name.                                         |
+| `variant`  | `'framed'`    | no       | unset   | A framed group: border, background, and padding.    |
+| `children` | `UiComponent` | yes      | —       | Group contents.                                     |
 
 **Variant**
 
-| Value        | Effect                                                               |
-| ------------ | -------------------------------------------------------------------- |
-| unset        | Framed group: border, radius, background, and its own padding.       |
-| `'unframed'` | Section: no frame or padding; the legend is a small uppercase label. |
+| Value      | Effect                                                               |
+| ---------- | -------------------------------------------------------------------- |
+| unset      | Section: no frame or padding; the legend is a small uppercase label. |
+| `'framed'` | Framed group: border, radius, background, and its own padding.       |
 
 **Example**
 
 ```tsx
-<UiFieldset legend='Spray window'>
+<UiFieldset variant='framed' legend='Spray window'>
   <UiLayout variant='inline-wrap'>
     <UiField label='Start time' for='start'>
       <UiInput id='start' type='time' />
@@ -1331,8 +1331,8 @@ A form's sections, divided by a rule:
 
 ```tsx
 <PanelSections>
-  <UiFieldset variant='unframed' legend='Identity'>…</UiFieldset>
-  <UiFieldset variant='unframed' legend='Contact Preferences'>…</UiFieldset>
+  <UiFieldset legend='Identity'>…</UiFieldset>
+  <UiFieldset legend='Contact Preferences'>…</UiFieldset>
   <NotesEditor … />
 </PanelSections>
 ```

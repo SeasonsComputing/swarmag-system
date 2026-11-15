@@ -370,9 +370,8 @@ Address fields are a form composition pattern, not a single compound field.
 ### 5.4 Form Sections
 
 A form's sections are divided by a rule, never boxed. `PanelSections` holds them, one section per
-direct child, and draws a hairline between each and the next; a section is an unframed
-`UiFieldset` or a section component such as a notes editor. A group inside a section keeps its
-frame.
+direct child, and draws a hairline between each and the next; a section is a `UiFieldset` or a
+section component such as a notes editor. A group inside a section is a framed `UiFieldset`.
 
 ## 6. Supporting Library
 
@@ -384,7 +383,7 @@ The machinery this repository already builds for the common cases. Reach for the
 | Present a standalone list and activate its Items | `Lister`                                                    | Collection                          |
 | Present one panel as a full-device dialog        | `Routes.sheet` + `PanelSheet`                               | —                                   |
 | Present a nested Collection at any depth         | `DrillDown` + `CollectionPanel`                             | Index-Detail                        |
-| Divide a form into sections                      | `PanelSections` + unframed `UiFieldset`                     | —                                   |
+| Divide a form into sections                      | `PanelSections` + `UiFieldset`                              | —                                   |
 | Walk nested levels to one Item and activate it   | `DrillNavigator`; `DrillDialog` from a field                | Index                               |
 | Capture or review Items one at a time            | `UiCollectionCursor`                                        | Collection-Cursor                   |
 | Decompose a complex subject into steps           | `Wizard` + `PanelStep`                                      | Sequence                            |
