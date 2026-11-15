@@ -63,6 +63,7 @@ Both themes; the tones are tokens in `themes.css`.
 ## Governing documents to amend
 
 _[Amended by the amendment "Tonal is a variant", item 3: what each document says.]_
+_[Amended by the amendment "Documentation amended", items 1–2: amended; the catalog remains.]_
 
 Amended first, since documentation leads code:
 
@@ -194,5 +195,19 @@ unchanged.
      principle "frame the window; divide its contents."
    - **ux-components-guide:** documents `UiCard`'s `variant` and `tone` props. Tone applies only to
      tonal; elevation applies to the existing cards. Examples show both tonal tones.
+
+## Amendment — 2026-11-15 — Documentation amended
+
+The AI Architect amended the governing documents at the CA's direction, ahead of production, since
+documentation leads code. They are no longer in ACE's production scope.
+
+1. **ux-design-language §4.6 Surfaces** (new): "Frame the window; divide its contents"; the framed
+   card and the tonal region; the tonal variant's two theme-owned tones, as `--sa-card-*` tokens;
+   the Aside light and Main dark. §4.5's Card row adds tonal tones.
+2. **ux-components-guide §4.4 UiCard:** the `variant` and `tone` props; tone only with tonal,
+   elevation only with framed cards, enforced by the props; a Variant table, a Tone table, and an
+   example of both tones.
+3. **Remains in production:** `ux-components-internals.md` catalogs component-specified tokens; its
+   Card row and the tonal tone tokens are named there when ACE creates them in `themes.css`.
 
 _End of Brief_

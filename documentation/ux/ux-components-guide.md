@@ -952,16 +952,35 @@ Extends native `span` attributes, excluding styling and semantic hook props.
 
 ### 4.4 UiCard
 
-Framed content surface.
+Content surface: a framed card by default, or a tonal region of the surface that holds it.
 
 **Props**
 
 Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Prop         | Type                               | Default  | Description                       |
-| ------------ | ---------------------------------- | -------- | --------------------------------- |
-| `decoration` | `'gradient' \| 'none'`             | `'none'` | Gradient stripe on the card edge. |
-| `elevation`  | `'none' \| 'raised' \| 'floating'` | `'none'` | Shadow depth of the card surface. |
+| Prop         | Type                               | Default  | Description                                |
+| ------------ | ---------------------------------- | -------- | ------------------------------------------ |
+| `decoration` | `'gradient' \| 'none'`             | `'none'` | Gradient stripe on the card edge.          |
+| `elevation`  | `'none' \| 'raised' \| 'floating'` | `'none'` | Shadow depth of a framed card.             |
+| `variant`    | `'tonal'`                          | unset    | Tonal region instead of a framed card.     |
+| `tone`       | `'light' \| 'dark'`                | unset    | Tone of a tonal card. Required with tonal. |
+
+`tone` applies only to `variant='tonal'`, and `elevation` only to framed cards; the props enforce
+these alternatives. Without `variant`, a card is framed, as before.
+
+**Variant**
+
+| Value     | Effect                                                                    |
+| --------- | ------------------------------------------------------------------------- |
+| unset     | Framed card: border, radius, and the shadow its elevation sets.           |
+| `'tonal'` | Tonal region: filled with its tone; no border, no shadow, square corners. |
+
+**Tone**
+
+| Value     | Effect                                              |
+| --------- | --------------------------------------------------- |
+| `'light'` | The lighter of the theme's two tonal surface tones. |
+| `'dark'`  | The darker of the theme's two tonal surface tones.  |
 
 **Decoration**
 
@@ -984,6 +1003,17 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 <UiCard decoration='gradient' elevation='raised'>
   <h3>Fleet Status</h3>
   <p>4 of 6 drones active</p>
+</UiCard>
+```
+
+Tonal cards divide a framed surface into regions, such as the two panes of a workbench:
+
+```tsx
+<UiCard variant='tonal' tone='light'>
+  <h3>Users</h3>
+</UiCard>
+<UiCard variant='tonal' tone='dark'>
+  <h3>New User</h3>
 </UiCard>
 ```
 

@@ -299,27 +299,42 @@ Component-specified tokens live in `themes.css` and are cataloged in
 `ux-components-internals.md`. They let themes tune reusable UI controls without changing
 component code or selector structure.
 
-| Family         | Token prefix / token                                          | Consumer                      |
-| -------------- | ------------------------------------------------------------- | ----------------------------- |
-| Button         | `--sa-button-*`                                               | Buttons                       |
-| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments   |
-| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts  |
-| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls               |
-| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels       |
-| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content    |
-| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders          |
-| Card           | `--sa-card-*`                                                 | Card decoration and elevation |
-| Table          | `--sa-table-*`                                                | Table parts                   |
-| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries     |
-| Progress       | `--sa-progress-*`                                             | Progress track and fill       |
-| List           | `--sa-list-*`                                                 | List and list item parts      |
-| Avatar         | `--sa-avatar-*`                                               | Avatar marker                 |
-| Separator      | `--sa-separator-*`                                            | Separator primitive           |
-| Shell          | `--sa-shell-*`                                                | Header and footer chrome      |
-| Footer         | `--sa-footer-*`                                               | Footer logo treatment         |
+| Family         | Token prefix / token                                          | Consumer                                    |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| Button         | `--sa-button-*`                                               | Buttons                                     |
+| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments                 |
+| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts                |
+| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls                             |
+| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels                     |
+| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content                  |
+| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders                        |
+| Card           | `--sa-card-*`                                                 | Card decoration, elevation, and tonal tones |
+| Table          | `--sa-table-*`                                                | Table parts                                 |
+| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries                   |
+| Progress       | `--sa-progress-*`                                             | Progress track and fill                     |
+| List           | `--sa-list-*`                                                 | List and list item parts                    |
+| Avatar         | `--sa-avatar-*`                                               | Avatar marker                               |
+| Separator      | `--sa-separator-*`                                            | Separator primitive                         |
+| Shell          | `--sa-shell-*`                                                | Header and footer chrome                    |
+| Footer         | `--sa-footer-*`                                               | Footer logo treatment                       |
 
 Shell chrome is intentionally theme-owned. It allows app frame surfaces to diverge from generic
 card and panel surfaces while still using the same design-language token contract.
+
+### 4.6 Surfaces
+
+**Frame the window; divide its contents.** A window, such as a dialog, is a framed surface: border,
+radius, and shadow set it apart from what lies beneath it. Inside a window, regions are divided by
+tone, not framed again, so the eye reads the content before the structure.
+
+| Surface      | Treatment                                                                   |
+| ------------ | --------------------------------------------------------------------------- |
+| Framed card  | Border, radius, and an elevation shadow; stands apart from its surroundings |
+| Tonal region | Filled with a tone; borderless, shadowless, square-cornered                 |
+
+The tonal variant has two tones, light and dark. Each theme owns both values, as `--sa-card-*`
+tokens, so adjacent regions remain distinct in light and dark themes alike. Where a window holds an
+Aside and a Main, the Aside takes the light tone and Main the dark.
 
 ## 5. Geometry, Layout, And Motion
 
