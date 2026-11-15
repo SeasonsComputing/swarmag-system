@@ -31,7 +31,8 @@ Verified against the code on 2026-11-15, with a read-only census by a delegate:
 **Frame the window; divide its contents.** The dialog is the one framed surface. Inside it, the
 panes are divided by tone, not framed.
 
-- **A tonal card.** `UiCardElevation` gains `tonal`: a filled tone, no border, no shadow, no radius.
+- _[Amended by the amendment "Tonal is a variant", item 1: a variant with a tone, not an elevation.]_
+  **A tonal card.** `UiCardElevation` gains `tonal`: a filled tone, no border, no shadow, no radius.
   The card owns its look.
 
   ```ts
@@ -60,6 +61,8 @@ Both themes; the tones are tokens in `themes.css`.
 - **Spacing roles hold:** pad for pane interiors and the header row, no gutter.
 
 ## Governing documents to amend
+
+_[Amended by the amendment "Tonal is a variant", item 3: what each document says.]_
 
 Amended first, since documentation leads code:
 
@@ -146,7 +149,8 @@ ACE's production scope follows this brief. Two points it implies are stated here
 the code, so the scope's escalation boundaries read cleanly. This amendment supersedes the marked
 passage in Target design and adds to Production scope.
 
-1. **The opt-in is an additive prop.** The workbench context is a factory, not a provider
+1. _[Amended by the amendment "Tonal is a variant", item 2: `variant` and `tone`, not `elevation`.]_
+   **The opt-in is an additive prop.** The workbench context is a factory, not a provider
    (`ux/shell/workbench/workbench-context.ts`), so nothing reaches the panels implicitly. `PanelList`,
    `PanelForm`, and `PanelStepflow` gain an optional `elevation`, defaulting to `'raised'`;
    `CollectionTable` forwards it to `PanelList`. Manager and Wizard pass `'tonal'`; Lister and
@@ -162,5 +166,33 @@ passage in Target design and adds to Production scope.
    used only by the Managers and the Onboarding Wizard (`front/app-admin/app.tsx`), so it is the
    hook for flush placement and clipping. In `ui.css` the workbench and sheet sizes share one rule
    block, `overflow: visible` included; the clipping change splits it, so sheets are not clipped.
+
+## Amendment — 2026-11-15 — Tonal is a variant
+
+The CA's direction. It supersedes the marked passages in Target design, Governing documents to
+amend, and the "After ACE scoping" amendment's item 1. Existing card and panel defaults are
+unchanged.
+
+1. **`UiCard` gains a variant with a tone.** Tonal is a kind of card, not a kind of elevation:
+   `variant='tonal'` with `tone='light' | 'dark'`. Tone applies only to the tonal variant; elevation
+   applies only to the existing cards. `UiCardElevation` is unchanged. The props enforce this as
+   alternatives, as `UiBadge`'s props require `color` exactly when `variant='color'`.
+
+   ```ts
+   <UiCard elevation='raised'>…</UiCard>             // existing cards, as today
+   <UiCard variant='tonal' tone='light'>…</UiCard>   // Aside
+   <UiCard variant='tonal' tone='dark'>…</UiCard>    // Main
+   ```
+
+2. **Panel opt-in and forwarding.** `PanelList`, `PanelForm`, and `PanelStepflow` gain the optional
+   `variant` and `tone`, passed to their `UiCard`; without them a panel is `elevation='raised'` as
+   today. `CollectionTable` forwards both to `PanelList`. Manager and Wizard pass `variant='tonal'`
+   with `tone='light'` for the Aside and `tone='dark'` for Main. Lister and retrieval pass nothing.
+3. **Governing documents.**
+   - **ux-design-language:** defines the tonal variant; its two tones, light and dark, each owned
+     by the theme; and its treatment: borderless, shadowless, square-cornered. It keeps the
+     principle "frame the window; divide its contents."
+   - **ux-components-guide:** documents `UiCard`'s `variant` and `tone` props. Tone applies only to
+     tonal; elevation applies to the existing cards. Examples show both tonal tones.
 
 _End of Brief_
