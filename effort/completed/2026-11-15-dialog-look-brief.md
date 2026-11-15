@@ -1,9 +1,10 @@
 # Dialog Look — Brief
 
-**Active, dispatched for ACE review 2026-11-15** (B-50); amended after that review. Recorded 2026-11-15 from a CA + AI Architect exploration
-session, after the CA reviewed the Workflow Builder mockups (held on the CA's mockup canvas). The
-workbench dialog's panes become tonal regions flush to the dialog; how panels work does not change.
-Foundation mode: `ux/ui` and `ux/shell` are locked. The CA has ACE review it before deciding.
+**Completed 2026-11-15.** Shipped in `0c724e2` and closed at the CA's direction after the CA's review on
+screen; see "Closure" at the end. Backlog B-50, now removed. Foundation mode: `ux/ui` and
+`ux/shell` are locked; the CA approved the change. The workbench dialog's panes are tonal cards,
+attached at a square seam inside the padded dialog; how panels work did not change. Records hold
+the reasons, and seven amendments the turns.
 
 ## Escalation: `ux/ui`, `ux/shell` (requested)
 
@@ -299,5 +300,27 @@ cards square-cornered, and the "Rounded pair" amendment's clipping.
 5. **Documentation** says the same: ux-design-language §4.6 (rounded like any card; attached
    regions square their shared seam) and ux-components-guide §4.4's Variant table, amended by the
    AI Architect.
+
+## Closure — 2026-11-15
+
+The CA directed closure after reviewing the Manager, the Wizard, and the style guide on screen.
+
+**Shipped** (`0c724e2`). `UiCard`'s `variant='tonal-light' | 'tonal-dark'`, the alternative to
+`elevation`, with per-theme `--sa-card-tonal-*` tokens: a filled tone, the card radius, no border,
+no shadow. `PanelList`, `PanelForm`, and `PanelStepflow` take the variant, raised without it;
+`CollectionTable` forwards it. Manager and Wizard attach the light Aside and dark Main with no
+column gap and a square seam while both panes show, inside the dialog's pad. The collapse threshold
+is 660px in both workbenches. Lister, retrieval, and other dialogs are unchanged. The design
+language (§4.6 Surfaces), the components guide, and the internals catalog document it.
+
+**Departures, settled by the CA during production,** each recorded in its amendment: the dialog
+pad restored; the attached pair rounded, then the cards rounded like the others with only the seam
+square; the tone folded into the variant value.
+
+**Settled on closing.**
+
+- **The flat draft's other points** (Cancel beside Save, a filled primary action, list rows with
+  badges, pane eyebrows, fieldsets as sections, a quiet table head): dropped with P-16.
+- **The selected row:** stays with B-5.
 
 _End of Brief_

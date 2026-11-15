@@ -636,12 +636,6 @@ state.
 
 **Picking this up:** with the next `ux/shell` change.
 
-### B-50 · Workbench panes are framed cards inside a framed dialog
-
-**Observed:** 2026-11-15 · normal
-
-Design record: [Dialog Look — Brief](../active/2026-11-15-dialog-look-brief.md).
-
 ## Document Storage
 
 ### B-42 · Unreferenced documents are never swept
