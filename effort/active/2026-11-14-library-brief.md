@@ -118,9 +118,9 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent
 ```
 
 - **Launchers.** One row of `UiActionButton`s with visible labels, at the top of the content, in
-  the order Asset Types, Assets, Chemicals, Services, each with the icon it has in the
-  Administration menu today. Each calls `redirect` from `useShellNavigate()` with its manager's
-  route.
+  the order Asset Types, Assets, Chemicals, Services, with the icons `layers`, `cube`, `opacity`,
+  and `target`, chosen by the CA. Each calls `redirect` from `useShellNavigate()` with its
+  manager's route.
 - **Documents.** Activating a document opens it in a secondary window through
   `UiWindow.openResolved` and `api.Attachments.link`, with the message
   "Allow a secondary window to open this document." The sheet stays open.
