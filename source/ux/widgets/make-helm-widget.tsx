@@ -27,6 +27,7 @@ import type { Dictionary } from '@core/std'
 import { createEffect, createMemo, createSignal, For, untrack } from '@solid-js'
 import type { WidgetComponent } from '@ux/shell/dashboard/widget-contract.ts'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
+import { ThemeState } from '@ux/shell/runtime/theme-state.ts'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
 import { UiActionButton, UiLayout, UiPopover, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
@@ -51,7 +52,6 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
   props: { settings: Dictionary }
 ): UiComponent => {
   const navigate = useShellNavigate()
-  const [theme, setTheme] = createSignal(document.documentElement.dataset.theme ?? '')
   let navigation!: HTMLElement
   const [open, setOpen] = createSignal<HelmToolbarItem | undefined>()
   const changeOpen = (surface: HelmToolbarItem, value: boolean): void => {
@@ -89,11 +89,11 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
   const disabled = (action: HelmCommand) => bindings.commands?.[action.command]?.disabled?.() ?? false
   const themeIcon = (name: string): string =>
     name === 'dark' ? 'moon' : name === 'light' ? 'sun' : 'color-wheel'
-  const icon = (action: HelmCommand) => action.command === '@theme' ? themeIcon(theme()) : action.icon
-  const chooseTheme = (name: string): void => {
+  const icon = (action: HelmCommand) =>
+    action.command === '@theme' ? themeIcon(ThemeState.store.theme) : action.icon
+  const chooseTheme = async (name: string): Promise<void> => {
     setOpen(undefined)
-    document.documentElement.dataset.theme = name
-    setTheme(name)
+    await ThemeState.choose(name)
   }
   const execute = (action: HelmCommand): void => {
     if (disabled(action)) return

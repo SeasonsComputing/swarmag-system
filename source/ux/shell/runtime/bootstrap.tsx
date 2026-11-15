@@ -25,6 +25,7 @@ import { createRouter, RouterProvider } from '@tanstack/solid-router'
 import { AppState } from './app-state.ts'
 import { compileApplicationRoutes } from './shell-compiler.tsx'
 import type { ShellApplication } from './shell.ts'
+import { ThemeState } from './theme-state.ts'
 
 import '@ux/css'
 
@@ -48,6 +49,7 @@ export async function bootstrap(
 
     // application runtime singleton
     const ApplicationRuntime = () => {
+      ThemeState.init()
       onMount(() => {
         showApplication()
         application.session.init()
