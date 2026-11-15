@@ -1,0 +1,16 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel sections styles                                                        ║
+║ Spacing and a separating rule between direct panel sections.                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-shell-panel='sections'] {
+  display: grid;
+  gap: var(--sa-rhythm-gap);
+}
+
+[data-shell-panel='sections'] > :not(:last-child) {
+  border-block-end: var(--sa-border-default);
+  padding-block-end: calc(var(--sa-rhythm-gap) * 1.5);
+}

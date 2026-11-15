@@ -24,6 +24,7 @@ import type { Attachment } from '@domain/abstractions/common.ts'
 import { NotesEditor } from '@front/app/shell/notes/notes-editor.tsx'
 import { onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -55,8 +56,8 @@ export const AssetStepDetail = (props: AssetStepDetailProps): UiComponent => {
       context={props.context}
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
-          <UiLayout>
-            <UiFieldset legend='Asset information'>
+          <PanelSections>
+            <UiFieldset variant='unframed' legend='Asset information'>
               <UiLayout>
                 <UiField for='label' label='Label' required>
                   <UiInput
@@ -122,7 +123,7 @@ export const AssetStepDetail = (props: AssetStepDetailProps): UiComponent => {
               onChange={state.setNotes}
               drill={drill}
             />
-          </UiLayout>
+          </PanelSections>
         </form>
       )}
     />

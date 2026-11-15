@@ -24,6 +24,7 @@ import type { ServiceCategory } from '@domain/abstractions/service.ts'
 import { NotesEditor } from '@front/app/shell/notes/notes-editor.tsx'
 import { onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -65,8 +66,8 @@ export const ServiceStepDetail = (props: ServiceStepDetailProps): UiComponent =>
       context={props.context}
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
-          <UiLayout>
-            <UiFieldset legend='Service information'>
+          <PanelSections>
+            <UiFieldset variant='unframed' legend='Service information'>
               <UiLayout>
                 <UiField for='name' label='Name' required>
                   <UiInput
@@ -135,7 +136,7 @@ export const ServiceStepDetail = (props: ServiceStepDetailProps): UiComponent =>
               onChange={state.setNotes}
               drill={drill}
             />
-          </UiLayout>
+          </PanelSections>
         </form>
       )}
     />

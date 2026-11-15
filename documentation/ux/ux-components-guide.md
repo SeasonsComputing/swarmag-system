@@ -1002,10 +1002,10 @@ Without `variant`, a card is framed, as before.
 Tonal cards divide a framed surface into regions, such as the two panes of a workbench:
 
 ```tsx
-<UiCard variant='tonal-light'>
+<UiCard variant='tonal-dark'>
   <h3>Users</h3>
 </UiCard>
-<UiCard variant='tonal-dark'>
+<UiCard variant='tonal-light'>
   <h3>New User</h3>
 </UiCard>
 ```

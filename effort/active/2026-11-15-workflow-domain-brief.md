@@ -50,13 +50,13 @@ For a Question whose only answer is a photo.
 
 In `front/api/api.ts`, one per abstraction, beside the others:
 
-| Client          | Kind               | Owner        | Partner      |
-| --------------- | ------------------ | ------------ | ------------ |
-| `Workflows`     | CRUD               |              |              |
-| `Tasks`         | CRUD               |              |              |
-| `Questions`     | CRUD               |              |              |
-| `WorkflowTasks` | ordered junction   | `workflowId` | `taskId`     |
-| `TaskQuestions` | ordered junction   | `taskId`     | `questionId` |
+| Client          | Kind             | Owner        | Partner      |
+| --------------- | ---------------- | ------------ | ------------ |
+| `Workflows`     | CRUD             |              |              |
+| `Tasks`         | CRUD             |              |              |
+| `Questions`     | CRUD             |              |              |
+| `WorkflowTasks` | ordered junction | `workflowId` | `taskId`     |
+| `TaskQuestions` | ordered junction | `taskId`     | `questionId` |
 
 The ordered junction is B-36 as designed: a `sequence` field in the specification makes `partners`
 return in order and `replace` write `sequence`, and `JunctionValidator<J>` gains `validateUpdate`.
@@ -80,15 +80,15 @@ Amended first, since documentation leads code:
 
 Paths are under `source/`.
 
-| Files                                                         | Work                                         |
-| ------------------------------------------------------------- | -------------------------------------------- |
-| `domain/abstractions/workflow.ts`                             | `photo`, `PhotoQuestion`, string `version`   |
-| `domain/adapters/workflow-adapter.ts`                         | as the types require                         |
-| `domain/validators/workflow-validator.ts`                     | `photo`; `major.minor` version               |
-| `domain/schema/schema.sql`                                    | type check, `version TEXT`, `UPDATE` policies |
-| `core/cli/make-supabase-client.ts`, `core/stdx` contract      | ordered junction variant (B-36)              |
-| `front/api/api.ts`                                            | the five clients                             |
-| `tests/cases/…`                                               | validator, adapter, ordered junction         |
+| Files                                                    | Work                                          |
+| -------------------------------------------------------- | --------------------------------------------- |
+| `domain/abstractions/workflow.ts`                        | `photo`, `PhotoQuestion`, string `version`    |
+| `domain/adapters/workflow-adapter.ts`                    | as the types require                          |
+| `domain/validators/workflow-validator.ts`                | `photo`; `major.minor` version                |
+| `domain/schema/schema.sql`                               | type check, `version TEXT`, `UPDATE` policies |
+| `core/cli/make-supabase-client.ts`, `core/stdx` contract | ordered junction variant (B-36)               |
+| `front/api/api.ts`                                       | the five clients                              |
+| `tests/cases/…`                                          | validator, adapter, ordered junction          |
 
 Out of scope:
 

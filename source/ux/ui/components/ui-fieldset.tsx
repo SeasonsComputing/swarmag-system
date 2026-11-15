@@ -17,7 +17,8 @@ UiFieldset       Semantic field group wrapper with named legend.
 COMPONENT PROPERTIES
 ───────────────────────────────────────────────────────────────────────────────
 UiFieldsetProps  UiFieldset props; extends UiContainerProps.
-└ legend         Field group legend.
+├ legend         Field group legend.
+└ variant        Framed by default; unframed opts out of the bordered surface.
 */
 
 import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
@@ -26,11 +27,12 @@ import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
 export type UiFieldsetProps = UiContainerProps & {
   /** Text content of the group legend — names the group, never wraps controls. */
   legend: string
+  variant?: 'unframed'
 }
 
 /** Semantic field group with legend. Compose UiLayout inside for child layout. */
 export const UiFieldset = (props: UiFieldsetProps): UiComponent => (
-  <fieldset data-ui='fieldset'>
+  <fieldset data-ui='fieldset' data-ui-variant={props.variant}>
     <legend>{props.legend}</legend>
     {props.children}
   </fieldset>

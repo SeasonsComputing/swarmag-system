@@ -308,7 +308,7 @@ export const Manager = <T extends Instance, Draft>(
     )
     return (
       <PanelForm
-        variant='tonal-dark'
+        variant='tonal-light'
         feedback={editorFeedback()}
         header={
           <>
@@ -344,7 +344,7 @@ export const Manager = <T extends Instance, Draft>(
         }
         aside={
           <CollectionTable
-            variant='tonal-light'
+            variant='tonal-dark'
             provider={props.provider}
             activate={onSelect}
             error={collectionError()}

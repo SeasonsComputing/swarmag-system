@@ -185,7 +185,7 @@ export const StyleGuide = (): UiComponent => {
       <SgMain>
         <UiLayout gap='loose'>
           <SgSection title='Typography'>
-            <UiFieldset legend='Typefaces'>
+            <UiFieldset variant='unframed' legend='Typefaces'>
               <UiTable>
                 <UiTableHeader>
                   <UiTableCell>Role</UiTableCell>
@@ -246,14 +246,14 @@ export const StyleGuide = (): UiComponent => {
                 </UiTableBody>
               </UiTable>
             </UiFieldset>
-            <UiFieldset legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
+            <UiFieldset variant='unframed' legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
               <h1>H1 Operations Command</h1>
               <h2>H2 Field Service Planning</h2>
               <h3>H3 Aerial Application Window</h3>
               <h4>H4 Ground Crew Assignment</h4>
               <h5>H5 Chemical Label Review</h5>
             </UiFieldset>
-            <UiFieldset legend='<body>, <p>, <blockquote>'>
+            <UiFieldset variant='unframed' legend='<body>, <p>, <blockquote>'>
               <p>
                 Body copy should inherit the product typography without local component styling. Weather,
                 acreage, crew availability, and service windows remain scannable.
@@ -262,7 +262,7 @@ export const StyleGuide = (): UiComponent => {
                 Service logs are records of field reality and must remain clear, durable, and auditable.
               </blockquote>
             </UiFieldset>
-            <UiFieldset legend='<code>, <kbd>, <samp>, <pre>'>
+            <UiFieldset variant='unframed' legend='<code>, <kbd>, <samp>, <pre>'>
               <p>
                 Inline code sample: <code>service.category === 'aerial-drone-services'</code>
               </p>
@@ -278,7 +278,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='HTML'>
-            <UiFieldset legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
+            <UiFieldset variant='unframed' legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
               <UiField
                 label='UiTable, UiTableHeader, UiTableBody, UiTableRow, UiTableCell, UiTableSection'
                 variant='caption'
@@ -318,7 +318,7 @@ export const StyleGuide = (): UiComponent => {
                 </UiTable>
               </UiField>
             </UiFieldset>
-            <UiFieldset legend='<ul>, <ol>, <li>'>
+            <UiFieldset variant='unframed' legend='<ul>, <ol>, <li>'>
               <UiLayout variant='inline-wrap'>
                 <UiField label='UiList (default)' variant='caption'>
                   <UiList>
@@ -345,7 +345,7 @@ export const StyleGuide = (): UiComponent => {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='<input>, <textarea>, <select>, <option>'>
+            <UiFieldset variant='unframed' legend='<input>, <textarea>, <select>, <option>'>
               <UiLayout variant='inline-wrap'>
                 <UiField label='UiInput' for='field-name-1'>
                   <UiInput
@@ -390,7 +390,7 @@ export const StyleGuide = (): UiComponent => {
             <UiLayout>
               <For each={COLOR_SWATCHES}>
                 {s => (
-                  <UiFieldset legend={s.legend}>
+                  <UiFieldset variant='unframed' legend={s.legend}>
                     <UiLayout variant='inline-wrap' data-app='style-guide-color-swatches'>
                       <For each={s.colors}>
                         {c => <SgSwatch value={c.value} label={c.label} token={c.token} />}
@@ -400,14 +400,14 @@ export const StyleGuide = (): UiComponent => {
                 )}
               </For>
             </UiLayout>
-            <UiFieldset legend='Gradients'>
+            <UiFieldset variant='unframed' legend='Gradients'>
               <UiLayout variant='inline-wrap' data-app='style-guide-color-gradients'>
                 <For each={COLOR_GRADIENTS}>
                   {g => <SgGradient value={g.value} label={g.label} token={g.token} />}
                 </For>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='Text'>
+            <UiFieldset variant='unframed' legend='Text'>
               <UiLayout variant='inline-wrap' data-app='style-guide-color-text'>
                 <For each={TEXT_TOKENS}>
                   {t => (
@@ -423,14 +423,14 @@ export const StyleGuide = (): UiComponent => {
           <SgSection title='Decorations'>
             <UiLayout>
               <UiLayout variant='inline-fill'>
-                <UiFieldset legend='UiAvatar'>
+                <UiFieldset variant='unframed' legend='UiAvatar'>
                   <UiAvatar>AG</UiAvatar>
                 </UiFieldset>
-                <UiFieldset legend='UiSpinner'>
+                <UiFieldset variant='unframed' legend='UiSpinner'>
                   <UiSpinner />
                 </UiFieldset>
               </UiLayout>
-              <UiFieldset legend='UiSeparator'>
+              <UiFieldset variant='unframed' legend='UiSeparator'>
                 <UiSeparator />
               </UiFieldset>
             </UiLayout>
@@ -446,14 +446,14 @@ export const StyleGuide = (): UiComponent => {
                 Loading
               </UiToggle>
             </UiField>
-            <UiFieldset legend='Variants'>
+            <UiFieldset variant='unframed' legend='Variants'>
               <UiLayout variant='cluster-wrap'>
                 <For each={BUTTON_VARIANTS}>
                   {b => <UiButton variant={b.variant}>{b.label}</UiButton>}
                 </For>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='Disabled and loading'>
+            <UiFieldset variant='unframed' legend='Disabled and loading'>
               <UiLayout variant='inline-fit'>
                 <UiButton disabled>Disabled</UiButton>
                 <UiButton variant='primary' loading={loading()}>Loading</UiButton>
@@ -471,7 +471,7 @@ export const StyleGuide = (): UiComponent => {
                 Error
               </UiToggle>
             </UiField>
-            <UiFieldset legend='Enabled'>
+            <UiFieldset variant='unframed' legend='Enabled'>
               <UiLayout variant='inline-wrap'>
                 <UiField label='Field name' for='field-name-2'>
                   <UiInput
@@ -494,7 +494,7 @@ export const StyleGuide = (): UiComponent => {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='Disabled'>
+            <UiFieldset variant='unframed' legend='Disabled'>
               <UiLayout variant='inline-wrap'>
                 <UiField label='Disabled acreage' for='disabled-acreage'>
                   <UiInput
@@ -575,14 +575,14 @@ export const StyleGuide = (): UiComponent => {
                 </UiLayout>
               </UiFieldset>
             </form>
-            <UiFieldset legend='Multi-select'>
+            <UiFieldset variant='unframed' legend='Multi-select'>
               <UiMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
             </UiFieldset>
           </SgSection>
 
           <SgSection title='UiField / UiFieldset / UiFormActions'>
             <UiLayout>
-              <UiFieldset legend='Service details'>
+              <UiFieldset variant='unframed' legend='Service details'>
                 <UiLayout variant='inline-wrap'>
                   <UiField label='Field name' for='form-demo-name'>
                     <UiInput name='form-demo-name' value='North Field' onInput={() => undefined} />
@@ -611,46 +611,69 @@ export const StyleGuide = (): UiComponent => {
             </UiLayout>
           </SgSection>
 
+          <SgSection title='UiFieldset — unframed variant'>
+            <UiLayout>
+              <UiFieldset variant='unframed' legend='Service details'>
+                <UiField label='Field name' for='section-demo-name'>
+                  <UiInput name='section-demo-name' value='North Field' onInput={() => undefined} />
+                </UiField>
+              </UiFieldset>
+              <UiFieldset variant='unframed' legend='Notes'>
+                <UiField label='Field notes' for='section-demo-notes'>
+                  <UiTextArea
+                    name='section-demo-notes'
+                    value='Spray window 06:00–09:00.'
+                    onInput={() => undefined}
+                    rows={3}
+                  />
+                </UiField>
+              </UiFieldset>
+            </UiLayout>
+          </SgSection>
+
           <SgSection title='UiCollectionCursor'>
             <label>Navbar bare — renderNav omitted</label>
-            <UiCollectionCursor
-              items={collectionItems()}
-              onItemsChange={setCollectionItems}
-              newItem={newCollectionItem}
-              empty={{ icon: 'home', message: 'No service blocks in this sample.' }}
-              confirmDelete={item => ({
-                title: item.label.trim() ? `Delete ${item.label}?` : 'Delete this item?',
-                message: 'This item will be removed from the local style-guide sample.'
-              })}
-              renderItem={(item, index) => (
-                <UiLayout>
-                  <UiField label='Block name' for={`collection-cursor-label-${index}`}>
-                    <UiInput
-                      name={`collection-cursor-label-${index}`}
-                      value={item.label}
-                      onInput={event =>
-                        updateCollectionItem(index, { label: event.currentTarget.value })}
-                    />
-                  </UiField>
-                  <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
-                    <UiInput
-                      name={`collection-cursor-acreage-${index}`}
-                      value={item.acreage}
-                      onInput={event =>
-                        updateCollectionItem(index, { acreage: event.currentTarget.value })}
-                    />
-                  </UiField>
-                  <UiField label='Note' for={`collection-cursor-note-${index}`}>
-                    <UiInput
-                      name={`collection-cursor-note-${index}`}
-                      value={item.note}
-                      onInput={event => updateCollectionItem(index, { note: event.currentTarget.value })}
-                    />
-                  </UiField>
-                </UiLayout>
-              )}
-            />
-            <UiSeparator />
+            <UiFieldset legend='Service blocks'>
+              <UiCollectionCursor
+                items={collectionItems()}
+                onItemsChange={setCollectionItems}
+                newItem={newCollectionItem}
+                empty={{ icon: 'home', message: 'No service blocks in this sample.' }}
+                confirmDelete={item => ({
+                  title: item.label.trim() ? `Delete ${item.label}?` : 'Delete this item?',
+                  message: 'This item will be removed from the local style-guide sample.'
+                })}
+                renderItem={(item, index) => (
+                  <UiLayout>
+                    <UiField label='Block name' for={`collection-cursor-label-${index}`}>
+                      <UiInput
+                        name={`collection-cursor-label-${index}`}
+                        value={item.label}
+                        onInput={event =>
+                          updateCollectionItem(index, { label: event.currentTarget.value })}
+                      />
+                    </UiField>
+                    <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
+                      <UiInput
+                        name={`collection-cursor-acreage-${index}`}
+                        value={item.acreage}
+                        onInput={event =>
+                          updateCollectionItem(index, { acreage: event.currentTarget.value })}
+                      />
+                    </UiField>
+                    <UiField label='Note' for={`collection-cursor-note-${index}`}>
+                      <UiInput
+                        name={`collection-cursor-note-${index}`}
+                        value={item.note}
+                        onInput={event =>
+                          updateCollectionItem(index, { note: event.currentTarget.value })}
+                      />
+                    </UiField>
+                  </UiLayout>
+                )}
+              />
+            </UiFieldset>
+
             <label>Navbar wrapped in UiCard — renderNav supplied</label>
             <UiFieldset legend='Service blocks'>
               <UiCollectionCursor
@@ -671,7 +694,7 @@ export const StyleGuide = (): UiComponent => {
                 )}
               />
             </UiFieldset>
-            <UiSeparator />
+
             <label>Navbar bare — renderNav omitted</label>
             <UiFieldset legend='Service blocks'>
               <UiCollectionCursor
@@ -790,7 +813,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiProgress'>
-            <UiFieldset legend='Progress Indicators'>
+            <UiFieldset variant='unframed' legend='Progress Indicators'>
               <UiLayout>
                 <UiProgress value={0} />
                 <UiProgress value={35} />
@@ -801,7 +824,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiSkeleton'>
-            <UiFieldset legend='Loading Indicators'>
+            <UiFieldset variant='unframed' legend='Loading Indicators'>
               <UiLayout>
                 <UiSkeleton />
                 <div data-app='style-guide-skeleton' data-app-width='three-quarters'>
@@ -815,7 +838,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiBadge'>
-            <UiFieldset legend='Variants'>
+            <UiFieldset variant='unframed' legend='Variants'>
               <UiLayout variant='cluster-wrap'>
                 <UiBadge>Pending</UiBadge>
                 <UiBadge variant='success'>Field ready</UiBadge>
@@ -827,7 +850,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiAlert'>
-            <UiFieldset legend='Variants'>
+            <UiFieldset variant='unframed' legend='Variants'>
               <UiLayout>
                 <UiAlert>Service record updated by dispatch.</UiAlert>
                 <UiAlert variant='success'>North Field completed and ready for customer review.</UiAlert>
@@ -840,14 +863,14 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='Secondary Windows'>
             <UiLayout variant='inline-wrap'>
-              <UiFieldset legend='UiTooltip'>
+              <UiFieldset variant='unframed' legend='UiTooltip'>
                 <UiLayout variant='inline-fit'>
                   <UiTooltip trigger='Hover field note' defaultOpen>
                     Verify buffer zone before aerial application.
                   </UiTooltip>
                 </UiLayout>
               </UiFieldset>
-              <UiFieldset legend='UiDialog'>
+              <UiFieldset variant='unframed' legend='UiDialog'>
                 <UiLayout variant='inline-fit'>
                   <UiDialog trigger='Open dispatch dialog'>
                     <UiLayout>
@@ -856,7 +879,7 @@ export const StyleGuide = (): UiComponent => {
                   </UiDialog>
                 </UiLayout>
               </UiFieldset>
-              <UiFieldset legend='UiPopover'>
+              <UiFieldset variant='unframed' legend='UiPopover'>
                 <UiLayout variant='inline-fit'>
                   <UiPopover trigger='About swarmAg'>
                     <UiCard>
@@ -936,32 +959,40 @@ export const StyleGuide = (): UiComponent => {
                 </UiLayout>
               </UiCard>
               <UiCard variant='tonal-light'>
-                <h3>Light tonal card</h3>
-                <p>The lighter region of a shared surface.</p>
+                <UiLayout>
+                  <h3>Light tonal card</h3>
+                  <p>
+                    The lighter region of a shared surface.
+                  </p>
+                </UiLayout>
               </UiCard>
               <UiCard variant='tonal-dark'>
-                <h3>Dark tonal card</h3>
-                <p>The darker region of a shared surface.</p>
+                <UiLayout>
+                  <h3>Dark tonal card</h3>
+                  <p>
+                    The darker region of a shared surface.
+                  </p>
+                </UiLayout>
               </UiCard>
             </UiLayout>
           </SgSection>
 
           <SgSection title='UiLayout'>
             <UiLayout variant='inline-wrap'>
-              <UiFieldset legend='Stack (default)'>
+              <UiFieldset variant='unframed' legend='Stack (default)'>
                 <UiLayout>
                   <UiAlert>North Field spray window confirmed.</UiAlert>
                   <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
                   <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
                 </UiLayout>
               </UiFieldset>
-              <UiFieldset legend='Stack (block-fill)'>
+              <UiFieldset variant='unframed' legend='Stack (block-fill)'>
                 <UiLayout variant='block-fill'>
                   <UiAlert>North Field spray window confirmed.</UiAlert>
                   <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
                 </UiLayout>
               </UiFieldset>
-              <UiFieldset legend='Stack (block-fit)'>
+              <UiFieldset variant='unframed' legend='Stack (block-fit)'>
                 <UiLayout variant='block-fit'>
                   <UiBadge>Pending</UiBadge>
                   <UiBadge variant='success'>Field ready</UiBadge>
@@ -969,13 +1000,13 @@ export const StyleGuide = (): UiComponent => {
                 </UiLayout>
               </UiFieldset>
             </UiLayout>
-            <UiFieldset legend='Row (inline-fit)'>
+            <UiFieldset variant='unframed' legend='Row (inline-fit)'>
               <UiLayout variant='inline-fit'>
                 <UiButton>Cancel</UiButton>
                 <UiButton variant='primary'>Confirm dispatch</UiButton>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='Row (inline-fill)'>
+            <UiFieldset variant='unframed' legend='Row (inline-fill)'>
               <UiLayout variant='inline-fill'>
                 <UiButton>Aerial</UiButton>
                 <UiButton>Ground</UiButton>
@@ -984,7 +1015,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiChart'>
-            <UiFieldset legend='Variants'>
+            <UiFieldset variant='unframed' legend='Variants'>
               <UiField label='pie' variant='caption'>
                 <UiSkeleton />
               </UiField>

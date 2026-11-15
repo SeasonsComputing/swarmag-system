@@ -24,6 +24,7 @@ import type { UserRole, UserStatus } from '@domain/abstractions/user.ts'
 import { NotesEditor } from '@front/app/shell/notes/notes-editor.tsx'
 import { For, onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormFeedback } from '@ux/shell/workbench/use-form-feedback.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
@@ -106,8 +107,8 @@ export function UserStepDetail(props: {
       context={props.context}
       root={drill => (
         <form id='abstraction-panel-form' ref={formRef} onSubmit={submit}>
-          <UiLayout>
-            <UiFieldset legend='Identity'>
+          <PanelSections>
+            <UiFieldset variant='unframed' legend='Identity'>
               <UiLayout>
                 <UiField for='displayName' label='Name' required>
                   <UiInput
@@ -155,7 +156,7 @@ export function UserStepDetail(props: {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='Contact Preferences'>
+            <UiFieldset variant='unframed' legend='Contact Preferences'>
               <UiLayout>
                 <UiField for='preferredChannel' label='Preferred Channel'>
                   <UiSingleSelect
@@ -169,7 +170,7 @@ export function UserStepDetail(props: {
               </UiLayout>
             </UiFieldset>
             <NotesEditor attach={props.attach} notes={notes} onChange={setNotes} drill={drill} />
-            <UiFieldset legend='Access'>
+            <UiFieldset variant='unframed' legend='Access'>
               <UiLayout>
                 <UiField variant='caption' label='Roles' required>
                   <UiMultiSelect
@@ -201,7 +202,7 @@ export function UserStepDetail(props: {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-          </UiLayout>
+          </PanelSections>
         </form>
       )}
     />

@@ -24,6 +24,7 @@ import { NotesEditor } from '@front/app/shell/notes/notes-editor.tsx'
 import { UserPicker } from '@front/app/shell/retrieval/user-picker.tsx'
 import { For, onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -57,8 +58,8 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
       context={props.context}
       root={drill => (
         <form ref={formRef} onSubmit={event => event.preventDefault()}>
-          <UiLayout data-app='customer-step-detail'>
-            <UiFieldset legend='Customer Information'>
+          <PanelSections>
+            <UiFieldset variant='unframed' legend='Customer Information'>
               <UiLayout>
                 <UiField for='name' label='Name' required>
                   <UiInput
@@ -86,7 +87,7 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <UiFieldset legend='Account'>
+            <UiFieldset variant='unframed' legend='Account'>
               <UiField for='account-manager' label='Manager'>
                 <div data-app='customer-account-manager'>
                   <UserPicker
@@ -105,7 +106,7 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
               onChange={state.setNotes}
               drill={drill}
             />
-          </UiLayout>
+          </PanelSections>
         </form>
       )}
     />

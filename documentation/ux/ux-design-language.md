@@ -334,8 +334,8 @@ tone, not framed again, so the eye reads the content before the structure.
 
 The `tonal-light` and `tonal-dark` variants select the lighter and darker surface tones. Each theme
 owns both values, as `--sa-card-*` tokens, so adjacent regions remain distinct in light and dark
-themes alike. Where a window holds an Aside and a Main, the Aside takes the light tone and Main the
-dark, and the two attach: the corners at their shared seam are square, so the pair reads as one
+themes alike. Where a window holds an Aside and a Main, the Aside takes the dark tone and Main the
+light, and the two attach: the corners at their shared seam are square, so the pair reads as one
 rounded surface divided by tone.
 
 ## 5. Geometry, Layout, And Motion

@@ -89,13 +89,13 @@ Amended first, since documentation leads code:
 
 Paths are under `source/`.
 
-| Files                                                     | Work                                     |
-| --------------------------------------------------------- | ---------------------------------------- |
-| `ux/shell/runtime/shell.ts`, `shell-compiler.tsx`, `shell-makers.tsx` | the feature route               |
-| `ux/shell/dashboard/*`                                    | the frame a feature takes over           |
-| `ux/widgets/*` (Brand, Helm)                              | show the feature's brand and toolbar     |
-| `ux/shell/workbench/manager.tsx`, its contract            | `pick`                                   |
-| `tests/cases/…`                                           | takeover and exit; Manager pick          |
+| Files                                                                 | Work                                 |
+| --------------------------------------------------------------------- | ------------------------------------ |
+| `ux/shell/runtime/shell.ts`, `shell-compiler.tsx`, `shell-makers.tsx` | the feature route                    |
+| `ux/shell/dashboard/*`                                                | the frame a feature takes over       |
+| `ux/widgets/*` (Brand, Helm)                                          | show the feature's brand and toolbar |
+| `ux/shell/workbench/manager.tsx`, its contract                        | `pick`                               |
+| `tests/cases/…`                                                       | takeover and exit; Manager pick      |
 
 Out of scope:
 

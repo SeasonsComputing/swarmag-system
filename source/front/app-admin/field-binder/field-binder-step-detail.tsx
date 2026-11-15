@@ -31,6 +31,7 @@ import type { FieldBinderUploadSource } from '@front/api/field-binder-inventory.
 import { UploadTask } from '@front/api/upload-task.ts'
 import { UrlField } from '@front/app/shell/retrieval/url-field.tsx'
 import { onCleanup, Show } from '@solid-js'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
@@ -118,8 +119,8 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
   )
   return (
     <form ref={form} inert={props.context.busy()} onSubmit={event => event.preventDefault()}>
-      <UiLayout>
-        <UiFieldset legend='Source'>
+      <PanelSections>
+        <UiFieldset variant='unframed' legend='Source'>
           <UiLayout>
             <Show
               when={state.adding}
@@ -181,7 +182,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
             </Show>
           </UiLayout>
         </UiFieldset>
-        <UiFieldset legend='Document'>
+        <UiFieldset variant='unframed' legend='Document'>
           <UiLayout>
             <UiField for='name' label='Name' required={state.delivered}>
               <UiInput
@@ -214,7 +215,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
             </UiField>
           </UiLayout>
         </UiFieldset>
-      </UiLayout>
+      </PanelSections>
     </form>
   )
 }

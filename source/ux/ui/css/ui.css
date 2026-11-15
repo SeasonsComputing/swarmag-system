@@ -1549,9 +1549,9 @@
 }
 
 [data-ui='fieldset'] {
+  background: var(--sa-fieldset-bg);
   border: var(--sa-fieldset-border);
   border-radius: var(--sa-radius-sm);
-  background: var(--sa-fieldset-bg);
   box-shadow: var(--sa-fieldset-shadow);
   display: grid;
   gap: var(--sa-rhythm-gap);
@@ -1563,6 +1563,21 @@
   font-family: var(--sa-annotation-font-family);
   font-size: var(--sa-annotation-font-size);
   font-weight: var(--sa-annotation-font-weight);
+}
+
+[data-ui='fieldset'][data-ui-variant='unframed'] {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+[data-ui='fieldset'][data-ui-variant='unframed'] > legend {
+  font-size: var(--sa-font-size-xs);
+  letter-spacing: 0.04em;
+  padding-block-end: var(--sa-space-sm);
+  text-transform: uppercase;
 }
 
 [data-ui='form-actions'] {
