@@ -1,7 +1,7 @@
 # Library — Brief
 
-**Active 2026-11-14. Dispatched to ACE 2026-11-14.** Not on the roadmap: chosen directly at the CA's
-direction. Feature mode inside established architecture; no locked namespace changes. It builds
+**Completed 2026-11-14.** Shipped in `217b724`. Closed at the CA's direction after on-screen
+acceptance; see "Closure" at the end. Not on the roadmap: chosen directly at the CA's direction. Feature mode inside established architecture; no locked namespace changes. It builds
 into the tree the Shell Namespaces brief established (`608a3a4`).
 The documents are already amended (Governing documents).
 
@@ -267,5 +267,35 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
    danger `UiAlert`; the sheet stays open.
 3. **`LibraryLevels` imports `UiText` from `ui-helpers.ts`,** not the `@ux/ui` barrel, so the
    module and its unit test carry no JSX. If `guard:imports` rejects the path, fix it in scope.
+
+## Closure — 2026-11-14
+
+The CA directed closure after reviewing the Library on screen.
+
+**Shipped** (`217b724`). The Drill family and `LibraryLevels` in `front/app/shell/retrieval/`, with
+the drill mark drawn by `UiIcon`; `LibraryDialog` at `/library`, opened from the Helm, with the four
+catalog launchers above Documents; `FieldBinderLibraryDialog` and `FieldBinderChemicalDialog` on
+`DrillDialog`; the Administration menu without the catalog managers; `library-levels-test.ts`. The
+amendment "At scope review" shipped as written, and `guard:imports` accepted the direct
+`ui-helpers.ts` import.
+
+**Departures, settled by the CA during production.**
+
+- **The launchers are dense,** as interior actions are. Inside a screen, action buttons are dense;
+  an action that belongs to a field, or a screen's primary actions with nothing above them, stay
+  standard.
+- **Asset Types stays in the Library.** The CA briefly moved it to the Administration menu because
+  it rarely changes, then returned it: placement follows ownership, and Asset Types belongs to the
+  catalog with the others.
+- **Rode along in the same commit:** the attachment row actions and the Tasks Dismiss became dense;
+  every `UiActionButton` lists its spreads, then its attributes sorted, then its callbacks; a typo
+  in a `ux/ui/components/ui-helpers.ts` comment was corrected.
+
+**Settled on closing.**
+
+- **The shell's overlay grammar** stays parking lot P-15.
+- **Browsing a docstore namespace directly** is dropped. A consumer that needs it starts its own
+  brief; the design is a sibling of `LibraryLevels` over the same Drill family.
+- **Ops and Customer access to the Library** is dropped until a user story asks for it.
 
 _End of Library Brief_
