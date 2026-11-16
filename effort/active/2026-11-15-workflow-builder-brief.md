@@ -2,7 +2,7 @@
 
 **Active, not dispatched.** Drafted 2026-11-15 from a CA + AI Architect exploration session. The
 M-7 feature. Feature mode, in `front/app-admin/workflows/`. Depends on the Workflow Domain brief
-(`2026-11-15-workflow-domain-brief.md`) and the Dashboard Feature brief
+(`effort/completed/2026-11/2026-11-15-workflow-domain-brief.md`) and the Dashboard Feature brief
 (`2026-11-15-dashboard-feature-brief.md`). Facets ride along
 (`2026-10-06-facets-workflow-seeding-brief.md`). The CA's prototype
 (`workflow_builder_workbench.html`, held by the CA) is the spec for the cards, mapped onto the

@@ -430,7 +430,8 @@ copy, are what the warning names; the CLI may drop them.
 placeholders (`__SECRET__`) in the stage env file, with the real values in `secrets.jsonc` behind
 `read-secret.ts`; the service key comes from the Supabase CLI; the client mode must be `edge`. The
 first stage run took several attempts (`effort/completed/2026-10/2026-10-13-stage-test-authorization-brief.md`).
-A script that sets the environment for a target would make it one command.
+A script that sets the environment for a target would make it one command. The stage test environment also needs the Field Binder keys (`FIELD_BINDER_SERVER_ROOT`,
+`FIELD_BINDER_INBOX_DB_NAME`, `FIELD_BINDER_DB_NAME`), which architecture-devops §12.4 omits.
 
 ### B-21 · No automated coverage above the domain/API layer — today's manual live pass proved it
 
@@ -524,17 +525,6 @@ Two decisions follow, each where it is first needed:
   through `expectWhen`. Postgres parses either form. Picking this up: roadmap §8 Job Definition.
 - **The deep clone writes one timestamp form into IndexedDB,** so the in-memory list evaluator
   compares `When` values correctly. Picking this up: roadmap §9 Ops Application.
-
-### B-36 · Ordered junctions have no client
-
-**Observed:** 2026-10-28 · normal
-
-`workflow_tasks` and `task_questions` carry `sequence`, but `makeJunctionSupabaseClient` serves
-unordered junctions only (`effort/completed/2026-10/2026-10-28-junction-client-brief.md`). The ordered
-variant is designed: a `sequence` field in the specification, so `partners` returns in order and
-`replace` writes `sequence`, and a `validateUpdate` in `JunctionValidator<J>`, as those junctions'
-validators already have. Both tables also need an `UPDATE` policy, which they lack. Picked up with
-workflows.
 
 ## Customer
 

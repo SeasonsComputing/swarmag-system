@@ -286,11 +286,32 @@ unreferenced documents stays backlog B-42, the document store CLI B-44, and load
 
 ## M-7 · Workflow, Task, Question & Service
 
-`project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists, `api.Services` commented out). Needs the Workflow Builder archetype — named in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme with no existing archetype to extend at all, and the most depended-upon: Job Definition's own §2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this exists.
+`project-user-stories.md` §5, currently unwritten. `Service` shipped with its manager
+(`effort/completed/2026-10/2026-10-28-service-manager-brief.md`). Needs the Workflow Builder — named
+in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme
+with no existing archetype to extend at all, and the most depended-upon: Job Definition's workflow
+seeding can't be built until this exists.
+
+**Enablers:**
+
+- **Workflow Domain** — closed 2026-11-16, `40bc505` to `9cb1ec9`,
+  `effort/completed/2026-11/2026-11-15-workflow-domain-brief.md`: Answer carries the Question's
+  type at capture; Note text is optional; `Workflow.version` is a string; `api.Workflows`,
+  `api.Tasks`, and `api.Questions`; the ordered junction family with `api.WorkflowTasks` and
+  `api.TaskQuestions`.
+- **Dashboard Feature** — active, `effort/active/2026-11-15-dashboard-feature-brief.md`: a feature
+  that takes over the dashboard frame; a Manager opened to return the Item picked.
+
+**Features:**
+
+- **Workflow Builder** — active, `effort/active/2026-11-15-workflow-builder-brief.md`. Depends on
+  both enablers.
+
+**Rides along:** facets on Workflow, edited in the Builder
+(`effort/active/2026-10-06-facets-workflow-seeding-brief.md`); seeding itself is M-8's.
 
 Seeding filters the Workflow library by the selected Services' facets, and the rep chooses from the
-result. Design input, including the open questions on facet values, curation, and Service versus
-Service Category: `effort/active/2026-10-06-facets-workflow-seeding-brief.md`.
+result. Design input: `effort/active/2026-10-06-facets-workflow-seeding-brief.md`.
 
 Assessment and planning edit job-specific Workflow clones with the Workflow builder
 (`architecture-front.md` §11.2.3), so this milestone is expected to produce the job assessment and

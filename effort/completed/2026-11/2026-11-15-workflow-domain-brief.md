@@ -1,6 +1,6 @@
 # Workflow Domain — Brief
 
-**Active — awaiting final independent verification and closure.** The first M-7 enabler: the domain and `api` supporting the Workflow Builder
+**Completed 2026-11-16.** Shipped from `40bc505` to `9cb1ec9` and closed at the CA's direction; see "Closure" at the end. The first M-7 enabler: the domain and `api` supporting the Workflow Builder
 (`2026-11-15-workflow-builder-brief.md`). Foundation mode: `domain/`, `core/cli`, and the schema
 are locked namespaces.
 
@@ -201,9 +201,6 @@ responses, and zero-effect, partial, and mismatched write confirmations.
 The mutation protocol and scope tests establish Question create/update equivalence, required
 select options, and union scope projections. Targeted formatting passes; `STYLE_AUDIT: PASS`
 covers the changed core contracts, maker, validator shape, API composition, and tests.
-Repository-wide `fmt:check` reports formatting differences in
-`source/domain/validators/common-validator.ts` and `workflow-validator.ts`, outside the ordered
-junction repair.
 
 Stage verification includes the CA's attachment-only User Note Save on screen and the
 2026-11-16 live workflow API test. Workflow, Task, and Question create/read/update/list/soft-delete
@@ -243,5 +240,36 @@ so this record stays active rather than being archived as verified.
 Deferred items are assigned explicitly: B-53 owns the Answer test gap, the Workflow Builder brief
 owns Builder work, and M-9 owns Runner capture and end-to-end verification. No product-code,
 domain-shape, schema, deployment, or UX changes are part of this review follow-up.
+
+## Closure — 2026-11-16
+
+The CA directed closure after review.
+
+**Shipped** (`40bc505` to `9cb1ec9`). Answer records its Question's type at capture with an
+optional value; Note text is optional and an attachment can be the content; `Workflow.version` is
+a nonempty string; `api.Workflows`, `api.Tasks`, and `api.Questions`; the ordered junction family
+(B-36) with `api.WorkflowTasks` and `api.TaskQuestions`; `UPDATE` policies on both junction
+tables; the governing documents above.
+
+**Verified.** `deno task check` and `deno task fmt:check` pass. The stage test passed on
+2026-11-16 (`workflow clients persist CRUD and ordered membership on stage ... ok`, one passed,
+none failed) after genesis and `db-genesis-verify`.
+
+**Not run.** The amendment's rewrite of `workflow-api-test.ts` (complete paged reads, cleanup
+that attempts every step) was reviewed by the AI Architect but not run; it needs the stage
+environment (B-34).
+
+**Departures from the drafted design,** settled by the CA with ACE: no `photo` Question type —
+a photo is a Note attachment on any Question; Answer gains its captured `type`; Note text is
+optional; version validation is a nonempty string, its `major.minor` reading the Builder's.
+
+**Settled on closing.**
+
+- **B-36** is done and leaves the backlog.
+- **The Answer test gap** is B-53.
+- **Builder work** is the Workflow Builder brief's; **Runner capture and end-to-end Q&A** are M-9's.
+- **architecture-devops §12.4** lists the stage test's environment but not the Field Binder keys
+  the run also requires (`FIELD_BINDER_SERVER_ROOT`, `FIELD_BINDER_INBOX_DB_NAME`,
+  `FIELD_BINDER_DB_NAME`); it joins B-34.
 
 _End of Brief_
