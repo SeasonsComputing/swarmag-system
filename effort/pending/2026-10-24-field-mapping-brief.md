@@ -1,7 +1,7 @@
 # Field Mapping — Brief
 
 **Pending, design input.** Recorded 2026-10-24 from a CA + AI Architect session, while extending
-the document storage brief (`effort/completed/2026-10-23-document-storage-brief.md`). It records the
+the document storage brief (`effort/completed/2026-10/2026-10-23-document-storage-brief.md`). It records the
 depth considered so far; job definition, the workflow workbench, and document storage will flesh
 out the details. Chosen from the roadmap when job definition is.
 
@@ -83,7 +83,7 @@ elements, and the validator checks ranges, which rejects every swapped Texas coo
    like `requires: 'note' | 'attachment'`.
 5. ~~**`ChemicalLabel.url` and `Attachment.url`** become `DocumentPath`s (document storage
    brief).~~ _Superseded 2026-10-29:_ a `url` stays a URL, and a stored document's is a `docs:`
-   reference, with no domain change (`effort/completed/2026-10-29-attachments-brief.md`).
+   reference, with no domain change (`effort/completed/2026-10/2026-10-29-attachments-brief.md`).
 
 ## Design moments
 
@@ -98,6 +98,6 @@ elements, and the validator checks ranges, which rejects every swapped Texas coo
    CA's), document properties (bounds, coordinate reference system, bands), packages, placement
    providers for the tiers, and renditions. Architecture-core §10.5 records them. Resumable uploads
    (TUS) past the free plan's 50 MB file cap join it, deferred from the Supabase provider brief
-   (`effort/completed/2026-10-30-document-store-supabase-brief.md`).
+   (`effort/completed/2026-10/2026-10-30-document-store-supabase-brief.md`).
 
 _End of Brief_

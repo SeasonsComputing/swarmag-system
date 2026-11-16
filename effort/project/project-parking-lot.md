@@ -40,7 +40,7 @@ explicit go.
 ## P-2 · How, and when, is a soft-deleted user's personal data erased?
 
 **Parked:** 2026-07-14 — during Edge Functions Remediation verification
-(`effort/completed/2026-07-14-user-create-hang-handoff.md`).
+(`effort/completed/2026-07/2026-07-14-user-create-hang-handoff.md`).
 
 **What it is:** `UserOrchestra.delete()`
 (`source/back/supabase-edge/orchestration/user-orchestra.ts`) soft-deletes a user by
@@ -140,7 +140,7 @@ Admin-only header actions to that surface and add the corresponding Ops composit
 when it has real app-specific destinations. The dashboard seed's validation is decided with it: dashboard
 state reads its seed with `ApiError` 400, which its handlers test to reach `Config.fail`, and
 whether seed validation fails as a client error at all is open
-(`effort/completed/2026-10-27-dictionary-guard-brief.md`, design moment 4).
+(`effort/completed/2026-10/2026-10-27-dictionary-guard-brief.md`, design moment 4).
 
 ## P-6 · Should onboarding warn before creating a likely duplicate customer?
 
@@ -266,7 +266,7 @@ inbound request from someone not yet a customer.
 ## P-10 · Should a charter become a way of authorizing work, and if so, in what form?
 
 **Parked:** 2026-10-22 — at the close of the charter experiment
-(`effort/completed/2026-10-21-charter-experiment-brief.md`).
+(`effort/completed/2026-10/2026-10-21-charter-experiment-brief.md`).
 
 **What it is:** A charter authorizes an outcome, an intent with bounds, delegated and reserved
 decisions, and obligations, instead of a scope per production; the agent scopes its own work and
@@ -283,7 +283,7 @@ whether independent review is a required part of it.
 ## P-11 · How does a production genesis exclude stage-only seed identities?
 
 **Parked:** 2026-10-23 — while settling the stage test authorization brief
-(`effort/completed/2026-10-13-stage-test-authorization-brief.md`).
+(`effort/completed/2026-10/2026-10-13-stage-test-authorization-brief.md`).
 
 **What it is:** Genesis applies one `schema.sql` to every target. Stage seeds a test administrator
 that production must not have.
@@ -297,7 +297,7 @@ check) depends on how production is set up.
 ## P-12 · How does swarmAg adopt `core` and `ux` once they ship as Seasons Computing libraries?
 
 **Parked:** 2026-10-27, while rescoping the nominal types brief
-(`effort/completed/2026-10-27-nominal-types-brief.md`, Amendment 1).
+(`effort/completed/2026-10/2026-10-27-nominal-types-brief.md`, Amendment 1).
 
 **What it is:** `core/` and `ux/` move to repositories of their own as Seasons Computing's
 essential tools. swarmAg then consumes them as third-party libraries in place of its `@core/` and
@@ -318,7 +318,7 @@ through this adoption:
   cannot know which attributes are URLs and check them as non-empty strings. A URL type, with
   data-dictionary metadata identifying URL attributes, lets genesis validate them with `expectUrl`
   (`core/std/validators.ts`). Until then the URL app control checks them at the UX seam (the
-  attachments brief, `effort/completed/2026-11-09-attachments-brief.md`, decision 10).
+  attachments brief, `effort/completed/2026-11/2026-11-09-attachments-brief.md`, decision 10).
 
 **Picking this up:** When `core` or `ux` first ships from its own repository.
 
@@ -326,9 +326,9 @@ through this adoption:
 
 **Parked:** 2026-10-28, while scoping the Service Manager's required asset types. Deferred, not
 abandoned: the abstraction manager brief
-(`effort/completed/2026-08-05-abstraction-manager-brief.md`) gave the manager "a home for" list
+(`effort/completed/2026-08/2026-08-05-abstraction-manager-brief.md`) gave the manager "a home for" list
 traversal (sort, direction, page index, page size, search), "not an implementation", and the
-list-query brief (`effort/completed/2026-10-11-list-query-brief.md`) built declared search fields
+list-query brief (`effort/completed/2026-10/2026-10-11-list-query-brief.md`) built declared search fields
 and keyset paging. Nothing tracked the deferral until now.
 
 **What it is:** general-purpose support for large datasets in the Collection and Index archetypes,
@@ -350,7 +350,7 @@ Collection, Index, and multi-select controls, so search and filtering behave the
 ## P-14 · Should the document store contract own pending documents?
 
 **Parked:** 2026-11-09, while settling the attachments brief's ledger
-(`effort/completed/2026-11-08-attachments-brief.md`, decision 4).
+(`effort/completed/2026-11/2026-11-08-attachments-brief.md`, decision 4).
 
 **What it is:** two-phase document creation in the store contract. A document is created pending,
 not yet visible, and later committed or discarded; recovery sweeps what is still pending:

@@ -12,7 +12,7 @@ feedback briefs ended in walkthroughs of discard prompts, success banners, and f
 User Manager, Customer Manager, Onboarding, the Sites step, and the notes editor. M-5 copies those
 managers, so each copy repeats the same flows and the same hand checks.
 
-Stage test authorization (`effort/completed/2026-10-13-stage-test-authorization-brief.md`) takes the
+Stage test authorization (`effort/completed/2026-10/2026-10-13-stage-test-authorization-brief.md`) takes the
 API path off the CA: once tests hold a session, a copied manager's create, read, update, and soft
 delete run under `deno task test`. It does not reach UI behavior.
 

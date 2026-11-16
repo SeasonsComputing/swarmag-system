@@ -4,7 +4,7 @@
 the portal's milestone, not a design: its details are written when the roadmap reaches it. It
 carries roadmap §1's open item "Additional-contact assignment" (`project-user-stories.md` §1.1,
 story 4), which is portal users. The same session's account-manager work is
-`effort/completed/2026-10-08-account-manager-brief.md`.
+`effort/completed/2026-10/2026-10-08-account-manager-brief.md`.
 
 ## What the repository holds
 
@@ -80,7 +80,7 @@ story 4), which is portal users. The same session's account-manager work is
    additional-contact assignment is "built before §5, or moved to a later milestone"; this brief is
    that later milestone once it has a slot.
 7. **The customer role's storage access.** `DocumentServer`'s policies grant the staff roles
-   alone (the Supabase provider brief, `effort/completed/2026-10-30-document-store-supabase-brief.md`);
+   alone (the Supabase provider brief, `effort/completed/2026-10/2026-10-30-document-store-supabase-brief.md`);
    which namespaces and buckets a customer reads, its own Customer's and its jobs', is the portal's
    to decide and write.
 

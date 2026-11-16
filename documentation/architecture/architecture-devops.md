@@ -635,23 +635,23 @@ Guards are Deno scripts that enforce structural and operational invariants. They
 
 ### 11.1 Guard Inventory
 
-| Task                        | Script                         | What it enforces                                               |
-| --------------------------- | ------------------------------ | -------------------------------------------------------------- |
-| `guard:architecture`        | `guard-architecture.ts`        | Dependency direction across layers                             |
-| `guard:env`                 | `guard-env.ts`                 | Env file structure and required keys                           |
-| `guard:leaf`                | `guard-leaf.ts`                | Leaf-module export discipline                                  |
-| `guard:validation`          | `guard-validation.ts`          | Validator shape conventions                                    |
-| `guard:domain-style`        | `guard-domain-style.ts`        | Domain layer code style conventions                            |
-| `guard:core-std-types`      | `guard-core-std-types.ts`      | Core std type usage                                            |
-| `guard:front-state`         | `guard-front-state.ts`         | Front state management conventions                             |
-| `guard:chart`               | `guard-chart.ts`               | Chart component conventions                                    |
-| `guard:imports`             | `guard-imports.ts`             | Import discipline across all layers                            |
-| `guard:namespaces`          | `guard-namespaces.ts`          | Front namespace boundaries: ui seam, widget SPI, app isolation |
-| `guard:css`                 | `guard-css.ts`                 | CSS architecture conventions                                   |
-| `guard:bare-html`           | `guard-bare-html.ts`           | HTML shell constraints                                         |
-| `guard:tokens`              | `guard-tokens.ts`              | Documentation does not restate a token's value beside its name |
-| `guard:completed-immutable` | `guard-completed-immutable.ts` | A path already in `effort/completed/` at HEAD is not changed   |
-| `guard:secrets`             | `validate-secrets.ts`          | `secrets.jsonc` structure and composite key identity           |
+| Task                        | Script                         | What it enforces                                                                              |
+| --------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `guard:architecture`        | `guard-architecture.ts`        | Dependency direction across layers                                                            |
+| `guard:env`                 | `guard-env.ts`                 | Env file structure and required keys                                                          |
+| `guard:leaf`                | `guard-leaf.ts`                | Leaf-module export discipline                                                                 |
+| `guard:validation`          | `guard-validation.ts`          | Validator shape conventions                                                                   |
+| `guard:domain-style`        | `guard-domain-style.ts`        | Domain layer code style conventions                                                           |
+| `guard:core-std-types`      | `guard-core-std-types.ts`      | Core std type usage                                                                           |
+| `guard:front-state`         | `guard-front-state.ts`         | Front state management conventions                                                            |
+| `guard:chart`               | `guard-chart.ts`               | Chart component conventions                                                                   |
+| `guard:imports`             | `guard-imports.ts`             | Import discipline across all layers                                                           |
+| `guard:namespaces`          | `guard-namespaces.ts`          | Front namespace boundaries: ui seam, widget SPI, app isolation                                |
+| `guard:css`                 | `guard-css.ts`                 | CSS architecture conventions                                                                  |
+| `guard:bare-html`           | `guard-bare-html.ts`           | HTML shell constraints                                                                        |
+| `guard:tokens`              | `guard-tokens.ts`              | Documentation does not restate a token's value beside its name                                |
+| `guard:completed-immutable` | `guard-completed-immutable.ts` | A path already in `effort/completed/` at HEAD is not changed; it may move unchanged within it |
+| `guard:secrets`             | `validate-secrets.ts`          | `secrets.jsonc` structure and composite key identity                                          |
 
 ### 11.2 Guard Scope
 

@@ -12,6 +12,9 @@ path under effort/completed/ was already present at HEAD and is now changed
 or deleted. A path arriving in effort/completed/ for the first time in this
 commit is not a violation, even when it rewrites its own closing framing in
 the same commit — that is the ordinary close pattern EFFORT.md §4 describes.
+A record moved within effort/completed/ with its content unchanged, as when
+records are filed into month folders, is not a violation either: the record
+is intact, only its place changed.
 
 Content guards inspect what a file currently says; this one inspects whether
 a file changed at all, which needs git rather than a file read. Found
@@ -34,10 +37,18 @@ const git = async (...args: string[]): Promise<{ success: boolean; stdout: strin
   return { success, stdout: new TextDecoder().decode(stdout) }
 }
 
-// Staged paths that differ from HEAD — added, changed, or deleted.
+// Staged paths that differ from HEAD — added, changed, or deleted. A record
+// moved within the watched tree with identical content is left out: it is
+// unchanged, only filed elsewhere.
 const stagedPaths = async (): Promise<string[]> => {
-  const { stdout } = await git('diff', '--cached', '--name-only')
-  return stdout.split('\n').map(line => line.trim()).filter(Boolean)
+  const { stdout } = await git('diff', '--cached', '--name-status', '-M100%')
+  return stdout.split('\n').map(line => line.trim()).filter(Boolean).flatMap(line => {
+    const [status, from, to] = line.split('\t')
+    const unchangedMove = status === 'R100'
+      && from.startsWith(WATCHED_PREFIX) && to.startsWith(WATCHED_PREFIX)
+    if (unchangedMove) return []
+    return to ? [from, to] : [from]
+  })
 }
 
 // True when the given path already existed at HEAD.

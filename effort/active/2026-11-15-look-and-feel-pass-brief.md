@@ -1,7 +1,7 @@
 # Look and Feel Pass — Brief
 
 **Active; items 1–6 and 8 done; item 7, the checks, is the CA's.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
-workbench panes shipped (`effort/completed/2026-11-15-dialog-look-brief.md`), the CA and AI
+workbench panes shipped (`effort/completed/2026-11/2026-11-15-dialog-look-brief.md`), the CA and AI
 Architect reworked the suite's look in look-and-feel mode: hacked fast, committed as it settled.
 This brief records what shipped, the rules it settled, and the clean-up that makes it right.
 Foundation mode: `ux/ui` and `ux/shell` are locked; the CA directed each change.

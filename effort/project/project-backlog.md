@@ -42,7 +42,7 @@ server hole again," implying this is not the first time. This is a live specimen
 exact failure this entry already describes — the constraint a session needed
 ("stage is the only environment") wasn't reached before the session acted on procedure it
 shouldn't have. Also noted in
-`effort/completed/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
+`effort/completed/2026-08/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
 already touches this file.
 
 ### B-2 · `domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS
@@ -54,7 +54,7 @@ validators, and adapters are expressed with `core/`. `domain-archetypes.md` and
 `effort/genesis/genesis-domain-sdk.md` restate parts of it; they can point to CONVENTIONS and keep
 only what is specific to the domain. `domain-archetypes.md` still cites "`CONVENTIONS.md`
 Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
-`effort/completed/2026-10-03-core-reconciliation-brief.md`.
+`effort/completed/2026-10/2026-10-03-core-reconciliation-brief.md`.
 
 ### B-39 · `project-user-stories.md` no longer reflects the product
 
@@ -63,7 +63,7 @@ Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close 
 Its themes predate decisions made since. §3 Asset Maintenance and §4 Chemical Maintenance describe
 manager work that has shipped, while maintenance itself became a dedicated workbench, parked as
 P-8. The Job Definition sections (§2.3–§2.9) are empty. Features decided since, such as the Field
-Binder (`effort/completed/2026-11-04-field-binder-brief.md`), have no story. The roadmap draws on
+Binder (`effort/completed/2026-11/2026-11-04-field-binder-brief.md`), have no story. The roadmap draws on
 the user stories (`EFFORT.md` §3), so bring them current before the next milestone is
 placed from them.
 
@@ -115,7 +115,7 @@ Bring the backend seed authority into the prompt's source set in a separate auth
 
 `validateChemicalCreate` checks `reEntryIntervalHours` with `expectPositiveNumber`, so 1.5
 passes, while `chemicals.re_entry_interval_hours` is `INTEGER`. The Chemical Manager accepts only
-blank or positive whole hours (`effort/completed/2026-10-21-asset-chemical-managers-brief.md`,
+blank or positive whole hours (`effort/completed/2026-10/2026-10-21-asset-chemical-managers-brief.md`,
 Amendment 1). Whether the domain means whole hours, and whether zero is valid, is a Foundation
 question for genesis.
 The stage-test-authorization production records this gap without changing the prompt or expanding
@@ -340,7 +340,7 @@ Fixing it also settles the task-chain question: `check` stays read-only, and not
 
 **Finding, 2026-10-21:** honoring git-ignore needs `--allow-run=git` on the leaf task in
 `deno.jsonc`, or an approved ignore-matcher dependency; the charter experiment could do neither
-(`effort/completed/2026-10-21-charter-experiment-brief.md`).
+(`effort/completed/2026-10/2026-10-21-charter-experiment-brief.md`).
 
 ### B-32 · `guard:css` checks values line by line, so a literal in a wrapped declaration passes
 
@@ -350,7 +350,7 @@ The selector-parsing repair (B-18) reads complete rules, but value and token aud
 physical line: a spacing literal inside a `clamp()` the formatter wraps across lines passes, while
 the same literal on one line fails. Broadening the audit would newly fail
 `source/ux/shell/dashboard/dashboard.css:29`. Found by the charter experiment
-(`effort/completed/2026-10-21-charter-experiment-brief.md`); a new check, so its own decision.
+(`effort/completed/2026-10/2026-10-21-charter-experiment-brief.md`); a new check, so its own decision.
 
 ## DevOps
 
@@ -370,7 +370,7 @@ runtime behavior, so it is its own production:
 - **Reporting (§19.1):** `guard-tokens.ts` bypasses `guardFail` and `guardPass`.
 - **Imports (§3.3):** thirteen guards import their own namespace through the alias.
 
-Design record: [DevOps Style Conformance & Shared Error Handling — Backlog Brief](../completed/2026-08-23-devops-style-error-handling-brief.md).
+Design record: [DevOps Style Conformance & Shared Error Handling — Backlog Brief](../completed/2026-08/2026-08-23-devops-style-error-handling-brief.md).
 
 ### B-20 · `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
 
@@ -429,7 +429,7 @@ copy, are what the warning names; the CLI may drop them.
 `SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`, and `SUPABASE_SERVICE_ROLE_KEY`. The first two are
 placeholders (`__SECRET__`) in the stage env file, with the real values in `secrets.jsonc` behind
 `read-secret.ts`; the service key comes from the Supabase CLI; the client mode must be `edge`. The
-first stage run took several attempts (`effort/completed/2026-10-13-stage-test-authorization-brief.md`).
+first stage run took several attempts (`effort/completed/2026-10/2026-10-13-stage-test-authorization-brief.md`).
 A script that sets the environment for a target would make it one command.
 
 ### B-21 · No automated coverage above the domain/API layer — today's manual live pass proved it
@@ -491,7 +491,7 @@ answer to one identity. The message is what fails the person.
 PostgREST returns `TIMESTAMPTZ` as `2026-10-11T15:08:14.27+00:00`: an offset, and zero to six
 fractional digits. The app writes `toISOString()` form, and `isWhen` accepts only that, with a `Z`.
 Nothing fails today because no read path validates a timestamp column. Evidence:
-`effort/completed/2026-10-11-canonical-when-brief.md`.
+`effort/completed/2026-10/2026-10-11-canonical-when-brief.md`.
 
 Two decisions follow, each where it is first needed:
 
@@ -505,7 +505,7 @@ Two decisions follow, each where it is first needed:
 **Observed:** 2026-10-28 · normal
 
 `workflow_tasks` and `task_questions` carry `sequence`, but `makeJunctionSupabaseClient` serves
-unordered junctions only (`effort/completed/2026-10-28-junction-client-brief.md`). The ordered
+unordered junctions only (`effort/completed/2026-10/2026-10-28-junction-client-brief.md`). The ordered
 variant is designed: a `sequence` field in the specification, so `partners` returns in order and
 `replace` writes `sequence`, and a `validateUpdate` in `JunctionValidator<J>`, as those junctions'
 validators already have. Both tables also need an `UPDATE` policy, which they lack. Picked up with
@@ -551,7 +551,7 @@ Nothing guards this today because no Jobs exist yet. Picking this up: with Job D
 sets themself (CA, 2026-10-08): each is a User picker field defaulting to the session user,
 changeable. The assessor is often assigned when the assessment is scheduled
 (`project-user-stories.md` §2: "assign assessor/crew"). The picker is built by
-[Account Manager & User Picker — Brief](../completed/2026-10-08-account-manager-brief.md).
+[Account Manager & User Picker — Brief](../completed/2026-10/2026-10-08-account-manager-brief.md).
 
 Picking this up: with roadmap §8 Job Definition.
 
@@ -646,20 +646,20 @@ Nothing a record references is ever deleted (architecture-core §10.3), so a doc
 refers to stays until a sweep clears it: a file staged and then cancelled, an editor closed
 mid-edit, a removed attachment, and the staged copy left behind once a document is placed. The
 sweep clears them in the inbox and on the server. Until it exists, an unreferenced document costs
-only its bytes. Deferred from `effort/completed/2026-11-09-attachments-brief.md`.
+only its bytes. Deferred from `effort/completed/2026-11/2026-11-09-attachments-brief.md`.
 
 **Picking this up:** after the Supabase provider, since the server side sweeps `DocumentServer`.
 Its scheduled job and edge entry point are the Supabase provider brief's DevOps items 4–6
-(`effort/completed/2026-10-30-document-store-supabase-brief.md`).
+(`effort/completed/2026-10/2026-10-30-document-store-supabase-brief.md`).
 
 ### B-44 · The document store has no CLI
 
 **Observed:** 2026-11-10 · low
 
 `document-store {noun} {verb}`, one to one with the store contract, was designed with the document
-storage brief (`effort/completed/2026-10-23-document-storage-brief.md`) for the back profile, which
+storage brief (`effort/completed/2026-10/2026-10-23-document-storage-brief.md`) for the back profile, which
 runs in Deno and has no IndexedDB. Nothing in M-6 uses it, so the Supabase provider brief
-(`effort/completed/2026-10-30-document-store-supabase-brief.md`) left it out.
+(`effort/completed/2026-10/2026-10-30-document-store-supabase-brief.md`) left it out.
 
 **Picking this up:** when a back-profile consumer needs it, the sweep (B-42) among them.
 

@@ -20,7 +20,7 @@ without enabling it is listed as **Rides along**.
 ## M-0 · Platform Foundation — Closed 2026-06-28
 
 Everything built before application features, from the first commit (2025-12-09) to the first
-feature design, `effort/completed/2026-06-28-user-contact-customer-design.md`:
+feature design, `effort/completed/2026-06/2026-06-28-user-contact-customer-design.md`:
 
 - **Physical architecture** — static PWA bundles on Netlify's CDN, bound to their Supabase backend
   at package time; Postgres under row-level security, called directly by the applications;
@@ -66,29 +66,29 @@ build them (`EFFORT.md` §7):
 `ux/shell/` split into `ux/shell/` and `front/app/`; CA then promoted `ux/` itself to a
 top-level `source/ux/` namespace with its own `@ux/` import alias, sibling to `front/` rather
 than nested under it — the literal conclusion of treating `ux/` as a third-party library.
-`effort/completed/2026-09-15-shell-app-split-brief.md`.
+`effort/completed/2026-09/2026-09-15-shell-app-split-brief.md`.
 
 ## M-3 · Customer Manager — Closed 2026-10-19
 
 Post-genesis Customer editing through `AbstractionManager`, reusing Onboarding's Customer steps.
 Both workbenches now host a sequence of one or more steps over one shared `panel/` step contract.
-Shipped 2026-09-30: `effort/completed/2026-09-22-customer-manager-brief.md`.
+Shipped 2026-09-30: `effort/completed/2026-09/2026-09-22-customer-manager-brief.md`.
 
 Additional-contact assignment (`project-user-stories.md` §1.1) is not built; it is slotted in §9
 Customer Portal.
 
 **The account manager field,** a User, set during Onboarding to the session user and changeable
 in Customer Manager through a shared User picker — shipped 2026-10-19 (`2172f90`) and verified by
-the CA: `effort/completed/2026-10-08-account-manager-brief.md`.
+the CA: `effort/completed/2026-10/2026-10-08-account-manager-brief.md`.
 
 1. **Soft-deleted references** — completed 2026-10-18:
-   `effort/completed/2026-10-13-soft-deleted-references-brief.md`. A deleted account manager is
+   `effort/completed/2026-10/2026-10-13-soft-deleted-references-brief.md`. A deleted account manager is
    still shown, so references had to resolve soft-deleted targets.
 2. **Account manager production** — completed 2026-10-19, including the session user
    (`SessionUserContract` and `UserProvider`, the brief's decision 11 and Addendum 5).
 
 **Continues on its own:** stage test authorization
-(`effort/completed/2026-10-13-stage-test-authorization-brief.md`), so `users-api-test.ts` and
+(`effort/completed/2026-10/2026-10-13-stage-test-authorization-brief.md`), so `users-api-test.ts` and
 `session-coordinator-test.ts` can run.
 
 ## M-4 · Notes Editor — Closed 2026-10-18
@@ -110,8 +110,8 @@ Workflow classification moves to curated facets. The Notes Editor shows no tags.
 
 **Sequence:**
 
-1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10-06-tags-classification-brief.md`.
-2. **Notes Editor brief** — completed 2026-10-08: `effort/completed/2026-10-08-notes-editor-brief.md`.
+1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10/2026-10-06-tags-classification-brief.md`.
+2. **Notes Editor brief** — completed 2026-10-08: `effort/completed/2026-10/2026-10-08-notes-editor-brief.md`.
 3. **Notes Editor production** — shipped 2026-10-08 (`7e56e39`), with the brief.
 4. ~~**Milestone verification**~~ — verified by the CA in User Manager and Customer Manager.
 
@@ -133,49 +133,49 @@ closed, to scope both themes properly before that fuller work is picked up.
 them; each fix lands once instead of chasing every copy:
 
 - **Workbench draft services** — closed 2026-10-21,
-  `effort/completed/2026-10-19-workbench-draft-services-brief.md`: one shared dirty check, draft
+  `effort/completed/2026-10/2026-10-19-workbench-draft-services-brief.md`: one shared dirty check, draft
   services that load no JSX, and each host owning its aggregate draft check.
 - **Fresh editor feedback** — closed 2026-10-21,
-  `effort/completed/2026-10-19-fresh-editor-feedback-brief.md`: a list action clears the stale
+  `effort/completed/2026-10/2026-10-19-fresh-editor-feedback-brief.md`: a list action clears the stale
   banner in `AbstractionManager`, which every new manager uses.
 - **Stage test authorization** — closed 2026-10-23,
-  `effort/completed/2026-10-13-stage-test-authorization-brief.md`: new managers arrive with
+  `effort/completed/2026-10/2026-10-13-stage-test-authorization-brief.md`: new managers arrive with
   integration tests that run against stage.
 - **Host-owned list errors** — added and closed 2026-10-21, `665034a`: `AbstractionManager`
   presents the collection's load failure from `listError`; copied managers supply it, not the
   banner.
 - **Junction client** — closed 2026-10-28, `7d45a4b`,
-  `effort/completed/2026-10-28-junction-client-brief.md`:
+  `effort/completed/2026-10/2026-10-28-junction-client-brief.md`:
   `makeJunctionSupabaseClient` in `core/cli`, so a manager edits a many-to-many from its owning
   side; the Service Manager is its first consumer.
 
 **Rides along:**
 
 - **Dictionary guard** — closed 2026-10-28, `44b9e40`,
-  `effort/completed/2026-10-27-dictionary-guard-brief.md`: `isDictionary` in `core/std`, taught to
+  `effort/completed/2026-10/2026-10-27-dictionary-guard-brief.md`: `isDictionary` in `core/std`, taught to
   the domain genesis and retrofitted into the domain guards; HelmWidget and dashboard state read
   through `@core/std`; CONVENTIONS 1.3.
 - **Nominal types** — closed 2026-10-27, `cefda19`,
-  `effort/completed/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, the
+  `effort/completed/2026-10/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, the
   `toId` and `toWhen` checkers, and Preferences binding an explicit row `Id`; CONVENTIONS 1.2.
   Making `Id` nominal is held in P-12; document storage does not depend on it.
 - **File header conformance** — closed 2026-10-20,
-  `effort/completed/2026-10-09-file-header-conformance-brief.md`: copied files carry their headers.
+  `effort/completed/2026-10/2026-10-09-file-header-conformance-brief.md`: copied files carry their headers.
 - **CONVENTIONS reconciliation** — closed 2026-10-20,
-  `effort/completed/2026-10-03-core-reconciliation-brief.md`: CONVENTIONS becomes the programming
+  `effort/completed/2026-10/2026-10-03-core-reconciliation-brief.md`: CONVENTIONS becomes the programming
   guide, and `architecture-core.md` is cut to the system.
 - **Containers in CONVENTIONS** — closed 2026-10-20,
-  `effort/completed/2026-10-09-containers-conventions-brief.md`: types, interfaces, classes, and
+  `effort/completed/2026-10/2026-10-09-containers-conventions-brief.md`: types, interfaces, classes, and
   module singletons as containers.
 - **Architecture documents cut to the system** — closed 2026-10-20,
-  `effort/completed/2026-10-20-architecture-system-cut-brief.md`: `architecture-back`, `-devops`,
+  `effort/completed/2026-10/2026-10-20-architecture-system-cut-brief.md`: `architecture-back`, `-devops`,
   and `-front` keep the system; portable material moves to CONVENTIONS.
 - **UX toolkit decomposition** — closed 2026-10-20,
-  `effort/completed/2026-10-20-ux-toolkit-decomposition-brief.md` (B-3):
+  `effort/completed/2026-10/2026-10-20-ux-toolkit-decomposition-brief.md` (B-3):
   `architecture-front.md`'s toolkit material moves by rank to the archetypes, the components guide,
   CONVENTIONS, and the `ux/` headers.
 - **EFFORT milestones** — closed 2026-10-20,
-  `effort/completed/2026-10-19-effort-milestones-brief.md`: codifies milestones, reconciliation,
+  `effort/completed/2026-10/2026-10-19-effort-milestones-brief.md`: codifies milestones, reconciliation,
   deferrals, and enablers in `EFFORT.md`. It makes nothing here copy-ready; it lands in the same
   window so the method is written down as practiced.
 
@@ -187,11 +187,11 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 
 - **Asset Type Manager** — shipped 2026-10-27 (`f709525`); same brief.
 - **Asset Manager** (`project-user-stories.md` §3.1–3.2) — shipped 2026-10-27 (`f709525`);
-  `effort/completed/2026-10-21-asset-chemical-managers-brief.md`.
+  `effort/completed/2026-10/2026-10-21-asset-chemical-managers-brief.md`.
 - **Chemical Manager** (`project-user-stories.md` §4) — shipped 2026-10-27 (`f709525`); same brief.
   The labels editor moved to M-6, with document storage.
 - **Service Manager** — shipped 2026-10-29 (`a527ef0`),
-  `effort/completed/2026-10-28-service-manager-brief.md`: missed from the mechanical productions;
+  `effort/completed/2026-10/2026-10-28-service-manager-brief.md`: missed from the mechanical productions;
   the first many-to-many (required asset types).
 - **Document storage** — moved to M-6 2026-10-30. M-4 assigned it here, but it proved a design
   effort, not a mechanical production (`EFFORT.md` §7).
@@ -210,56 +210,56 @@ attaches and shares documents; field capture and its upload are the Ops applicat
 **Enablers:**
 
 - **The kernel and IndexedDB provider** — closed 2026-10-30, `4381df5`,
-  `effort/completed/2026-10-23-document-storage-brief.md`: the contract and `DocumentAddresses` in
+  `effort/completed/2026-10/2026-10-23-document-storage-brief.md`: the contract and `DocumentAddresses` in
   `core/std`, the kernel and `makeDocumentStoreIndexedDbClient` in `core/cli`, and key paths and
   indexes in the IndexedDB wrapper.
 - **The document store platform** — closed 2026-11-08, `1249a05`,
-  `effort/completed/2026-11-08-document-store-platform-brief.md`: `DocumentStore` constructed
+  `effort/completed/2026-11/2026-11-08-document-store-platform-brief.md`: `DocumentStore` constructed
   over a provider class per binding; optional supplied ids on namespace and bucket `create`,
   idempotent on an existing id; each IndexedDB document store a database of its own, named by
   a config key; and the URL validators in `core/std`.
-- **Manager** — closed 2026-11-10, `795707a`, `effort/completed/2026-11-10-manager-brief.md`:
+- **Manager** — closed 2026-11-10, `795707a`, `effort/completed/2026-11/2026-11-10-manager-brief.md`:
   `Manager`, the Collection-Detail
   manager over any identified items, with collection actions; `AbstractionManager` narrowed to it
   for domain records. The Field Binder's workbench is its first non-record consumer.
-- **Lister** — closed 2026-11-10, `b980b19`, `effort/completed/2026-11-10-lister-brief.md`:
+- **Lister** — closed 2026-11-10, `b980b19`, `effort/completed/2026-11/2026-11-10-lister-brief.md`:
   `Lister`, a standalone list whose Items
   the consumer activates, over `CollectionContract`, which `ManagerContract` extends. The Field
   Binder's viewer is its first consumer.
 
 - **Durable upload lifecycle and root binding** — closed 2026-11-11, `07a6ce5` and the closing
-  commit, `effort/completed/2026-11-11-upload-brief.md`: `Uploads` in `core/cli`, composed per
+  commit, `effort/completed/2026-11/2026-11-11-upload-brief.md`: `Uploads` in `core/cli`, composed per
   inbox/server pair, and `SupabaseDocumentProvider` bound to a configured native root from one
   storage target contract. This is distinct from the closed Upload feature below.
 - **Stage on its storage roots** — closed 2026-11-12: the attachment and Field Binder roots are
   provisioned, the materialized policies applied, and the legacy namespace buckets disposed of.
   The CA ran it and accepted attaching in Admin.
 - **Background Tasks** — closed 2026-11-13, `548d0e1`,
-  `effort/completed/2026-11-10-background-tasks-brief.md`: application-bound Helm commands and task
+  `effort/completed/2026-11/2026-11-10-background-tasks-brief.md`: application-bound Helm commands and task
   reporting; uses attachment delivery first and supplies the Binder's command fitting.
 
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
 store shared:
 
 1. **Attachments** — closed 2026-11-10, `ea870d0`,
-   `effort/completed/2026-11-09-attachments-brief.md`: staging and placement,
+   `effort/completed/2026-11/2026-11-09-attachments-brief.md`: staging and placement,
    `Attachments` in `front/api` with its catalog, the inbox, the editors (attachments on notes,
    and the URL app control with the Chemical labels editor and the SDS field), and Admin capture,
    against a second IndexedDB store, `DocumentServer`.
 2. **Upload** — closed 2026-11-10, `3a07a9c`,
-   `effort/completed/2026-10-30-document-upload-brief.md`: `Attachments.drain()` and Admin's
+   `effort/completed/2026-10/2026-10-30-document-upload-brief.md`: `Attachments.drain()` and Admin's
    `DocumentDrain` loop, one tab at a time, draining `DocumentInbox` into `DocumentServer`.
 3. **The Supabase provider** — closed 2026-11-10, `81ce07c`,
-   `effort/completed/2026-10-30-document-store-supabase-brief.md`: `SupabaseDocumentProvider`
+   `effort/completed/2026-10/2026-10-30-document-store-supabase-brief.md`: `SupabaseDocumentProvider`
    over Storage's API with names in its metadata, swapped into `api` for `DocumentServer`; storage
    provisioning, reset, and usage tasks; the staff roles' storage policies; SDK 2.119.0.
 4. **The Field Binder** — closed 2026-11-13, `7227120` through `a70a928`,
-   `effort/completed/2026-11-04-field-binder-brief.md`: Admin manages an
+   `effort/completed/2026-11/2026-11-04-field-binder-brief.md`: Admin manages an
    independent remote source through its own upload pair; the reader opens a completely prepared
    local mirror. Files enter by upload. Depends on root binding and Helm menus above; Ops route
    and preparation-trigger integration is M-9's.
 5. **Upload Tasks** — closed 2026-11-13, `914d0c5`,
-   `effort/completed/2026-11-12-upload-tasks-brief.md`: both uploads run
+   `effort/completed/2026-11/2026-11-12-upload-tasks-brief.md`: both uploads run
    as background tasks; a chosen document is a row at once, staging and delivery report progress,
    and a Binder entry is delivered when its document is on the server. Its two `core/cli`
    changes, both approved, are a supplied id on `Uploads.stage` and `Uploads.stagedAddress`. Supersedes the Field Binder's entry
@@ -268,11 +268,11 @@ store shared:
 **Rides along:**
 
 - **Attachment look** — closed 2026-11-10, `ed03399`,
-  `effort/completed/2026-11-10-attachment-look-brief.md`: one row look for the notes and
+  `effort/completed/2026-11/2026-11-10-attachment-look-brief.md`: one row look for the notes and
   attachments tables through `LabelCell`, `CollectionPanel.renderLabel`, `UiText.size`, and the
   Attachments tab's fieldset and Add Attachment action.
 - **Helm menus** — closed 2026-11-13, `d6186c9`,
-  `effort/completed/2026-11-13-helm-menus-brief.md`: the Helm becomes a toolbar of commands and
+  `effort/completed/2026-11/2026-11-13-helm-menus-brief.md`: the Helm becomes a toolbar of commands and
   menus, each menu a titled popover; Tasks is a menu of reports; overflow and `labelMode` go.
   Carries the Field Binder menu's Manage, Open, and Synchronize.
 
@@ -336,13 +336,13 @@ Runner's own prerequisite plumbing, not a separate milestone with its own featur
 **Field documents** — from M-6: each job clone's inbox, in `DocumentInbox`; the job runner's photo
 answer, captured on the phone (a file input with `capture`); and the job upload that drains the
 job's inbox into `DocumentServer` back at base, beside `api.uploadJobLogs`
-(`effort/completed/2026-10-29-attachments-brief.md`,
-`effort/completed/2026-10-30-document-upload-brief.md`). Whether a job's inbox is a namespace or a
+(`effort/completed/2026-10/2026-10-29-attachments-brief.md`,
+`effort/completed/2026-10/2026-10-30-document-upload-brief.md`). Whether a job's inbox is a namespace or a
 bucket is designed here.
 
 **The Field Binder, Ops side** — every Ops device mirrors the binder into its `FieldBinder` store
 when behind its version, and a crew opens a document offline
-(`effort/completed/2026-11-04-field-binder-brief.md`).
+(`effort/completed/2026-11/2026-11-04-field-binder-brief.md`).
 
 ## M-10 · Customer Portal
 

@@ -7,7 +7,7 @@
 assumption both would edit `ui.css`/`ui-action-button.tsx`. The Helm boundary
 repair has since shipped by a different mechanism (per-action `labelMode`
 config, no `HelmButton`, no shared-file changes — see
-`effort/completed/2026-08-16-helm-button-boundary-repair-brief.md`), so
+`effort/completed/2026-08/2026-08-16-helm-button-boundary-repair-brief.md`), so
 `ui.css`/`ui-action-button.tsx` carry no Helm-specific leakage today and there
 is no longer a file conflict gating this brief. It may run independently.
 
