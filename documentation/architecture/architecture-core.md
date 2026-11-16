@@ -324,9 +324,13 @@ are declared and used; the `core/std` module headers state their semantics, incl
 filtering, search, ordering, and cursors (`make-query.ts`, `api-contracts.ts`).
 
 A junction client edits a many-to-many from its owning side. Unordered junctions manage partner
-membership as a set. Ordered junctions preserve sequence and expose a mutator bound to one
-owner. Callers identify partners; the client owns sequence arithmetic and persistence of affected
-links. The capability is independent of domain topic and presentation.
+membership as a set. Ordered junctions use distinct sequence positions within each owner; gaps
+are valid. They expose a mutator bound to one owner. Callers identify partners; the client owns
+sequence arithmetic and persistence of affected links. The capability is independent of domain
+topic and presentation.
+
+A bound mutator publishes its local state only after the database confirms the affected links.
+A failed or unconfirmed write invalidates that instance; reopening reconciles persisted state.
 
 A table with its own id and life cycle is a record, edited through CRUD, not a junction.
 

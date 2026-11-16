@@ -11,21 +11,31 @@ with domain-layer serialization hooks and uniform ApiError mapping.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudSupabaseSpecification              CRUD Supabase configuration, including validator.
-JunctionSupabaseSpecification<J>       Unordered junction configuration and key fields.
-BusRuleSupabaseSpecification           RPC or Edge Function configuration.
-SupabaseBaseFilter                     Common SDK filter discriminant.
-SupabaseScalarFilter                   Scalar equality and ordered comparisons.
-SupabaseInFilter                       Membership filter.
-SupabaseContainsFilter                 JSONB containment filter.
-SupabaseOrFilter                       Generated alternatives.
-SupabaseListFilter                     Ordered SDK filter operation union.
-SupabaseListRequest<T>                 Constructed list request and paging context.
-makeCrudSupabaseClient(spec)           Build CRUD/list client over Supabase.
-makeJunctionSupabaseClient(spec)       Build owner-side unordered junction client.
-makeSupabaseListRequest(spec, options) Construct list operations without dispatch.
-makeBusRuleSupabaseRpcClient(spec)     Build business-rule client over Supabase RPC.
-makeBusRuleSupabaseEdgeClient(spec)    Build business-rule client over Edge Functions.
+CrudSupabaseSpecification                CRUD Supabase configuration, including validator.
+JunctionSupabaseSpecification<J>         Unordered junction configuration and key fields.
+├ table                                  Junction table.
+├ adapter                                Domain-to-column mapping.
+├ validator                              Create validation.
+├ owner                                  Owner identifier field.
+├ partner                                Partner identifier field.
+└ sequence                               Omitted for unordered membership.
+OrderedJunctionSupabaseSpecification<J>  Ordered junction configuration and sequence field.
+├ JunctionSupabaseSpecification          Extends its table, adapter, and identifier settings.
+├ validator                              Create and update validation.
+└ sequence                               Numeric ordering field.
+BusRuleSupabaseSpecification             RPC or Edge Function configuration.
+SupabaseBaseFilter                       Common SDK filter discriminant.
+SupabaseScalarFilter                     Scalar equality and ordered comparisons.
+SupabaseInFilter                         Membership filter.
+SupabaseContainsFilter                   JSONB containment filter.
+SupabaseOrFilter                         Generated alternatives.
+SupabaseListFilter                       Ordered SDK filter operation union.
+SupabaseListRequest<T>                   Constructed list request and paging context.
+makeCrudSupabaseClient(spec)             Build CRUD/list client over Supabase.
+makeJunctionSupabaseClient(spec)         Build unordered or ordered owner-side junction client.
+makeSupabaseListRequest(spec, options)   Construct list operations without dispatch.
+makeBusRuleSupabaseRpcClient(spec)       Build business-rule client over Supabase RPC.
+makeBusRuleSupabaseEdgeClient(spec)      Build business-rule client over Edge Functions.
 */
 
 import { Supabase } from '@core/db/supabase.ts'
@@ -37,6 +47,7 @@ import type {
   Id,
   Instantiable,
   JunctionValidator,
+  OrderedJunctionValidator,
   ScopedUpdate,
   StringSet,
   UpdateFromInstantiable,
@@ -48,7 +59,9 @@ import type {
   ApiCrudContract,
   ApiErrorDetail,
   ApiJunctionContract,
+  ApiOrderedJunctionContract,
   DeleteResult,
+  JunctionListContract,
   ListOptions,
   ListQuery,
   ListResult,
@@ -56,6 +69,7 @@ import type {
   QueryScalar
 } from '@core/stdx'
 import {
+  ApiError,
   checkApiError,
   checkValidatorError,
   listPage,
@@ -68,9 +82,9 @@ import {
 } from '@core/stdx'
 import type { Adapter, AdapterPatch, ScopedUpdateAdapter } from '@core/stdx'
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 // SPECIFICATIONS
-// ───────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Configuration for a CRUD Supabase API client. */
 export type CrudSupabaseSpecification<T extends Instantiable> = {
@@ -80,81 +94,61 @@ export type CrudSupabaseSpecification<T extends Instantiable> = {
 }
 
 /** Configuration for an unordered junction Supabase API client. */
-type IdKey<J> = { [K in keyof J]: J[K] extends Id ? K : never }[keyof J]
 export type JunctionSupabaseSpecification<J> = {
   table: string
   adapter: Adapter<J>
   validator: JunctionValidator<J>
   owner: IdKey<J>
   partner: IdKey<J>
+  sequence?: never
 }
+
+/** Ordered junction settings; sequence names a numeric domain field. */
+export type OrderedJunctionSupabaseSpecification<J> =
+  & Omit<JunctionSupabaseSpecification<J>, 'validator' | 'sequence'>
+  & {
+    validator: OrderedJunctionValidator<J>
+    sequence: { [K in keyof J]-?: J[K] extends number ? K : never }[keyof J]
+  }
 
 /** Configuration for a Supabase business-rule client. */
 export type BusRuleSupabaseSpecification = {
   fn: string
 }
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 // MAKERS
-// ───────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 
 /**
- * Maker to produce an unordered junction API client over Supabase.
- * @param spec Table, domain adapter, create validator, and the two identifier fields.
- * @returns Complete single/set-owner membership reads and non-atomic, retryable set replacement.
+ * Build owner-side junction access; a sequence specification enables ordered mutation.
+ * @param spec Table, adapter, validators, identifier fields, and optional sequence field.
+ * @returns Complete reads and non-atomic replacement; ordered clients also open bound lists.
  */
-export const makeJunctionSupabaseClient = <J>(
-  { table, adapter, validator, owner, partner }: JunctionSupabaseSpecification<J>
-): ApiJunctionContract => {
+export function makeJunctionSupabaseClient<J>(
+  spec: OrderedJunctionSupabaseSpecification<J>
+): ApiOrderedJunctionContract
+export function makeJunctionSupabaseClient<J>(
+  spec: JunctionSupabaseSpecification<J>
+): ApiJunctionContract
+export function makeJunctionSupabaseClient<J>(
+  spec: JunctionSupabaseSpecification<J> | OrderedJunctionSupabaseSpecification<J>
+): ApiJunctionContract | ApiOrderedJunctionContract {
+  if (isOrderedJunctionSpecification(spec)) return makeOrderedJunctionClient(spec)
+  const { table, adapter, validator, owner, partner } = spec
   const ownerColumn = adapter[owner].column
   const partnerColumn = adapter[partner].column
 
+  const readRows = makeJunctionReader(table, ownerColumn, partnerColumn)
   const partnersOf = async (ownerIds: readonly Id[]): Promise<ReadonlyMap<Id, readonly Id[]>> => {
-    const grouped = new Map<Id, Id[]>(ownerIds.map(ownerId => [ownerId, []]))
-    const owners = [...grouped.keys()]
-    // Fifty UUIDs keep each owner filter below 2 KB, leaving room for paging and the endpoint.
-    const OWNER_BATCH_LIMIT = 50
-    for (let start = 0; start < owners.length; start += OWNER_BATCH_LIMIT) {
-      const batch = owners.slice(start, start + OWNER_BATCH_LIMIT)
-      let after: { owner: Id; partner: Id } | undefined
-      while (true) {
-        let builder = Supabase.client().from(table)
-          .select(`${ownerColumn},${partnerColumn}`, { count: 'exact' })
-          .in(ownerColumn, batch).order(ownerColumn).order(partnerColumn).limit(MAX_LIMIT)
-        if (after !== undefined) {
-          builder = builder.or(
-            `${ownerColumn}.gt.${after.owner},`
-              + `and(${ownerColumn}.eq.${after.owner},${partnerColumn}.gt.${after.partner})`
-          )
-        }
-        const { data, error, count } = await builder.returns<Dictionary[]>()
-        checkApiError(error, 'Failed to read junction partners', Supabase.errorToStatus)
-        const rows = data as Dictionary[]
-        if (rows.length === 0) break
-        for (const row of rows) grouped.get(row[ownerColumn] as Id)!.push(row[partnerColumn] as Id)
-        if (rows.length === count) break
-        const last = rows[rows.length - 1]
-        after = { owner: last[ownerColumn] as Id, partner: last[partnerColumn] as Id }
-      }
-    }
-    return grouped
+    const grouped = await readRows(ownerIds)
+    return new Map([...grouped].map(([ownerId, rows]) => [
+      ownerId,
+      rows.map(row => row[partnerColumn] as Id)
+    ]))
   }
-
-  const partners = async (ownerId: Id): Promise<readonly Id[]> => {
-    const members: Id[] = []
-    let after: Id | undefined
-    while (true) {
-      let builder = Supabase.client().from(table).select(partnerColumn)
-        .eq(ownerColumn, ownerId).order(partnerColumn).limit(MAX_LIMIT)
-      if (after !== undefined) builder = builder.gt(partnerColumn, after)
-      const { data, error } = await builder.returns<Dictionary[]>()
-      checkApiError(error, 'Failed to read junction partners', Supabase.errorToStatus)
-      const rows = data as Dictionary[]
-      if (rows.length === 0) return members
-      for (const row of rows) members.push(row[partnerColumn] as Id)
-      after = members[members.length - 1]
-    }
-  }
+  const partners = async (ownerId: Id): Promise<readonly Id[]> =>
+    (await partnersOf([ownerId])).get(ownerId)!
 
   const replace = async (ownerId: Id, partnerIds: readonly Id[]): Promise<void> => {
     const requested: StringSet = new Set(partnerIds)
@@ -430,9 +424,9 @@ export const makeBusRuleSupabaseEdgeClient = <
   }
 })
 
-// ───────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 // INTERNALS
-// ───────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Return an edge response's data, or throw the error it carries. */
 const unwrapEdgeData = <TResult>(data: unknown): TResult => {
@@ -512,4 +506,230 @@ const translateOperator = (
         ).join(',')
       }
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// JUNCTIONS
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Identifier fields accepted as junction sides. */
+type IdKey<J> = { [K in keyof J]: J[K] extends Id ? K : never }[keyof J]
+
+/** Bind complete membership reads to declared columns; cursors use immutable pair keys. */
+const makeJunctionReader = (
+  table: string,
+  ownerColumn: string,
+  partnerColumn: string,
+  sequenceColumn?: string
+) =>
+async (ownerIds: readonly Id[]): Promise<Map<Id, Dictionary[]>> => {
+  const grouped = new Map<Id, Dictionary[]>(ownerIds.map(ownerId => [ownerId, []]))
+  const owners = [...grouped.keys()]
+  const columns = [ownerColumn, partnerColumn]
+  if (sequenceColumn !== undefined) columns.push(sequenceColumn)
+  // Fifty UUIDs keep each owner filter below 2 KB, leaving room for paging and the endpoint.
+  const OWNER_BATCH_LIMIT = 50
+  for (let start = 0; start < owners.length; start += OWNER_BATCH_LIMIT) {
+    const batch = owners.slice(start, start + OWNER_BATCH_LIMIT)
+    let after: { owner: Id; partner: Id } | undefined
+    while (true) {
+      let builder = Supabase.client().from(table).select(columns.join(','), { count: 'exact' })
+        .in(ownerColumn, batch).order(ownerColumn).order(partnerColumn).limit(MAX_LIMIT)
+      if (after !== undefined) {
+        builder = builder.or(
+          `${ownerColumn}.gt.${after.owner},`
+            + `and(${ownerColumn}.eq.${after.owner},${partnerColumn}.gt.${after.partner})`
+        )
+      }
+      const { data, error, count } = await builder.returns<Dictionary[]>()
+      checkApiError(error, 'Failed to read junction partners', Supabase.errorToStatus)
+      const rows = data as Dictionary[]
+      if (rows.length === 0) break
+      for (const row of rows) grouped.get(row[ownerColumn] as Id)!.push(row)
+      if (rows.length === count) break
+      const last = rows[rows.length - 1]
+      after = { owner: last[ownerColumn] as Id, partner: last[partnerColumn] as Id }
+    }
+  }
+  if (sequenceColumn !== undefined) {
+    for (const rows of grouped.values()) {
+      rows.sort((a, b) =>
+        (a[sequenceColumn] as number) - (b[sequenceColumn] as number)
+        || (a[partnerColumn] as Id).localeCompare(b[partnerColumn] as Id)
+      )
+    }
+  }
+  return grouped
+}
+
+/** Partner identity and its stored position within one owner's links. */
+type JunctionLink = { partner: Id; sequence: number }
+
+const isOrderedJunctionSpecification = <J>(
+  spec: JunctionSupabaseSpecification<J> | OrderedJunctionSupabaseSpecification<J>
+): spec is OrderedJunctionSupabaseSpecification<J> => spec.sequence !== undefined
+
+/** Bind ordered reads and link writes to a declared junction. */
+const makeOrderedJunctionClient = <J>(
+  { table, adapter, validator, owner, partner, sequence }: OrderedJunctionSupabaseSpecification<J>
+): ApiOrderedJunctionContract => {
+  const ownerColumn = adapter[owner].column
+  const partnerColumn = adapter[partner].column
+  const sequenceColumn = adapter[sequence].column
+  const pairColumns = `${ownerColumn},${partnerColumn}`
+
+  const readRows = makeJunctionReader(table, ownerColumn, partnerColumn, sequenceColumn)
+  const readLinks = async (ownerId: Id): Promise<JunctionLink[]> =>
+    (await readRows([ownerId])).get(ownerId)!.map(row => ({
+      partner: row[partnerColumn] as Id,
+      sequence: row[sequenceColumn] as number
+    }))
+
+  const row = (ownerId: Id, link: JunctionLink, creating: boolean): Dictionary => {
+    const source = { [owner]: ownerId, [partner]: link.partner, [sequence]: link.sequence } as J
+    checkValidatorError(creating ? validator.validateCreate(source) : validator.validateUpdate(source))
+    return adapter.fromDomain(source as AdapterPatch<J>)
+  }
+  const confirm = (
+    requested: readonly Dictionary[],
+    returned: Dictionary[] | null,
+    columns: readonly string[]
+  ): void => {
+    const remaining = new Map(requested.map(record => [record[partnerColumn] as Id, record]))
+    if (returned === null) throw new ApiError('Junction write does not confirm the requested links', 409)
+    for (const record of returned) {
+      const expected = remaining.get(record[partnerColumn] as Id)
+      if (expected === undefined || columns.some(column => record[column] !== expected[column])) {
+        throw new ApiError('Junction write does not confirm the requested links', 409)
+      }
+      remaining.delete(record[partnerColumn] as Id)
+    }
+    if (remaining.size) throw new ApiError('Junction write does not confirm the requested links', 409)
+  }
+  const writeColumns = `${pairColumns},${sequenceColumn}`
+  const insert = async (rows: Dictionary[]): Promise<void> => {
+    const { data, error } = await Supabase.client().from(table).insert(rows)
+      .select(writeColumns).returns<Dictionary[]>()
+    checkApiError(error, 'Failed to insert ordered junction partners', Supabase.errorToStatus)
+    confirm(rows, data, [ownerColumn, partnerColumn, sequenceColumn])
+  }
+  const upsert = async (rows: Dictionary[]): Promise<void> => {
+    const { data, error } = await Supabase.client().from(table).upsert(rows, { onConflict: pairColumns })
+      .select(writeColumns).returns<Dictionary[]>()
+    checkApiError(error, 'Failed to write ordered junction positions', Supabase.errorToStatus)
+    confirm(rows, data, [ownerColumn, partnerColumn, sequenceColumn])
+  }
+  const removeLinks = async (ownerId: Id, partners: readonly Id[]): Promise<void> => {
+    const { data, error } = await Supabase.client().from(table).delete()
+      .eq(ownerColumn, ownerId).in(partnerColumn, partners).select(pairColumns).returns<Dictionary[]>()
+    checkApiError(error, 'Failed to delete ordered junction partners', Supabase.errorToStatus)
+    const requested = partners.map(partnerId => ({ [ownerColumn]: ownerId, [partnerColumn]: partnerId }))
+    confirm(requested, data, [ownerColumn, partnerColumn])
+  }
+  const partnersOf = async (ownerIds: readonly Id[]): Promise<ReadonlyMap<Id, readonly Id[]>> => {
+    const grouped = await readRows(ownerIds)
+    return new Map([...grouped].map(([ownerId, rows]) => [
+      ownerId,
+      rows.map(row => row[partnerColumn] as Id)
+    ]))
+  }
+  const partners = async (ownerId: Id): Promise<readonly Id[]> =>
+    (await partnersOf([ownerId])).get(ownerId)!
+
+  const replace = async (ownerId: Id, partnerIds: readonly Id[]): Promise<void> => {
+    const requested: StringSet = new Set(partnerIds)
+    if (requested.size !== partnerIds.length) {
+      throw new ApiError('Duplicate ordered junction partner', 422)
+    }
+    const current = await readLinks(ownerId)
+    const positions = new Map(current.map(link => [link.partner, link.sequence]))
+    const changed: Dictionary[] = []
+    for (const [index, partnerId] of partnerIds.entries()) {
+      const position = index + 1
+      if (positions.get(partnerId) === position) continue
+      changed.push(row(ownerId, { partner: partnerId, sequence: position }, !positions.has(partnerId)))
+    }
+    const removed = current.filter(link => !requested.has(link.partner)).map(link => link.partner)
+    if (removed.length) await removeLinks(ownerId, removed)
+    if (changed.length) await upsert(changed)
+  }
+
+  const list = async (ownerId: Id): Promise<JunctionListContract> => {
+    let links = await readLinks(ownerId)
+    if (new Set(links.map(link => link.sequence)).size !== links.length) {
+      throw new ApiError('Ordered junction list requires distinct sequence positions', 422)
+    }
+    let valid = true
+    let pending = Promise.resolve()
+    const requireValid = (): void => {
+      if (!valid) throw new ApiError('Reopen the junction list after a failed write', 409)
+    }
+    const indexOf = (partnerId: Id): number => {
+      const index = links.findIndex(link => link.partner === partnerId)
+      if (index < 0) throw new ApiError('Partner is not linked to this owner', 404)
+      return index
+    }
+    const commit = async (write: () => Promise<void>, next: JunctionLink[]): Promise<void> => {
+      try {
+        await write()
+      } catch (error) {
+        valid = false
+        throw error
+      }
+      links = next
+    }
+    const mutate = (operation: () => Promise<void>): Promise<void> => {
+      const previous = pending
+      let release!: () => void
+      pending = new Promise<void>(resolve => {
+        release = resolve
+      })
+      return (async () => {
+        await previous
+        try {
+          requireValid()
+          await operation()
+        } finally {
+          release()
+        }
+      })()
+    }
+    const move = (partnerId: Id, step: number): Promise<void> =>
+      mutate(async () => {
+        const index = indexOf(partnerId)
+        const adjacent = index + step
+        if (adjacent < 0 || adjacent >= links.length) return
+        const first = { ...links[index], sequence: links[adjacent].sequence }
+        const second = { ...links[adjacent], sequence: links[index].sequence }
+        const rows = [row(ownerId, first, false), row(ownerId, second, false)]
+        const next = [...links]
+        next[index] = second
+        next[adjacent] = first
+        // Both positions are written in one statement; no half-swap is published locally.
+        await commit(() => upsert(rows), next)
+      })
+    return {
+      items: () => {
+        requireValid()
+        return links.map(link => link.partner)
+      },
+      add: partnerId =>
+        mutate(async () => {
+          if (links.some(link => link.partner === partnerId)) {
+            throw new ApiError('Partner is already linked to this owner', 409)
+          }
+          const link = { partner: partnerId, sequence: (links.at(-1)?.sequence ?? 0) + 1 }
+          const record = row(ownerId, link, true)
+          await commit(() => insert([record]), [...links, link])
+        }),
+      remove: partnerId =>
+        mutate(async () => {
+          const index = indexOf(partnerId)
+          await commit(() => removeLinks(ownerId, [partnerId]), links.filter((_, at) => at !== index))
+        }),
+      moveBack: partnerId => move(partnerId, -1),
+      moveForward: partnerId => move(partnerId, 1)
+    }
+  }
+  return { partners, partnersOf, replace, list }
 }

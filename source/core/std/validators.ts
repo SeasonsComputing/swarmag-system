@@ -49,6 +49,9 @@ ExpectResult                    Standard validator return value.
 ExpectGuard<T>                  Type guard used by composition helpers.
 Validator<T>                    Domain mutation boundary validation shape.
 JunctionValidator<J>            Create-only junction boundary validation shape.
+OrderedJunctionValidator<J>     Create and update validation for ordered junction rows.
+├ JunctionValidator<J>          Extends create validation.
+└ validateUpdate                Validate a row's sequence update.
 notValid(message)               Throw ValidatorError with message.
 expectValid(...results)         Return first validation error or null.
 */
@@ -283,9 +286,14 @@ export type Validator<T extends Instantiable> = {
   validateUpdate: (input: UpdateFromInstantiable<T>) => ExpectResult
 }
 
-/** Domain validation for a junction: rows are inserted and deleted, never updated. */
+/** Create validation for junction membership. */
 export type JunctionValidator<J> = {
   validateCreate: (input: J) => ExpectResult
+}
+
+/** Domain validation for ordered junction rows and their sequence updates. */
+export type OrderedJunctionValidator<J> = JunctionValidator<J> & {
+  validateUpdate: (input: J) => ExpectResult
 }
 
 // ────────────────────────────────────────────────────────────────────────────

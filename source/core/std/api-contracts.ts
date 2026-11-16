@@ -17,6 +17,14 @@ ApiJunctionContract                   Owner-side junction membership contract.
 ├ partners(owner)                     Read complete unordered partner membership.
 ├ partnersOf(owners)                  Read complete membership grouped by owner.
 └ replace(owner, partners)            Replace membership as a set.
+JunctionListContract                  One owner's ordered partner ids.
+├ items()                             Read an isolated membership snapshot.
+├ add(partner)                        Append a partner.
+├ remove(partner)                     Remove one link without renumbering.
+├ moveBack(partner)                   Move one place earlier in the sequence.
+└ moveForward(partner)                Move one place later in the sequence.
+ApiOrderedJunctionContract            Ordered owner-side membership; extends ApiJunctionContract.
+└ list(owner)                         Open an owner-bound list mutator.
 ApiBusRuleContract<TParams, TResult>  Generic business-rule execution contract.
 └ run(params)                         Execute business rule and return typed result.
 
@@ -215,6 +223,50 @@ export interface ApiJunctionContract {
    * Writes are not atomic across requests.
    */
   replace(owner: Id, partners: readonly Id[]): Promise<void>
+}
+
+/**
+ * One owner's ordered links, identified by partner id rather than array index.
+ * Commands serialize within this instance; other writers require a fresh list.
+ * Local state advances only after the database confirms the requested identities and positions.
+ * A failed or unconfirmed write invalidates reads and commands; reopen to reconcile persisted state.
+ * Relative moves are not automatically replayed. Boundary moves perform no write.
+ */
+export interface JunctionListContract {
+  /** Read an isolated snapshot of the last successful membership/order. */
+  items(): readonly Id[]
+
+  /** Append at the next sequence position; duplicate membership fails. */
+  add(partner: Id): Promise<void>
+
+  /** Delete the link; unknown partners fail and remaining positions retain their values. */
+  remove(partner: Id): Promise<void>
+
+  /** Exchange positions with the preceding link; unknown partners fail. */
+  moveBack(partner: Id): Promise<void>
+
+  /** Exchange positions with the following link; unknown partners fail. */
+  moveForward(partner: Id): Promise<void>
+}
+
+/** Ordered junction membership with distinct positions per owner; gaps are valid. */
+export interface ApiOrderedJunctionContract extends ApiJunctionContract {
+  /** Read complete partner membership in sequence order, breaking ties by partner id. */
+  partners(owner: Id): Promise<readonly Id[]>
+
+  /** Read complete ordered membership for each owner, including empty owners. */
+  partnersOf(owners: readonly Id[]): Promise<ReadonlyMap<Id, readonly Id[]>>
+
+  /**
+   * Replace membership and order, assigning sequence positions from one.
+   * Duplicate partners fail validation before writes. All changed rows validate before deletion.
+   * Writes confirm the requested link identities and positions before reporting success.
+   * Multi-request replacement is non-atomic; replay converges without competing writers.
+   */
+  replace(owner: Id, partners: readonly Id[]): Promise<void>
+
+  /** Open an owner-bound list; tied positions fail without silently rewriting links. */
+  list(owner: Id): Promise<JunctionListContract>
 }
 
 /** Non-mutating-shape CRUD primitives shared by every ApiCrudContract realization. */
