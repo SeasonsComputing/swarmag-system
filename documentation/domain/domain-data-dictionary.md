@@ -665,7 +665,7 @@ Attributes: **State**
 | -------------- | ----------------------------------------- |
 | `name`         | string                                    |
 | `description?` | string                                    |
-| `version`      | number                                    |
+| `version`      | string                                    |
 | `facets`       | CompositionMany\<string\> (`scheme:code`) |
 
 ### 11.12 WorkflowTask

@@ -89,7 +89,7 @@ Deno.test('Service and Workflow create and update validate facet references', ()
     notes: [],
     facets: ['service:aerial/spray']
   }
-  const workflow = { name: 'Spray preparation', version: 1, notes: [], facets: service.facets }
+  const workflow = { name: 'Spray preparation', version: '1.0', notes: [], facets: service.facets }
   assertEquals(validateServiceCreate(service), null)
   assertEquals(validateWorkflowCreate(workflow), null)
   const patch = { id: FacetSamples.aerialSpray.id, facets: service.facets }

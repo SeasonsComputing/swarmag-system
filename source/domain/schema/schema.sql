@@ -355,7 +355,7 @@ CREATE TABLE workflows (
   notes JSONB NOT NULL DEFAULT '[]'::jsonb,
   name TEXT NOT NULL,
   description TEXT,
-  version INTEGER NOT NULL,
+  version TEXT NOT NULL,
   facets JSONB NOT NULL DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),

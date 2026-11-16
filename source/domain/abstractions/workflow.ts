@@ -120,7 +120,7 @@ export type Workflow = Instantiable & {
   notes: CompositionMany<Note>
   name: string
   description?: string
-  version: number
+  version: string
   facets: CompositionMany<string>
 }
 

@@ -139,7 +139,7 @@ export const validateWorkflowCreate = (input: WorkflowCreate): ExpectResult =>
     expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.name, 'name'),
     expectNonEmptyString(input.description, 'description', true),
-    expectPositiveNumber(input.version, 'version'),
+    expectNonEmptyString(input.version, 'version'),
     expectCompositionMany(input.facets, 'facets', isFacetRef)
   )
 
@@ -150,7 +150,7 @@ export const validateWorkflowUpdate = (input: WorkflowUpdate): ExpectResult =>
     expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.name, 'name', true),
     expectNonEmptyString(input.description, 'description', true),
-    expectPositiveNumber(input.version, 'version', true),
+    expectNonEmptyString(input.version, 'version', true),
     expectCompositionMany(input.facets, 'facets', isFacetRef, true)
   )
 
@@ -193,3 +193,4 @@ export const isAnswer = (v: unknown): v is Answer => {
         expectWhen(answer.capturedAt, 'capturedAt')
       ) === null && isAllowedValue
 }
+

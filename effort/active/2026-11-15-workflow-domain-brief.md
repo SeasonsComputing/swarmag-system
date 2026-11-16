@@ -6,9 +6,17 @@ are locked namespaces.
 
 ## Status
 
-The Answer and Note slice is implemented, including the shared Notes editor and edge source sync.
-Checks and STYLE_AUDIT are not run under the CA's instruction. Workflow versions, ordered
-junctions, and the five clients remain undispatched.
+The Answer and Note slice is implemented. The stage `user-create` and `user-update` edge functions
+use the updated domain validators. The CA verifies attachment-only User Note Save on screen.
+Q&A has no capture or execution surface, so Answer behavior has no end-to-end verification.
+Checks and STYLE_AUDIT are not run under the CA's instruction.
+
+The Workflow version slice is implemented across the dictionary, abstraction, validator, schema,
+and affected test data. The adapter mapping and derived protocols carry the string unchanged.
+The edge source copy includes the version changes; stage deployment and database reset are
+outside this slice. Checks and STYLE_AUDIT are not run under the CA's instruction.
+
+Ordered junctions and the five clients remain undispatched.
 
 ## Design
 
@@ -36,14 +44,16 @@ combined content, and rejects an empty Note. Drafts, text normalization, titles,
 indicators, and errors handle absent text consistently. Structural domain validation checks
 optional text and attachment shapes; content sufficiency belongs to the editing surface.
 
+The Note index title uses the first line of text, a single attachment's filename, or the count
+for multiple attachments. An empty draft uses "Untitled note".
+
 Photos are Note attachments, available with every Question type. Question types are `internal`,
 `text`, `number`, `boolean`, `single-select`, and `multi-select`.
 
 ### Workflow version
 
-`Workflow.version` is a string in the form `major.minor` (`"4.2"`), stored as `TEXT`. The validator
-requires two non-negative integers joined by a dot. The domain owns the form; the Builder owns
-when the major or minor changes.
+`Workflow.version` is a string, stored as `TEXT`. Domain validation uses the existing nonempty
+string expectation. The Builder owns its `major.minor` interpretation (`"4.2"`) and advancement.
 
 ### The five clients
 
@@ -72,12 +82,9 @@ Workflow carries facets; Task and Question carry none. The Builder edits Workflo
 Documentation leads implementation:
 
 - **domain-data-dictionary §5.4 and §11:** optional Note `content`, captured Answer `type`,
-  optional Answer `value`, and Workflow `version` as a `major.minor` string.
+  optional Answer `value`, and Workflow `version` as a string.
 - **architecture-core §5:** the junction client family includes an ordered variant.
 - **domain-seed-data:** Workflow versions use the string form wherever present.
-
-The dictionary retains its table-first structure. Concrete Answer and Note field changes require
-no new domain or UX archetype rules.
 
 ## Production scope
 
@@ -87,7 +94,7 @@ Paths are under `source/`.
 | ----- | ---- |
 | `domain/abstractions/workflow.ts` | Answer `type`, optional `value`, string Workflow `version` |
 | `domain/adapters/workflow-adapter.ts` | Answer type mapping and Workflow version serialization |
-| `domain/validators/workflow-validator.ts` | Answer structural validation and `major.minor` validation |
+| `domain/validators/workflow-validator.ts` | Answer structural validation and string version validation |
 | `domain/abstractions/common.ts` | Optional Note `content` |
 | `domain/validators/common-validator.ts` | Optional Note text shape validation |
 | `front/app/shell/notes/notes-editor.tsx` | Text or attachments satisfy content; absent text handling |
@@ -128,14 +135,21 @@ Changes outside this scope require escalation.
 - Note permits absent text structurally; supplied text and attachments satisfy shape validation.
 - The Notes editor saves text-only, attachment-only, and combined content, rejects an empty Note,
   and displays Notes without text safely.
+- The Note index identifies attachment-only Notes by filename or attachment count.
 - The edge domain copy contains the source abstractions, adapters, and validators.
-- A version outside `major.minor` fails validation.
+- Workflow version validation accepts nonempty strings; create requires a version and update
+  permits its omission. Interpretation of the string belongs to the Builder.
 - `WorkflowTasks.partners` returns Tasks in `sequence` order; `replace` writes the supplied order;
   a replayed `replace` converges.
 - The CA runs `db-genesis`; the five clients read and write on stage.
 
 Implementation verification comprises `deno task check`, `deno task fmt:check`, the permitted
-unit suite, and STYLE_AUDIT. The current Answer/Note slice has no verification claim.
+unit suite, and STYLE_AUDIT. These checks are not run for the Answer/Note slice under the CA's
+instruction. Its verification is limited to the CA's attachment-only User Note Save on screen.
+Answer validation and nested adapter round-trip are testable independently of the Runner;
+those tests are not present. Q&A end-to-end verification depends on the Runner capture surface.
+The Workflow version slice has no verification claim; the schema applies through the CA's
+greenfield database reset.
 
 ## Open
 
