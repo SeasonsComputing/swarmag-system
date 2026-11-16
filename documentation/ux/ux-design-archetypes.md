@@ -63,7 +63,7 @@ Disclosure is about how much a user can take in at once. It is the reason the co
 
 **A surface may compose more than one archetype**, and composing them is where feature design does its creative work. What a surface keys that composition on is a design decision, not a property of the archetypes: `AbstractionManager` keys on viewport, and nothing requires that. Another surface might key on role, on data volume, or on task mode.
 
-Consequently an archetype names a surface's behaviour _in a mode_, not a permanent classification of a screen.
+Consequently an archetype names a surface's behavior _in a mode_, not a permanent classification of a screen.
 
 ## 3. Collection Archetypes
 
@@ -184,7 +184,7 @@ The sketch shows an Index embedded in a form, where a Detail commits into its pa
 - Selecting an Item replaces the panel it lives in. The Collection is not scrolled past, not below, not collapsed — it is gone.
 - Drill-back restores the panel that was replaced.
 - This holds identically at every depth. A note's Detail replaces the _site's_ panel.
-- Creating an Item opens it. That is one behaviour, not two.
+- Creating an Item opens it. That is one behavior, not two.
 - Hosted inside a Sequence Step, drill-back replaces the Sequence's controls rather than joining them (§4.2).
 - An Index-Detail surface nests freely. A Collection nested inside a Detail is another Index-Detail, and the Index it replaces is the panel it was opened from.
 
@@ -216,7 +216,7 @@ The sketch shows an Index embedded in a form, where a Detail commits into its pa
 
 These hold for every Collection archetype, at every depth, in every application.
 
-- **A Collection behaves identically at every depth, whatever visualization presents it.** Depth changes nothing about its appearance or behaviour. A user who has learned one Collection has learned all of them, including the ones not yet built. That transfer is why the component is shared, and it outranks local visual harmony inside any one panel.
+- **A Collection behaves identically at every depth, whatever visualization presents it.** Depth changes nothing about its appearance or behavior. A user who has learned one Collection has learned all of them, including the ones not yet built. That transfer is why the component is shared, and it outranks local visual harmony inside any one panel.
 - **An archetype never names a visualization.** See §2.2.
 - **Selection is drawable only under full disclosure.** See §2.1. A selected state plumbed into a selective-disclosure surface is dead markup by construction.
 - **A destructive row action inside an activation target requires confirmation.** The row activates on click, so a delete control inside it is a mis-click hazard and the confirmation absorbs it. This is not conditional on the Item looking empty.

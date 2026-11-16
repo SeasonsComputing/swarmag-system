@@ -8,6 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Edits notes within a step-owned drill host without persisting. New notes remain
 local until Save; existing timestamps and attachments survive content edits.
+Save requires text or an attachment; either supplies the Note's content.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -122,17 +123,18 @@ type NotePanelProps = {
 }
 
 const NotePanel = (props: NotePanelProps): UiComponent => {
-  const original = copyDraft(props.note)
-  const [draft, setDraft] = createStore(copyDraft(props.note))
+  const original = { ...copyDraft(props.note), content: props.note.content ?? '' }
+  const [draft, setDraft] = createStore(copyDraft(original))
   const [attaching, setAttaching] = createSignal(false)
   const [saveAttempted, setSaveAttempted] = createSignal(false)
-  const error = (): boolean => saveAttempted() && !isNote(draft)
+  const hasContent = (): boolean => draft.content.trim().length > 0 || draft.attachments.length > 0
+  const error = (): boolean => saveAttempted() && (!isNote(draft) || !hasContent())
   props.context.registerDirty(() => isDraftChanged(draft, original))
   const save = (): void => {
     if (!props.context.isActive() || attaching()) return
     setSaveAttempted(true)
-    const note = { ...copyDraft(draft), content: toTrimmed(draft.content) }
-    if (!isNote(note)) return
+    const note = { ...copyDraft(draft), content: UiText.optional(toTrimmed(draft.content)) }
+    if (!isNote(note) || !hasContent()) return
     props.onSave(note)
     props.context.returnToParent()
   }
@@ -167,14 +169,14 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
               >
                 {UiText.relativeTime(draft.createdAt)}
               </time>
-              <UiField for='note-content' label='Content' required>
+              <UiField for='note-content' label='Content' required={draft.attachments.length === 0}>
                 <UiTextArea
                   name='note-content'
                   rows={6}
                   value={draft.content}
-                  error={saveAttempted() && draft.content.trim().length === 0}
+                  error={saveAttempted() && !hasContent()}
                   onInput={event => setDraft('content', event.currentTarget.value)}
-                  required
+                  required={draft.attachments.length === 0}
                 />
               </UiField>
             </UiLayout>
@@ -194,4 +196,11 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
   )
 }
 
-const noteTitle = (note: Note): string => UiText.untitled(note.content.split('\n')[0], 'Untitled note')
+/** Summarize a note by its text, filename, or attachment count. */
+const noteTitle = (note: Note): string => {
+  const text = toTrimmed(note.content ?? '').split('\n')[0]
+  if (text) return text
+  if (note.attachments.length === 1) return note.attachments[0].filename
+  if (note.attachments.length > 1) return `${note.attachments.length} attachments`
+  return 'Untitled note'
+}

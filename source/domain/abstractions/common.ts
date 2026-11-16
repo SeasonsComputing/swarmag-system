@@ -59,7 +59,7 @@ export type Attachment = {
 export type Note = {
   attachments: CompositionMany<Attachment>
   createdAt: When
-  content: string
+  content?: string
 }
 
 /** Curated classification catalog entry: one code within a scheme. */

@@ -124,36 +124,38 @@ export function UserStepDetail(props: {
                     required
                   />
                 </UiField>
-                <UiField for='primaryEmail' label='Email' required>
-                  <UiInput
-                    name='primaryEmail'
-                    type='email'
-                    value={primaryEmail()}
-                    onInput={event => {
-                      setPrimaryEmail(event.currentTarget.value)
-                      validation.inputField('primaryEmail')
-                    }}
-                    onBlur={() => validation.blurField('primaryEmail')}
-                    error={validation.isInvalid('primaryEmail')}
-                    disabled={props.context.busy()}
-                    required
-                  />
-                </UiField>
-                <UiField for='phoneNumber' label='Phone' required>
-                  <UiInput
-                    name='phoneNumber'
-                    type='tel'
-                    value={phoneNumber()}
-                    onInput={event => {
-                      setPhoneNumber(event.currentTarget.value)
-                      validation.inputField('phoneNumber')
-                    }}
-                    onBlur={() => validation.blurField('phoneNumber')}
-                    error={validation.isInvalid('phoneNumber')}
-                    disabled={props.context.busy()}
-                    required
-                  />
-                </UiField>
+                <UiLayout variant='inline-fill'>
+                  <UiField for='primaryEmail' label='Email' required>
+                    <UiInput
+                      name='primaryEmail'
+                      type='email'
+                      value={primaryEmail()}
+                      onInput={event => {
+                        setPrimaryEmail(event.currentTarget.value)
+                        validation.inputField('primaryEmail')
+                      }}
+                      onBlur={() => validation.blurField('primaryEmail')}
+                      error={validation.isInvalid('primaryEmail')}
+                      disabled={props.context.busy()}
+                      required
+                    />
+                  </UiField>
+                  <UiField for='phoneNumber' label='Phone' required>
+                    <UiInput
+                      name='phoneNumber'
+                      type='tel'
+                      value={phoneNumber()}
+                      onInput={event => {
+                        setPhoneNumber(event.currentTarget.value)
+                        validation.inputField('phoneNumber')
+                      }}
+                      onBlur={() => validation.blurField('phoneNumber')}
+                      error={validation.isInvalid('phoneNumber')}
+                      disabled={props.context.busy()}
+                      required
+                    />
+                  </UiField>
+                </UiLayout>
               </UiLayout>
             </UiFieldset>
             <UiFieldset legend='Contact Preferences'>

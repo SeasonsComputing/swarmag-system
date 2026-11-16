@@ -34,7 +34,8 @@ import {
   expectPositiveNumber,
   expectValid,
   expectWhen,
-  isDictionary
+  isDictionary,
+  isNullish
 } from '@core/std'
 import type { ExpectResult } from '@core/std'
 import type { Answer, SelectOption } from '@domain/abstractions/workflow.ts'
@@ -181,12 +182,13 @@ export const isAnswer = (v: unknown): v is Answer => {
   if (!isDictionary(v)) return false
   const answer = v
   const value = answer.value
-  const isAllowedValue = typeof value === 'string' || typeof value === 'number'
+  const isAllowedValue = isNullish(value) || typeof value === 'string' || typeof value === 'number'
     || typeof value === 'boolean'
     || (Array.isArray(value) && value.every(item => typeof item === 'string'))
 
   return expectValid(
         expectId(answer.questionId, 'questionId'),
+        expectConstEnum(answer.type, 'type', QUESTION_TYPES),
         expectCompositionMany(answer.notes, 'notes', isNote),
         expectWhen(answer.capturedAt, 'capturedAt')
       ) === null && isAllowedValue

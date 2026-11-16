@@ -68,6 +68,7 @@ const FieldMetadataLogEntry: JobWorkLogEntry = {
   userId: USER_ID,
   answer: [{
     questionId: TELEMETRY_QUESTION_ID,
+    type: 'internal',
     value: '32.2144,-97.1234',
     capturedAt: toWhen('2025-01-18T16:21:00Z'),
     notes: []

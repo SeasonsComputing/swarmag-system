@@ -173,7 +173,7 @@ Attributes: **State**
 | **Attribute** | **Type** |
 | ------------- | -------- |
 | `createdAt`   | When     |
-| `content`     | string   |
+| `content?`    | string   |
 
 ### 5.5 Facet
 
@@ -590,7 +590,7 @@ Discriminator: `type`
 
 ### 11.8 Answer
 
-Purpose: **Captured response to a question; notes carry crew annotations and attachments**
+Purpose: **Records the question's answer at capture time; notes carry crew annotations and attachments**
 
 Type: **object**
 
@@ -605,7 +605,8 @@ Attributes: **State**
 
 | **Attribute** | **Type**                                        |
 | ------------- | ----------------------------------------------- |
-| `value`       | `string` \| `number` \| `boolean` \| `string[]` |
+| `type`        | QuestionType                                    |
+| `value?`      | `string` \| `number` \| `boolean` \| `string[]` |
 | `capturedAt`  | When                                            |
 
 ### 11.9 Task

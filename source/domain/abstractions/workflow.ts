@@ -95,8 +95,9 @@ export type Question = InternalQuestion | ScalarQuestion | SelectQuestion
 /** Captured response to a question. */
 export type Answer = {
   questionId: AssociationOne<Question>
+  type: QuestionType
   notes: CompositionMany<Note>
-  value: string | number | boolean | string[]
+  value?: string | number | boolean | string[]
   capturedAt: When
 }
 

@@ -27,6 +27,7 @@ import {
   expectValid,
   expectWhen,
   isDictionary,
+  isNullish,
   isNonEmptyString
 } from '@core/std'
 import type { ExpectResult } from '@core/std'
@@ -74,9 +75,8 @@ export const isNote = (v: unknown): v is Note => {
   const note = v
   return expectValid(
     expectCompositionMany(note.attachments, 'attachments', isAttachment),
-    expectWhen(note.createdAt, 'createdAt'),
-    expectNonEmptyString(note.content, 'content')
-  ) === null
+    expectWhen(note.createdAt, 'createdAt')
+  ) === null && (isNullish(note.content) || typeof note.content === 'string')
 }
 
 /** Guard for scheme:code references with exactly one separator. */

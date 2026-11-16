@@ -83,6 +83,7 @@ export const QuestionAdapter = makeAdapter<Question>({
 /** Deserialize/Serialize Answer. */
 export const AnswerAdapter = makeAdapter<Answer>({
   questionId: ['question_id'],
+  type: ['type'],
   notes: ['notes', NoteAdapter],
   value: ['value'],
   capturedAt: ['captured_at']
