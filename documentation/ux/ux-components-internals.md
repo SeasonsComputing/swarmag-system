@@ -32,6 +32,7 @@ component-local CSS.
 | Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content                  |
 | Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders                        |
 | Card           | `--sa-card-*`                                                 | Card decoration, elevation, and tonal tones |
+| Dialog         | `--sa-dialog-*`                                               | Dialog surface and pad                      |
 | Table          | `--sa-table-*`                                                | Table parts                                 |
 | Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries                   |
 | Progress       | `--sa-progress-*`                                             | Progress track and fill                     |

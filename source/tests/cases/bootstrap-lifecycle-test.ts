@@ -48,7 +48,8 @@ async function browserHarness() {
   )
   const { makeHelmWidget } = await import('/source/ux/widgets/make-helm-widget.tsx')
   const { HelmWidget } = await import('/source/ux/widgets/helm-widget.tsx')
-  const { HelmButton, HelmButtonGlyph } = await import('/source/ux/widgets/helm-button.tsx')
+  const { HelmButtonGlyph } = await import('/source/ux/widgets/helm-button.tsx')
+  const { UiActionButton } = await import('/source/ux/ui/components/ui-action-button.tsx')
   const { UiPopover } = await import('/source/ux/ui/components/ui-popover.tsx')
   const { createComponent, createSignal, onCleanup } = await import('solid-js')
   const { render } = await import('solid-js/web')
@@ -123,8 +124,8 @@ async function browserHarness() {
     probeMount: () => {
       probe.dataset.widget = 'helm-widget'
       probeDispose = render(() => [
-        createComponent(HelmButton, {
-          icon: 'update', label: 'Probe command',
+        createComponent(UiActionButton, {
+          density: 'dense', icon: 'update', label: 'Probe command',
           get loading() { return probeLoading() }, get disabled() { return probeDisabled() },
           ref: element => { probeRef = element }, 'aria-describedby': 'probe-help',
           onClick: () => { probeCalls++ }
@@ -205,7 +206,6 @@ try {
     }))
     for (const style of styles) assert.deepEqual(style, ['0px', 'rgba(0, 0, 0, 0)'])
     assert.equal(await toolbar.locator('[data-widget="helm-action-frame"]').count(), 0)
-    assert.equal(await toolbar.locator('[data-ui="action-button"]').count(), 0)
     const centers = await toolbar.locator('button').evaluateAll(buttons => buttons.map(button => {
       const target = button.getBoundingClientRect()
       const glyph = button.querySelector('[data-widget="helm-button-glyph"]').getBoundingClientRect()
@@ -361,13 +361,13 @@ try {
   await page.evaluate(() => Harness.setProbeLoading(true))
   assert.equal(await probeCommand.isDisabled(), true)
   assert.equal(await probeMenu.isDisabled(), true)
-  assert.equal(await probeCommand.getAttribute('aria-busy'), 'true')
+  assert.equal(await probeCommand.getAttribute('data-ui-state'), 'loading')
   await probeCommand.evaluate(element => element.click())
   assert.equal(await page.evaluate(() => Harness.probeCalls()), 2)
   await page.evaluate(() => { Harness.setProbeLoading(false); Harness.setProbeDisabled(true) })
   assert.equal(await probeCommand.isDisabled(), true)
   assert.equal(await probeMenu.isDisabled(), true)
-  assert.equal(await probeCommand.getAttribute('aria-busy'), null)
+  assert.equal(await probeCommand.getAttribute('data-ui-state'), 'disabled')
   await page.evaluate(() => Harness.setProbeDisabled(false))
   await probeMenu.focus()
   await page.keyboard.press('Space')

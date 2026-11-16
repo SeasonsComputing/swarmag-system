@@ -126,8 +126,8 @@
   inline-size: auto;
 }
 
-/* The frame draws nothing: an action is a glyph, a bar, and a label, not a ring. It keeps its
-   box, sized to the ring, so an icon-only action keeps its touch target. */
+/* An action is a glyph, a bar, and a label; its frame draws nothing unless the caller declares a
+   ring, and keeps its box so an icon-only action keeps its touch target. */
 [data-ui='action-button-frame'] {
   align-items: center;
   background: transparent;

@@ -1,12 +1,11 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Helm button styles                                                           ║
-║ Shared local presentation for commands and existing popover trigger hosts.   ║
+║ Presentation for the Helm's popover triggers.                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* Both semantic hosts contain the same Helm-owned glyph. */
-[data-widget='helm-button'][data-ui='button'],
+/* A popover trigger holding the Helm's glyph. */
 [data-widget='helm-widget'] [data-ui='button']:has([data-widget='helm-button-glyph']) {
   align-items: center;
   background: transparent;
@@ -27,7 +26,6 @@
   transition: var(--sa-transition-fast);
 }
 
-[data-widget='helm-button'][data-ui='button']:not([disabled]):hover,
 [data-widget='helm-widget']
   [data-ui='button']:has([data-widget='helm-button-glyph']):not([disabled]):hover {
   background: transparent;
@@ -36,7 +34,6 @@
   transform: none;
 }
 
-[data-widget='helm-button'][data-ui='button']:not([disabled]):focus-visible,
 [data-widget='helm-widget']
   [data-ui='button']:has([data-widget='helm-button-glyph']):not([disabled]):focus-visible {
   background: transparent;
@@ -49,7 +46,6 @@
   transform: none;
 }
 
-[data-widget='helm-button'][data-ui='button'][disabled],
 [data-widget='helm-widget'] [data-ui='button']:has([data-widget='helm-button-glyph'])[disabled] {
   box-shadow: none;
   cursor: not-allowed;

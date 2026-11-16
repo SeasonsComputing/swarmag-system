@@ -1,6 +1,6 @@
 # Look and Feel Pass — Brief
 
-**Active; items 1–3 and 5 done, items 4 and 6–8 ready for ACE.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
+**Active; items 1–6 and 8 done; item 7, the checks, is the CA's.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
 workbench panes shipped (`effort/completed/2026-11-15-dialog-look-brief.md`), the CA and AI
 Architect reworked the suite's look in look-and-feel mode: hacked fast, committed as it settled.
 This brief records what shipped, the rules it settled, and the clean-up that makes it right.
@@ -41,8 +41,8 @@ No checks were run on any of these commits.
 
 ## Clean-up scope
 
-The CA and the AI Architect did items 1–3 and 5 directly on 2026-11-15; items 4, 6, and 7 are
-ACE's. Paths are
+The CA and the AI Architect did items 1–6 and 8 directly on 2026-11-15, ACE being unavailable;
+item 7, the checks, cannot run in this session and is the CA's. Paths are
 under `source/`.
 
 1. **Documentation.** Done:
@@ -58,30 +58,28 @@ under `source/`.
    touch box.
 3. **Sheets.** Done: the design language states a sheet's single region is the dark tonal card;
    `Lister` (always a sheet) and the Library's `DrillNavigator` follow it.
-4. **For ACE: remove `HelmButton`** (`ux/widgets/helm-button.tsx`) and the `helm-button.css` rules
-   only it consumed; `HelmButtonGlyph` and its trigger rules stay for popover triggers. The browser
-   test `tests/cases/bootstrap-lifecycle-test.ts` still mounts `HelmButton` as a probe (loading,
-   `aria-busy`, ref forwarding, `aria-describedby`, click count, a centered glyph in a frameless
-   target) and asserts the toolbar holds no `UiActionButton` — a decision this pass reversed.
-   Rewrite the probe around a dense `UiActionButton`, drop that assertion, and add a plain command
-   to the test toolbar so the command path, with its hover glow (`helm-widget.css`), is covered.
-   Run the browser test (`-- --browser`).
+4. **`HelmButton` removed.** Done: `ux/widgets/helm-button.tsx` keeps only `HelmButtonGlyph` for
+   popover triggers; `helm-button.css` keeps only the trigger rules. The browser test
+   `tests/cases/bootstrap-lifecycle-test.ts` mounts its probe as a dense `UiActionButton`: busy and
+   disabled are asserted through `data-ui-state` (the action button has no `aria-busy`), and the
+   assertion that the toolbar holds no `UiActionButton` is gone. The test's toolbar still has no
+   plain command, so the command path and its glow are not covered by it. Unrun.
 5. **Redundant CSS.** Done: `front/app-admin/customers/customer-step-detail.css` keeps only the
    picker wrapper's `min-inline-size: 0`. Its layout rules are gone: the 16rem floor sits under the
    select's own `--sa-size-wrap` floor, `justify-items: stretch` no longer moves a fit-content
    select, and a fit-content layout already stays within its field. ACE verifies the Manager picker
    on screen with the checks (item 7).
-6. **For ACE: comments** carry design reasons, not session notes; sweep this pass's CSS and TSX.
-7. **For ACE: checks.** None of this pass's commits has been checked; run the set below and fix
-   in-scope failures.
+6. **Comments.** Done: this pass's comments state the design as it is; the action-frame comment
+   no longer defines itself against a ring.
+7. **Checks (CA).** None of this pass's commits has been checked: run the set below, the browser
+   test included (`-- --browser`), and fix in-scope failures.
 
-8. **For ACE: document the late changes** (`ae843cb`…`337f4a3`): cards and dialogs no longer
-   blur (`backdrop-filter` was the long-standing interaction lag; header, footer, and select
-   dropdown keep it); dialogs take `--sa-dialog-bg` per theme, a step from the panes they hold;
-   the light theme's table and form sit on the popup surface; the site editor's sections are in
-   `PanelSections`; Notes tabs hold their content without fieldsets; light `--sa-text-dim` is
-   60%; the sequence rail reveals a full-rail gradient by clip, as `UiProgress` does. ux-design-language §4.6 and
-   the internals token catalog (`--sa-dialog-bg`).
+8. **Late changes documented.** Done: ux-design-language §4.6 (a dialog's `--sa-dialog-bg` sits a
+   step from its panes; working surfaces are opaque and backdrop blur belongs to thin chrome) and
+   the `--sa-filter-blur` purpose; the Dialog token row in both catalogs; ux-components-guide
+   `UiProgress` (the gradient spans the track and progress reveals it; the Sequence rail fills
+   through the current Step). The site editor's sections and the Notes tabs follow existing rules
+   and need no new text.
 
 Out of scope: new looks; the overlay-trigger brief (B-6), which is what lets the Helm's menu
 triggers become `UiActionButton`s too.

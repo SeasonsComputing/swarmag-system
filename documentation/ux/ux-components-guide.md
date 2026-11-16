@@ -790,6 +790,10 @@ Linear progress indicator.
 Use to show progress through a determinate operation such as upload, sync, or
 batch completion.
 
+The brand gradient spans the whole track, and progress reveals it, so the color at the leading
+edge tells how far along the operation is. A Sequence's progress rail follows the same rule and
+fills through the current Step.
+
 **Props**
 
 | Prop       | Type          | Required | Default | Description                |

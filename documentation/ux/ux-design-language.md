@@ -309,6 +309,7 @@ component code or selector structure.
 | Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content                  |
 | Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders                        |
 | Card           | `--sa-card-*`                                                 | Card decoration, elevation, and tonal tones |
+| Dialog         | `--sa-dialog-*`                                               | Dialog surface and pad                      |
 | Table          | `--sa-table-*`                                                | Table parts                                 |
 | Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries                   |
 | Progress       | `--sa-progress-*`                                             | Progress track and fill                     |
@@ -337,6 +338,11 @@ owns both values, as `--sa-card-*` tokens, so adjacent regions remain distinct i
 themes alike. Where a window holds an Aside and a Main, the Aside takes the dark tone and Main the
 light, and the two attach: the corners at their shared seam are square, so the pair reads as one
 rounded surface divided by tone.
+
+A dialog's own surface is `--sa-dialog-bg`, a step from the panes it holds, so the window reads as
+the frame around them. Every surface a person works on is opaque; backdrop blur belongs only to
+thin chrome over moving content — the dashboard header, the footer, a select's dropdown — because
+blurring a large surface makes every interaction beneath it repaint.
 
 **Sections divide a region.** Inside a region, a form's sections are divided by a rule, not boxed:
 each section is an unframed fieldset whose legend is a small uppercase label, and a hairline
@@ -456,7 +462,7 @@ detail of that ordering.
 
 | Token              | Purpose                        |
 | ------------------ | ------------------------------ |
-| `--sa-filter-blur` | Shared backdrop blur treatment |
+| `--sa-filter-blur` | Backdrop blur for thin chrome  |
 | `--sa-filter-mono` | Monochrome asset filter        |
 
 ### 5.8 Motion And Transitions
