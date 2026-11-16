@@ -227,7 +227,6 @@ and CONVENTIONS §14.3: incremental advancement preserves existing state through
 a CA-authorized greenfield genesis reset applies the complete canonical schema without a
 migration for changes already represented there.
 
-
 ## Amendment — 2026-11-16 · Review and closure preparation
 
 The CA authorized the review follow-up. The stage test now uses complete paginated reads for

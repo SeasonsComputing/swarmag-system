@@ -142,7 +142,10 @@ const verifyOrder = async (
 }
 
 // Exhaust every page before reporting absence; stop as soon as the record is found.
-const containsRecord = async <T extends Instance>(client: CrudListContract<T>, id: Id): Promise<boolean> => {
+const containsRecord = async <T extends Instance>(
+  client: CrudListContract<T>,
+  id: Id
+): Promise<boolean> => {
   for await (const record of listAll(client)) if (record.id === id) return true
   return false
 }
