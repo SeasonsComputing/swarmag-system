@@ -193,4 +193,3 @@ export const isAnswer = (v: unknown): v is Answer => {
         expectWhen(answer.capturedAt, 'capturedAt')
       ) === null && isAllowedValue
 }
-

@@ -27,8 +27,8 @@ import {
   expectValid,
   expectWhen,
   isDictionary,
-  isNullish,
-  isNonEmptyString
+  isNonEmptyString,
+  isNullish
 } from '@core/std'
 import type { ExpectResult } from '@core/std'
 import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
@@ -74,9 +74,9 @@ export const isNote = (v: unknown): v is Note => {
   if (!isDictionary(v)) return false
   const note = v
   return expectValid(
-    expectCompositionMany(note.attachments, 'attachments', isAttachment),
-    expectWhen(note.createdAt, 'createdAt')
-  ) === null && (isNullish(note.content) || typeof note.content === 'string')
+        expectCompositionMany(note.attachments, 'attachments', isAttachment),
+        expectWhen(note.createdAt, 'createdAt')
+      ) === null && (isNullish(note.content) || typeof note.content === 'string')
 }
 
 /** Guard for scheme:code references with exactly one separator. */
