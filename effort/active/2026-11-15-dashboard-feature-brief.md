@@ -28,7 +28,7 @@ Verified against the code on 2026-11-15:
 
 ### A feature takes over the dashboard
 
-_[Superseded by the amendment "After ACE review", item 1: `ShellPage` is extracted and composed, not taken over.]_
+_[Superseded by the amendment "After ACE review", item 1: `ShellFrame` is extracted and composed, not taken over.]_
 
 
 Some features are the place a person works, not an overlay on it. The Workflow Builder is the
@@ -154,17 +154,17 @@ instead of takeover. This amendment supersedes "A feature takes over the dashboa
 "Manager returns the Item picked".
 
 1. **The frame is extracted and composed, not taken over.** The application's chrome becomes
-   `ShellPage` in `ux/shell/runtime/shell-page.tsx`, beside the shell's routes and makers: the
+   `ShellFrame` in `ux/shell/runtime/shell-frame.tsx`, beside the shell's routes and makers: the
    header (Brand, fields, Helm; fixed) and the body with the footer following it in flow. It frames
    the authenticated application's pages; an anonymous page such as Login renders without it.
-   The dashboard's API surface is unchanged: `Dashboard` is implemented in terms of `ShellPage`,
+   The dashboard's API surface is unchanged: `Dashboard` is implemented in terms of `ShellFrame`,
    composing it around its rows. The Workflow Builder composes its own instance, parameterized,
    around its stack. Nothing registers at runtime, so there is no `useDashboardFrame` and no
    route-owned frame state to clear.
 
    ```tsx
-   <ShellPage header={…} footer={Footer}>{rows}</ShellPage>                  // inside Dashboard
-   <ShellPage header={{ brand, toolbar }} footer={Footer}>…</ShellPage>      // the Builder
+   <ShellFrame header={…} footer={Footer}>{rows}</ShellFrame>                  // inside Dashboard
+   <ShellFrame header={{ brand, toolbar }} footer={Footer}>…</ShellFrame>      // the Builder
    ```
 
 2. **The Builder is its own route stack.** A top-level authenticated route outside the dashboard
@@ -182,5 +182,23 @@ instead of takeover. This amendment supersedes "A feature takes over the dashboa
 5. **Split.** Manager `pick` is small and standalone: it ships first, verified through a style-guide
    example. The frame extraction and the Builder's route are verified by the Builder's first
    slice, their only consumer.
+
+## Amendment — 2026-11-16 — After ACE scoping
+
+ACE's production scope, as authorized by the CA, with one change.
+
+1. **The frame is `ShellFrame`** (`ux/shell/runtime/shell-frame.tsx`). `ShellPage` already names the
+   page route in `shell.ts`'s route family (`ShellIndex`, `ShellRedirect`, `ShellTransition`,
+   `ShellPage`, `ShellOverlay`); the component takes its own name rather than an import alias. A
+   `ShellPage` route renders a page; an authenticated page frames its content in a `ShellFrame`.
+2. **The authenticated route stack is `makeAuthenticatedShell(routes)`:** an authenticated shell
+   holding an outlet, registered beside the dashboard shell, using the existing `Routes.page`.
+3. **Two slices.** Manager `pick` first (archetypes and components guide where applicable,
+   `manager.tsx`, `manager-contract.ts`, a style-guide example, tests); then `ShellFrame`
+   (architecture-front and archetypes first, `shell-frame.tsx` and its styles, dashboard
+   rendering, shell makers and route contracts as needed, a parameterized Brand that keeps its
+   identity and logo defaults, Helm presentation only as needed). `onPick` is awaited before the
+   Manager closes; a synchronous throw or rejection is reported and the Manager stays open.
+   `ShellFrame` is accepted through the Builder's first slice.
 
 _End of Brief_
