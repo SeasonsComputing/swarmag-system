@@ -99,7 +99,7 @@
     rgb(30 41 59 / 0.8) 0%,
     rgb(51 65 85 / 0.6) 100%
   );
-  --sa-bg-backdrop: oklch(0% 0 0 / 0.225);
+  --sa-bg-backdrop: oklch(0% 0 0 / 0.335);
 
   /* Text */
   --sa-text-primary: oklch(var(--sa-lch-neutral-1));
@@ -202,8 +202,8 @@
   /* Skeleton */
   --sa-skeleton-bg-shimmer: oklch(42% 0.025 252 / 0.6);
 
-  /* Dialog: the window's frame, a teal step above the panes it holds. */
-  --sa-dialog-bg: oklch(32% 0.035 220);
+  /* Dialog */
+  --sa-dialog-bg: linear-gradient(var(--sa-shell-bg), var(--sa-shell-bg)), rgb(21 24 30);
 
   /* Card */
   --sa-card-tonal-light-bg: oklch(28.5% 0.023 236);
@@ -393,7 +393,7 @@
   /* Skeleton */
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
-  /* Dialog: the window's frame sits a step below the panes it holds. */
+  /* Dialog */
   --sa-dialog-bg: oklch(91% 0.012 100);
 
   /* Card */
