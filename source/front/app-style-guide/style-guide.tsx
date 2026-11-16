@@ -256,11 +256,12 @@ export const StyleGuide = (): UiComponent => {
               </UiFieldset>
               <UiFieldset legend='<body>, <p>, <blockquote>'>
                 <p>
-                  Body copy should inherit the product typography without local component styling. Weather,
-                  acreage, crew availability, and service windows remain scannable.
+                  Body copy should inherit the product typography without local component styling.
+                  Weather, acreage, crew availability, and service windows remain scannable.
                 </p>
                 <blockquote>
-                  Service logs are records of field reality and must remain clear, durable, and auditable.
+                  Service logs are records of field reality and must remain clear, durable, and
+                  auditable.
                 </blockquote>
               </UiFieldset>
               <UiFieldset legend='<code>, <kbd>, <samp>, <pre>'>

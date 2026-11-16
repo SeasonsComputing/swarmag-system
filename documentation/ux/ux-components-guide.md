@@ -1312,11 +1312,11 @@ inside `PanelSections`; a group within a section is framed.
 
 **Props**
 
-| Prop       | Type          | Required | Default | Description                                         |
-| ---------- | ------------- | -------- | ------- | --------------------------------------------------- |
-| `legend`   | `string`      | yes      | —       | Group name.                                         |
-| `variant`  | `'framed'`    | no       | unset   | A framed group: border, background, and padding.    |
-| `children` | `UiComponent` | yes      | —       | Group contents.                                     |
+| Prop       | Type          | Required | Default | Description                                      |
+| ---------- | ------------- | -------- | ------- | ------------------------------------------------ |
+| `legend`   | `string`      | yes      | —       | Group name.                                      |
+| `variant`  | `'framed'`    | no       | unset   | A framed group: border, background, and padding. |
+| `children` | `UiComponent` | yes      | —       | Group contents.                                  |
 
 **Variant**
 

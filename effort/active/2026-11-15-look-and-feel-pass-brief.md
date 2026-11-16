@@ -10,14 +10,14 @@ Foundation mode: `ux/ui` and `ux/shell` are locked; the CA directed each change.
 
 No checks were run on any of these commits.
 
-| Commit    | Change                                                                                  |
-| --------- | --------------------------------------------------------------------------------------- |
-| `e912128` | `UiFieldset` unframed variant; `PanelSections`; step editors retrofitted; workbench tones |
-| `585d2a3` | Docs: sections in the design language, archetypes, components guide, internals          |
-| `cf0016a` | Every form puts its sections in `PanelSections`                                          |
+| Commit    | Change                                                                                                                                                                                |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `e912128` | `UiFieldset` unframed variant; `PanelSections`; step editors retrofitted; workbench tones                                                                                             |
+| `585d2a3` | Docs: sections in the design language, archetypes, components guide, internals                                                                                                        |
+| `cf0016a` | Every form puts its sections in `PanelSections`                                                                                                                                       |
 | `e1b57ca` | Sections are the fieldset default (`variant='framed'` opts in); frameless action buttons; Helm commands are `UiActionButton`s; sheets dark tonal; Library toolbar pad; header divider |
-| `63ef388` | Style guide: Typography and HTML sections spaced loosely                                 |
-| `22d5f62` | Status pills lead the row; `StatusBadge` names the status; selects fit their choices; `DrillDown` axis; header title holds its height |
+| `63ef388` | Style guide: Typography and HTML sections spaced loosely                                                                                                                              |
+| `22d5f62` | Status pills lead the row; `StatusBadge` names the status; selects fit their choices; `DrillDown` axis; header title holds its height                                                 |
 
 ## Settled rules
 

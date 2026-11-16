@@ -460,10 +460,10 @@ detail of that ordering.
 
 ### 5.7 Effects
 
-| Token              | Purpose                        |
-| ------------------ | ------------------------------ |
-| `--sa-filter-blur` | Backdrop blur for thin chrome  |
-| `--sa-filter-mono` | Monochrome asset filter        |
+| Token              | Purpose                       |
+| ------------------ | ----------------------------- |
+| `--sa-filter-blur` | Backdrop blur for thin chrome |
+| `--sa-filter-mono` | Monochrome asset filter       |
 
 ### 5.8 Motion And Transitions
 
