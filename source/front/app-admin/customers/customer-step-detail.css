@@ -1,10 +1,4 @@
-/* Customer account-manager sizing in both workbench hosts. */
+/* The account-manager picker may shrink with its field; the select sets its own width. */
 [data-app='customer-account-manager'] {
   min-inline-size: 0;
-}
-
-[data-app='customer-account-manager'] > [data-ui='layout'] {
-  justify-items: stretch;
-  min-inline-size: min(16rem, 100%);
-  max-inline-size: 100%;
 }

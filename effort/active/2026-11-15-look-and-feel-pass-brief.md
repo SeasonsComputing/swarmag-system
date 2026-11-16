@@ -1,6 +1,6 @@
 # Look and Feel Pass — Brief
 
-**Active; items 1–3 done, items 4–7 ready for ACE.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
+**Active; items 1–3 and 5 done, items 4, 6, and 7 ready for ACE.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
 workbench panes shipped (`effort/completed/2026-11-15-dialog-look-brief.md`), the CA and AI
 Architect reworked the suite's look in look-and-feel mode: hacked fast, committed as it settled.
 This brief records what shipped, the rules it settled, and the clean-up that makes it right.
@@ -41,7 +41,8 @@ No checks were run on any of these commits.
 
 ## Clean-up scope
 
-The CA and the AI Architect did items 1–3 directly on 2026-11-15; items 4–7 are ACE's. Paths are
+The CA and the AI Architect did items 1–3 and 5 directly on 2026-11-15; items 4, 6, and 7 are
+ACE's. Paths are
 under `source/`.
 
 1. **Documentation.** Done:
@@ -65,9 +66,11 @@ under `source/`.
    Rewrite the probe around a dense `UiActionButton`, drop that assertion, and add a plain command
    to the test toolbar so the command path, with its hover glow (`helm-widget.css`), is covered.
    Run the browser test (`-- --browser`).
-5. **For ACE: redundant CSS.** `front/app-admin/customers/customer-step-detail.css`'s
-   `customer-account-manager` rules set the Manager picker's width; selects now fit their choices.
-   Remove what no longer changes the result; verify the Manager picker on screen.
+5. **Redundant CSS.** Done: `front/app-admin/customers/customer-step-detail.css` keeps only the
+   picker wrapper's `min-inline-size: 0`. Its layout rules are gone: the 16rem floor sits under the
+   select's own `--sa-size-wrap` floor, `justify-items: stretch` no longer moves a fit-content
+   select, and a fit-content layout already stays within its field. ACE verifies the Manager picker
+   on screen with the checks (item 7).
 6. **For ACE: comments** carry design reasons, not session notes; sweep this pass's CSS and TSX.
 7. **For ACE: checks.** None of this pass's commits has been checked; run the set below and fix
    in-scope failures.
