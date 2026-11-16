@@ -473,6 +473,21 @@ authorization before any UX test lands.
 not need stage configuration. Recorded at the close of
 `effort/completed/2026-11/2026-11-15-look-and-feel-pass-brief.md`.
 
+### B-53 · Answer structural validation and nested adapter round-trip lack tests
+
+**Observed:** 2026-11-16 · normal
+
+The Workflow domain brief records no focused tests for captured `Answer.type`, optional `value`,
+and nested Answer/Note/Attachment adapter round-trips. The live workflow client test exercises
+Workflow, Task, Question, and their ordered junctions; it does not exercise embedded Answers.
+
+Add structural validation coverage for missing or invalid captured types, absent values, and
+supported value shapes independently of Question type. Round-trip Answers containing Notes and
+attachments through `AnswerAdapter` and the enclosing log-entry adapter. This work does not
+require a Runner capture surface; Runner end-to-end verification remains M-9.
+
+**Picking this up:** a bounded test production against the settled domain contracts.
+
 ## Core
 
 ### B-23 · A unique-key conflict with a soft-deleted record reports a general failure
@@ -522,6 +537,21 @@ validators already have. Both tables also need an `UPDATE` policy, which they la
 workflows.
 
 ## Customer
+
+### B-52 · Primary Contact email is optional in the domain but required in the UX
+
+**Observed:** 2026-11-16 · normal
+
+The CA requires an email for every Customer primary contact. `CustomerStepContact` now marks
+Email required and validates it even when blank, while `Contact.email` and domain-data-dictionary
+§8.1 still permit omission. Domain validation therefore accepts contacts the UX no longer allows.
+
+Make `Contact.email` required in the dictionary and abstraction, require it in the contact guard,
+and align affected protocols, fixtures, and tests. Contact is embedded JSONB, so this introduces
+no standalone email column. Review existing contact data and the schema lifecycle at pickup;
+the current UX change does not alter the domain contract or persisted records.
+
+**Picking this up:** Foundation scope for the domain alignment.
 
 ### B-25 · Onboarding has no Initial Job Assessment stage
 

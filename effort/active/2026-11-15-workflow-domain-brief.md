@@ -1,6 +1,6 @@
 # Workflow Domain — Brief
 
-**Active.** The first M-7 enabler: the domain and `api` supporting the Workflow Builder
+**Active — awaiting final independent verification and closure.** The first M-7 enabler: the domain and `api` supporting the Workflow Builder
 (`2026-11-15-workflow-builder-brief.md`). Foundation mode: `domain/`, `core/cli`, and the schema
 are locked namespaces.
 
@@ -12,14 +12,13 @@ Q&A has no capture or execution surface, so Answer behavior has no end-to-end ve
 
 The Workflow version slice is implemented across the dictionary, abstraction, validator, schema,
 and affected test data. The adapter mapping and derived protocols carry the string unchanged.
-The edge source copy includes the version changes; stage deployment and database reset are
-outside this slice.
+The edge source copy includes the version changes. The subsequent CA-authorized stage
+database reset applies the string version schema; this effort does not deploy edge functions.
 
 The three CRUD clients, `api.Workflows`, `api.Tasks`, and `api.Questions`, are composed with the
 existing Supabase CRUD maker, domain adapters, and create/update validators. Core mutation
 protocols and scoped drafts preserve union constituents. Lifecycle helpers and CRUD makers
-retain their existing implementations. Client typing passes verification; stage CRUD has no
-verification claim.
+retain their existing implementations. Client typing and live stage CRUD pass verification.
 
 The ordered junction capability is implemented under
 [B-36](../project/project-backlog.md#b-36--ordered-junctions-have-no-client): shared complete
@@ -27,8 +26,10 @@ membership reads, ordered replacement, and an owner-bound list mutator with conf
 Architecture and construction conventions describe the pattern. The core contracts, maker,
 validators, and edge source copy include the capability.
 
-The two junction client compositions, schema `UPDATE` policies, and stage verification remain
-outside the implemented slices.
+The two ordered junction clients are composed in `api`. Both canonical junction tables now
+include `UPDATE` policies matching their existing membership policies. The CA-authorized stage
+genesis reset and `db-genesis-verify` passed on 2026-11-16. Live five-client verification passed
+through `workflow-api-test.ts` (one test, zero failures).
 
 ## Design
 
@@ -151,7 +152,7 @@ investigation are outside this scope.
 Answer and Note are embedded JSONB compositions; their field changes require no new schema
 columns. Development is greenfield, with stage as the only environment. The CA resets the
 database through `db-genesis`; there is no backfill or compatibility path. The schema/reset
-approach is subject to the governing alignment below.
+approach follows the governing lifecycle alignment below.
 
 `deno task edge-sync` regenerates `supabase/functions/_shared/` from source, along with function
 manifests and build metadata. The generated copy is not hand-edited. Edge handlers require no
@@ -204,22 +205,44 @@ Repository-wide `fmt:check` reports formatting differences in
 `source/domain/validators/common-validator.ts` and `workflow-validator.ts`, outside the ordered
 junction repair.
 
-Stage behavior verification is limited to the CA's attachment-only User Note Save on screen.
+Stage verification includes the CA's attachment-only User Note Save on screen and the
+2026-11-16 live workflow API test. Workflow, Task, and Question create/read/update/list/soft-delete
+passed. Both ordered junctions passed persisted replacement, append, removal, adjacent movement,
+and owner-set reads through the public test-administrator session. Test cleanup removed junction
+links and soft-deleted its records. Genesis and genesis verification both passed.
 Answer validation and nested adapter round-trip are testable independently of the Runner;
 those tests are not present. Q&A end-to-end verification depends on the Runner capture surface.
-The Workflow version schema applies through the CA's greenfield database reset; its stage
-behavior has no verification claim.
+Workflow string versions round-tripped as `1.0` and `1.1` on stage after the authorized reset.
 
 ## Remaining work
 
-- Compose `api.WorkflowTasks` and `api.TaskQuestions` with their domain adapters and validators.
-- Add `UPDATE` policies to `workflow_tasks` and `task_questions` in the canonical schema.
-- Apply the schema through the CA's greenfield database reset and verify the five clients on stage.
+Final independent verification of the review amendments remains before archival. The Answer
+structural-validation and nested adapter coverage gap is assigned to B-53 in the project backlog.
+Builder work remains in its own brief; Runner capture and end-to-end verification remain M-9.
 
 ## Open
 
-1. **Schema lifecycle wording.** Architecture-core §12.1 prescribes migrations. Its wording needs
-   reconciliation with the CA's greenfield `db-genesis` scope; this effort includes no migration
-   or genesis prompt changes.
+Schema lifecycle wording is reconciled in architecture-core §12.1, architecture-devops §12,
+and CONVENTIONS §14.3: incremental advancement preserves existing state through migrations;
+a CA-authorized greenfield genesis reset applies the complete canonical schema without a
+migration for changes already represented there.
+
+
+## Amendment — 2026-11-16 · Review and closure preparation
+
+The CA authorized the review follow-up. The stage test now uses complete paginated reads for
+membership and soft-delete exclusion assertions. Cleanup attempts every tracked owner and record,
+retaining the original test failure alongside cleanup failures. This supersedes the original
+first-page-only assertions and fail-fast cleanup. CONVENTIONS §14.3 now explicitly follows the
+approved lifecycle choice in architecture-core §12.1.
+
+Earlier stage and repository verification results above describe the version before this test
+amendment. No checks or stage rerun were performed for the amendment, per CA instruction; it has
+no new verification claim. Final independent verification and CA closure review remain pending,
+so this record stays active rather than being archived as verified.
+
+Deferred items are assigned explicitly: B-53 owns the Answer test gap, the Workflow Builder brief
+owns Builder work, and M-9 owns Runner capture and end-to-end verification. No product-code,
+domain-shape, schema, deployment, or UX changes are part of this review follow-up.
 
 _End of Brief_

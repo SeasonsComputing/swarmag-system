@@ -1434,6 +1434,12 @@
 /* CONFIRM DIALOG                                                              */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
+[data-ui='dialog']:has(> [data-ui='confirm-dialog']) {
+  backdrop-filter: var(--sa-filter-blur);
+  background: color-mix(in oklch, var(--sa-dialog-bg) 25%, transparent);
+  box-shadow: var(--sa-card-elevation-floating-shadow);
+}
+
 [data-ui='confirm-dialog'] {
   display: grid;
   gap: var(--sa-rhythm-gap);

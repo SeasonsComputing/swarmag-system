@@ -40,7 +40,7 @@ export const CustomerStepContact = (props: CustomerStepContactProps): UiComponen
   const validation = useFormValidation(() => formRef, {
     displayName: () => expectNonEmptyString(state.displayName(), 'Name'),
     phoneNumber: () => expectNonEmptyString(state.phoneNumber(), 'Phone'),
-    email: () => state.email().trim() ? expectEmail(toEmail(state.email()), 'Email') : null
+    email: () => expectEmail(toEmail(state.email()), 'Email')
   })
   onCleanup(props.context.registerValidation(validation.validateForm))
   useFormKeyboard(() => formRef, field => validation.blurField(field))
@@ -63,20 +63,36 @@ export const CustomerStepContact = (props: CustomerStepContactProps): UiComponen
                 required
               />
             </UiField>
-            <UiField for='phoneNumber' label='Phone' required>
-              <UiInput
-                name='phoneNumber'
-                type='tel'
-                value={state.phoneNumber()}
-                onInput={event => {
-                  state.setPhoneNumber(event.currentTarget.value)
-                  validation.inputField('phoneNumber')
-                }}
-                onBlur={() => validation.blurField('phoneNumber')}
-                error={validation.isInvalid('phoneNumber')}
-                required
-              />
-            </UiField>
+            <UiLayout variant='inline-fill'>
+              <UiField for='phoneNumber' label='Phone' required>
+                <UiInput
+                  name='phoneNumber'
+                  type='tel'
+                  value={state.phoneNumber()}
+                  onInput={event => {
+                    state.setPhoneNumber(event.currentTarget.value)
+                    validation.inputField('phoneNumber')
+                  }}
+                  onBlur={() => validation.blurField('phoneNumber')}
+                  error={validation.isInvalid('phoneNumber')}
+                  required
+                />
+              </UiField>
+              <UiField for='email' label='Email' required>
+                <UiInput
+                  name='email'
+                  type='email'
+                  value={state.email()}
+                  onInput={event => {
+                    state.setEmail(event.currentTarget.value)
+                    validation.inputField('email')
+                  }}
+                  onBlur={() => validation.blurField('email')}
+                  error={validation.isInvalid('email')}
+                  required
+                />
+              </UiField>
+            </UiLayout>
             <UiField for='preferredChannel' label='Preferred Channel'>
               <UiSingleSelect
                 name='preferredChannel'
@@ -86,19 +102,6 @@ export const CustomerStepContact = (props: CustomerStepContactProps): UiComponen
                 }))}
                 value={state.preferredChannel()}
                 onChange={value => state.setPreferredChannel(value as ContactPreferredChannel)}
-              />
-            </UiField>
-            <UiField for='email' label='Email'>
-              <UiInput
-                name='email'
-                type='email'
-                value={state.email()}
-                onInput={event => {
-                  state.setEmail(event.currentTarget.value)
-                  validation.inputField('email')
-                }}
-                onBlur={() => validation.blurField('email')}
-                error={validation.isInvalid('email')}
               />
             </UiField>
           </UiLayout>

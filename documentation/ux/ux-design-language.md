@@ -340,9 +340,11 @@ light, and the two attach: the corners at their shared seam are square, so the p
 rounded surface divided by tone.
 
 A dialog's own surface is `--sa-dialog-bg`, a step from the panes it holds, so the window reads as
-the frame around them. Every surface a person works on is opaque; backdrop blur belongs only to
-thin chrome over moving content — the dashboard header, the footer, a select's dropdown — because
-blurring a large surface makes every interaction beneath it repaint.
+the frame around them. Work surfaces are opaque; backdrop blur belongs to thin chrome over moving
+content — the dashboard header, the footer, a select's dropdown — because blurring a large surface
+makes every interaction beneath it repaint. The compact `UiConfirmDialog` is an exception: its
+dialog surface uses a translucent tint of `--sa-dialog-bg` and the shared blur for a liquid effect.
+Other dialogs retain their opaque surface, and the overlay keeps its theme background.
 
 **Sections divide a region.** Inside a region, a form's sections are divided by a rule, not boxed:
 each section is an unframed fieldset whose legend is a small uppercase label, and a hairline

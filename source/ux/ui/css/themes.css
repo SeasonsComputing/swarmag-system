@@ -99,7 +99,7 @@
     rgb(30 41 59 / 0.8) 0%,
     rgb(51 65 85 / 0.6) 100%
   );
-  --sa-bg-backdrop: oklch(0% 0 0 / 0.25);
+  --sa-bg-backdrop: oklch(0% 0 0 / 0.33);
 
   /* Text */
   --sa-text-primary: oklch(var(--sa-lch-neutral-1));
@@ -203,7 +203,7 @@
   --sa-skeleton-bg-shimmer: oklch(42% 0.025 252 / 0.6);
 
   /* Dialog */
-  --sa-dialog-bg: linear-gradient(var(--sa-shell-bg), var(--sa-shell-bg)), rgb(21 24 30);
+  --sa-dialog-bg: oklch(0.36 0.055 214.4);
 
   /* Card */
   --sa-card-tonal-light-bg: oklch(28.5% 0.023 236);

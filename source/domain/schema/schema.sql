@@ -463,6 +463,9 @@ CREATE POLICY "workflow_tasks_select_all" ON workflow_tasks
 CREATE POLICY "workflow_tasks_insert_all" ON workflow_tasks
   FOR INSERT WITH CHECK (true);
 
+CREATE POLICY "workflow_tasks_update_all" ON workflow_tasks
+  FOR UPDATE USING (true) WITH CHECK (true);
+
 CREATE POLICY "workflow_tasks_delete_all" ON workflow_tasks
   FOR DELETE USING (true);
 
@@ -484,6 +487,9 @@ CREATE POLICY "task_questions_select_all" ON task_questions
 
 CREATE POLICY "task_questions_insert_all" ON task_questions
   FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "task_questions_update_all" ON task_questions
+  FOR UPDATE USING (true) WITH CHECK (true);
 
 CREATE POLICY "task_questions_delete_all" ON task_questions
   FOR DELETE USING (true);

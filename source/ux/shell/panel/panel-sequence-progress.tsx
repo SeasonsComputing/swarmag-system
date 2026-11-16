@@ -28,7 +28,9 @@ export const PanelSequenceProgress = (props: { sequence: PanelSequenceControl })
           data-shell='sequence-bar-fill'
           style={{
             'clip-path': `inset(0 ${
-              (100 - (props.sequence.index() + 1) / props.sequence.steps().length * 100).toFixed(3)
+              (100 - (props.sequence.steps().length === FOUR_STEP_PROGRESS.length
+                ? FOUR_STEP_PROGRESS[props.sequence.index()]
+                : (props.sequence.index() + 0.32) / props.sequence.steps().length * 100)).toFixed(3)
             }% 0 0 round var(--sa-radius-full))`
           }}
         />
@@ -56,3 +58,6 @@ export const PanelSequenceProgress = (props: { sequence: PanelSequenceControl })
     </div>
   </Show>
 )
+
+/** Approved fill positions for a four-step sequence. */
+const FOUR_STEP_PROGRESS = [10, 30, 55, 85] as const

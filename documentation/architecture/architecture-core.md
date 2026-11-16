@@ -1025,11 +1025,16 @@ When invariants conflict with convenience, **invariants win**.
 1. Update `domain-model.md` (solution space, then domain model)
 2. Implement domain abstractions, validators, protocols, and adapters
 3. Regenerate `source/domain/schema/schema.sql` from domain
-4. Write a forward-only migration in `source/back/migrations/` for the delta
+4. Apply the schema through an authorized lifecycle path: a forward-only migration in
+   `source/back/migrations/` when preserving existing state, or a CA-authorized greenfield
+   `db-genesis` reset when no existing authentication or domain data must be preserved
 5. Implement backend functions
 6. Update UX application integration
 
-Domain changes flow unidirectionally through the system.
+Domain changes flow unidirectionally through the system. A greenfield reset derives its full
+state from the canonical schema and requires no incremental migration or compatibility path.
+The CA chooses the lifecycle path; reset procedures and target confirmation remain governed by
+`architecture-devops.md` §12.2.
 
 ### 12.2 Adding New API Clients
 
