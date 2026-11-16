@@ -9,14 +9,19 @@ are locked namespaces.
 The Answer and Note slice is implemented. The stage `user-create` and `user-update` edge functions
 use the updated domain validators. The CA verifies attachment-only User Note Save on screen.
 Q&A has no capture or execution surface, so Answer behavior has no end-to-end verification.
-Checks and STYLE_AUDIT are not run under the CA's instruction.
 
 The Workflow version slice is implemented across the dictionary, abstraction, validator, schema,
 and affected test data. The adapter mapping and derived protocols carry the string unchanged.
 The edge source copy includes the version changes; stage deployment and database reset are
-outside this slice. Checks and STYLE_AUDIT are not run under the CA's instruction.
+outside this slice.
 
-Ordered junctions and the five clients remain undispatched.
+The three CRUD clients, `api.Workflows`, `api.Tasks`, and `api.Questions`, are composed with the
+existing Supabase CRUD maker, domain adapters, and create/update validators. Core mutation
+protocols and scoped drafts preserve union constituents. Lifecycle helpers and CRUD makers
+retain their existing implementations. Client typing passes verification; stage CRUD has no
+verification claim.
+
+Ordered junctions and their two clients remain undispatched.
 
 ## Design
 
@@ -67,6 +72,12 @@ string expectation. The Builder owns its `major.minor` interpretation (`"4.2"`) 
 | `WorkflowTasks` | ordered junction | `workflowId` | `taskId`     |
 | `TaskQuestions` | ordered junction | `taskId`     | `questionId` |
 
+Mutation protocols apply lifecycle projection independently to each union constituent.
+Create and update protocols preserve the resulting variants. Scoped drafts and updates preserve
+constituents over common fields; variant-specific scopes use the corresponding constituent.
+Question's named per-variant protocols remain the domain boundary vocabulary. The generic CRUD
+maker and validator shape consume the preserved union without Question-specific behavior.
+
 The ordered junction follows [B-36](../project/project-backlog.md#b-36--ordered-junctions-have-no-client):
 a `sequence` field in the specification makes `partners` return in order and `replace` write
 `sequence`; `JunctionValidator<J>` includes `validateUpdate`. Unordered junction behavior is
@@ -90,20 +101,21 @@ Documentation leads implementation:
 
 Paths are under `source/`.
 
-| Files | Work |
-| ----- | ---- |
-| `domain/abstractions/workflow.ts` | Answer `type`, optional `value`, string Workflow `version` |
-| `domain/adapters/workflow-adapter.ts` | Answer type mapping and Workflow version serialization |
-| `domain/validators/workflow-validator.ts` | Answer structural validation and string version validation |
-| `domain/abstractions/common.ts` | Optional Note `content` |
-| `domain/validators/common-validator.ts` | Optional Note text shape validation |
-| `front/app/shell/notes/notes-editor.tsx` | Text or attachments satisfy content; absent text handling |
-| `domain/schema/schema.sql` | `version TEXT`; junction `UPDATE` policies |
-| `core/cli/make-supabase-client.ts` | Ordered junction variant |
-| `core/std/validators.ts`, `core/std/api-contracts.ts` | Junction validator and client contracts |
-| `front/api/api.ts` | The five clients |
-| `tests/fixtures/job-samples.ts` | Captured `type: 'internal'` on the telemetry Answer |
-| `tests/cases/…` | Validators, adapters, Note content, and ordered junction behavior |
+| Files                                                 | Work                                                              |
+| ----------------------------------------------------- | ----------------------------------------------------------------- |
+| `domain/abstractions/workflow.ts`                     | Answer `type`, optional `value`, string Workflow `version`        |
+| `domain/adapters/workflow-adapter.ts`                 | Answer type mapping and Workflow version serialization            |
+| `domain/validators/workflow-validator.ts`             | Answer structural validation and string version validation        |
+| `domain/abstractions/common.ts`                       | Optional Note `content`                                           |
+| `domain/validators/common-validator.ts`               | Optional Note text shape validation                               |
+| `front/app/shell/notes/notes-editor.tsx`              | Text or attachments satisfy content; absent text handling         |
+| `domain/schema/schema.sql`                            | `version TEXT`; junction `UPDATE` policies                        |
+| `core/cli/make-supabase-client.ts`                    | Ordered junction variant                                          |
+| `core/std/protocols.ts`, `core/std/make-scope.ts`     | Union-preserving mutation protocols and scoped drafts             |
+| `core/std/validators.ts`, `core/std/api-contracts.ts` | Junction validator and client contracts                           |
+| `front/api/api.ts`                                    | The five clients                                                  |
+| `tests/fixtures/job-samples.ts`                       | Captured `type: 'internal'` on the telemetry Answer               |
+| `tests/cases/…`                                       | Validators, adapters, Note content, and ordered junction behavior |
 
 Domain artifacts are hand-edited as if produced from genesis. Genesis prompts and drift
 investigation are outside this scope.
@@ -144,12 +156,15 @@ Changes outside this scope require escalation.
 - The CA runs `db-genesis`; the five clients read and write on stage.
 
 Implementation verification comprises `deno task check`, `deno task fmt:check`, the permitted
-unit suite, and STYLE_AUDIT. These checks are not run for the Answer/Note slice under the CA's
-instruction. Its verification is limited to the CA's attachment-only User Note Save on screen.
+unit suite, and STYLE_AUDIT. `deno task check` passes, including guards, source types, and lint.
+The scope and list-client suites pass all 18 tests with type checking enabled, including Question
+create/update equivalence, required select options, and union scope projections. Targeted
+formatting and STYLE_AUDIT cover the core repair, API composition, and affected scope tests.
+Stage behavior verification is limited to the CA's attachment-only User Note Save on screen.
 Answer validation and nested adapter round-trip are testable independently of the Runner;
 those tests are not present. Q&A end-to-end verification depends on the Runner capture surface.
-The Workflow version slice has no verification claim; the schema applies through the CA's
-greenfield database reset.
+The Workflow version schema applies through the CA's greenfield database reset; its stage
+behavior has no verification claim.
 
 ## Open
 

@@ -8,6 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Provides reusable protocol shapes for creating and updating Instantiable and
 InstantiableOnly abstractions at system boundaries.
+Protocol derivation preserves each constituent of a union.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -25,27 +26,34 @@ import type {
 } from './instance.ts'
 
 /** Contract to create an Instantiable. */
-export type CreateFromInstantiable<T extends Instantiable> = FromInstantiable<T>
+export type CreateFromInstantiable<T extends Instantiable> = T extends unknown ? FromInstantiable<T>
+  : never
 
 /** Contract to update an Instantiable. Optional attributes admit null to clear the stored value. */
-export type UpdateFromInstantiable<T extends Instantiable> =
-  & Pick<T, 'id'>
-  & {
-    [K in keyof FromInstantiable<T>]?: undefined extends FromInstantiable<T>[K]
-      ? FromInstantiable<T>[K] | null
-      : FromInstantiable<T>[K]
-  }
+export type UpdateFromInstantiable<T extends Instantiable> = T extends unknown ?
+    & Pick<T, 'id'>
+    & {
+      [K in keyof FromInstantiable<T>]?: undefined extends FromInstantiable<T>[K]
+        ? FromInstantiable<T>[K] | null
+        : FromInstantiable<T>[K]
+    }
+  : never
 
 /**
  * Contract to update declared fields of an Instantiable.
  * Fields inside the declared scope are required; values admitting undefined also admit null.
+ * Union scopes select common fields; a constituent supplies its variant-specific fields.
  */
-export type ScopedUpdate<T extends Instantiable, K extends keyof FromInstantiable<T>> =
-  & Pick<T, 'id'>
-  & {
-    [P in K]-?: undefined extends FromInstantiable<T>[P] ? FromInstantiable<T>[P] | null
-      : FromInstantiable<T>[P]
-  }
+export type ScopedUpdate<T extends Instantiable, K extends keyof FromInstantiable<T>> = T extends unknown
+  ?
+    & Pick<T, 'id'>
+    & {
+      [P in K]-?: undefined extends FromInstantiable<T>[P] ? FromInstantiable<T>[P] | null
+        : FromInstantiable<T>[P]
+    }
+  : never
 
 /** Contract to create an InstantiableOnly. */
-export type CreateFromInstantiableOnly<T extends InstantiableOnly> = FromInstantiableOnly<T>
+export type CreateFromInstantiableOnly<T extends InstantiableOnly> = T extends unknown
+  ? FromInstantiableOnly<T>
+  : never

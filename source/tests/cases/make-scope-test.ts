@@ -9,14 +9,28 @@ PURPOSE
 Scope inference, constraints, and create/update projection tests.
 */
 
-import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
+import type {
+  CreateFromInstantiable,
+  Dictionary,
+  FromInstantiable,
+  Id,
+  ScopedUpdate,
+  UpdateFromInstantiable
+} from '@core/std'
 import type { CrudBaseContract, DirectUpdateContract } from '@core/stdx'
 import { makeAdaptedScope, makeScope } from '@core/stdx'
-import type { DraftOf } from '@core/stdx'
+import type { DraftOf, ScopeDraft } from '@core/stdx'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User } from '@domain/abstractions/user.ts'
+import type {
+  InternalQuestion,
+  Question,
+  ScalarQuestion,
+  SelectQuestion
+} from '@domain/abstractions/workflow.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
+import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/workflow-protocol.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { assertEquals } from '@std/assert'
 import { CustomerSamples } from '@tests/fixtures/customer-samples.ts'
@@ -49,6 +63,32 @@ type Draft = DraftOf<typeof Scope>
 /** Compile-time type equality. */
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
   : false
+
+Deno.test('union mutation protocols retain the named Question variants', () => {
+  const exactCreate: Equal<CreateFromInstantiable<Question>, QuestionCreate> = true
+  const exactUpdate: Equal<UpdateFromInstantiable<Question>, QuestionUpdate> = true
+  assertEquals(exactCreate, true)
+  assertEquals(exactUpdate, true)
+  // @ts-expect-error A select Question still requires options at the CRUD create boundary.
+  const missingOptions: CreateFromInstantiable<Question> = { type: 'single-select', prompt: 'Choose' }
+  assertEquals(missingOptions.type, 'single-select')
+})
+
+Deno.test('union scopes preserve constituent projections of their common fields', () => {
+  type Fields = 'type' | 'prompt'
+  type ExpectedDraft =
+    | ScopeDraft<InternalQuestion, Fields>
+    | ScopeDraft<ScalarQuestion, Fields>
+    | ScopeDraft<SelectQuestion, Fields>
+  type ExpectedUpdate =
+    | ScopedUpdate<InternalQuestion, Fields>
+    | ScopedUpdate<ScalarQuestion, Fields>
+    | ScopedUpdate<SelectQuestion, Fields>
+  const exactDraft: Equal<ScopeDraft<Question, Fields>, ExpectedDraft> = true
+  const exactUpdate: Equal<ScopedUpdate<Question, Fields>, ExpectedUpdate> = true
+  assertEquals(exactDraft, true)
+  assertEquals(exactUpdate, true)
+})
 
 // Detail draft built from the sample Customer.
 const detailDraft = (): Draft => ({

@@ -278,7 +278,13 @@ export type TaskQuestionUpdate = TaskQuestion
 
 ### 4.4 Union-Type Protocols
 
-When an abstraction is a `union-type` (discriminated union of concrete variants), derive per-variant create and update types from each concrete member. Never apply `CreateFromInstantiable` or `UpdateFromInstantiable` directly to the union. Export a union alias as the boundary call-site type.
+For a `union-type`, derive named create and update protocols from each constituent and export
+their unions as the boundary types. The named protocols retain each constituent's domain
+vocabulary.
+
+`CreateFromInstantiable` and `UpdateFromInstantiable` preserve constituents when applied directly
+to a union. Generic CRUD contracts use this derivation and accept the corresponding domain
+validators without casts or variant-specific clients.
 
 ```typescript
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'

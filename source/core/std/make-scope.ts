@@ -25,6 +25,8 @@ Inference  Both makers infer from adapter field metadata without type
            arguments. ScopeDraft<T, K> selects the scope's domain attributes,
            preserving domain optionality; DraftOf<typeof scope> derives the
            draft without restating its fields.
+           Union drafts preserve constituents. A scope selects common fields
+           or uses a constituent for variant-specific fields.
 Defaults   Defaults supply the required out-of-scope create attributes. The
            generic constraint rejects scoped, lifecycle, and unknown default
            keys, including keys supplied through typed variables.
@@ -48,10 +50,9 @@ import type { FieldAdapter, ScopedUpdateAdapter } from './make-adapter.ts'
 import type { CreateFromInstantiable, ScopedUpdate } from './protocols.ts'
 
 /** Domain-shaped attributes owned by one scope, preserving optionality. */
-export type ScopeDraft<T extends Instantiable, K extends keyof FromInstantiable<T>> = Pick<
-  FromInstantiable<T>,
-  K
->
+export type ScopeDraft<T extends Instantiable, K extends keyof FromInstantiable<T>> = T extends unknown
+  ? Pick<FromInstantiable<T>, K>
+  : never
 
 /** Create/update projections for one declared scope. */
 export type Scope<T extends Instantiable, K extends keyof FromInstantiable<T>> = {

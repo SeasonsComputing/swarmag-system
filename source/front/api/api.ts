@@ -34,9 +34,12 @@ api                          Shared API namespace for UX applications.
 ├ Chemicals                  Chemical CRUD client.
 ├ Customers                  Customer CRUD client.
 ├ Facets                     Curated classification catalog CRUD client.
+├ Questions                  Question CRUD client.
 ├ Services                   Service CRUD client.
 ├ ServiceRequiredAssetTypes  Required asset type membership by Service.
-└ Users                      User CRUD with Supabase Auth synchronization.
+├ Tasks                      Task CRUD client.
+├ Users                      User CRUD with Supabase Auth synchronization.
+└ Workflows                  Workflow CRUD client.
 */
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
@@ -46,11 +49,13 @@ import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Facet } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
+import type { Question, Task, Workflow } from '@domain/abstractions/workflow.ts'
 import { AssetAdapter, AssetTypeAdapter } from '@domain/adapters/asset-adapter.ts'
 import { ChemicalAdapter } from '@domain/adapters/chemical-adapter.ts'
 import { FacetAdapter } from '@domain/adapters/common-adapter.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { ServiceAdapter, ServiceRequiredAssetTypeAdapter } from '@domain/adapters/service-adapter.ts'
+import { QuestionAdapter, TaskAdapter, WorkflowAdapter } from '@domain/adapters/workflow-adapter.ts'
 import {
   validateAssetCreate,
   validateAssetTypeCreate,
@@ -65,6 +70,14 @@ import {
   validateServiceRequiredAssetTypeCreate,
   validateServiceUpdate
 } from '@domain/validators/service-validator.ts'
+import {
+  validateQuestionCreate,
+  validateQuestionUpdate,
+  validateTaskCreate,
+  validateTaskUpdate,
+  validateWorkflowCreate,
+  validateWorkflowUpdate
+} from '@domain/validators/workflow-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 import { SessionState } from '@ux/shell/runtime/session-state.ts'
@@ -128,6 +141,14 @@ export const api = {
     }
   }),
   // Jobs: makeCrudSupabaseClient<Job>({ table: 'jobs', adapter: JobAdapter }),
+  Questions: makeCrudSupabaseClient<Question>({
+    table: 'questions',
+    adapter: QuestionAdapter,
+    validator: {
+      validateCreate: validateQuestionCreate,
+      validateUpdate: validateQuestionUpdate
+    }
+  }),
   Services: makeCrudSupabaseClient<Service>({
     table: 'services',
     adapter: ServiceAdapter,
@@ -143,6 +164,21 @@ export const api = {
     owner: 'serviceId',
     partner: 'assetTypeId'
   }),
-  Users: makeAuthUsers()
-  // Workflows: makeCrudSupabaseClient<Workflow>({ table: 'workflows', adapter: WorkflowAdapter }),
+  Tasks: makeCrudSupabaseClient<Task>({
+    table: 'tasks',
+    adapter: TaskAdapter,
+    validator: {
+      validateCreate: validateTaskCreate,
+      validateUpdate: validateTaskUpdate
+    }
+  }),
+  Users: makeAuthUsers(),
+  Workflows: makeCrudSupabaseClient<Workflow>({
+    table: 'workflows',
+    adapter: WorkflowAdapter,
+    validator: {
+      validateCreate: validateWorkflowCreate,
+      validateUpdate: validateWorkflowUpdate
+    }
+  })
 }
