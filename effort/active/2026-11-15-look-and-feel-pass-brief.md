@@ -75,11 +75,12 @@ under `source/`.
 7. **For ACE: checks.** None of this pass's commits has been checked; run the set below and fix
    in-scope failures.
 
-8. **For ACE: document the late changes** (`ae843cb`…`c19da43`): cards and dialogs no longer
+8. **For ACE: document the late changes** (`ae843cb`…`337f4a3`): cards and dialogs no longer
    blur (`backdrop-filter` was the long-standing interaction lag; header, footer, and select
    dropdown keep it); dialogs take `--sa-dialog-bg` per theme, a step from the panes they hold;
    the light theme's table and form sit on the popup surface; the site editor's sections are in
-   `PanelSections`; Notes tabs hold their content without fieldsets. ux-design-language §4.6 and
+   `PanelSections`; Notes tabs hold their content without fieldsets; light `--sa-text-dim` is
+   60%; the sequence rail reveals a full-rail gradient by clip, as `UiProgress` does. ux-design-language §4.6 and
    the internals token catalog (`--sa-dialog-bg`).
 
 Out of scope: new looks; the overlay-trigger brief (B-6), which is what lets the Helm's menu
