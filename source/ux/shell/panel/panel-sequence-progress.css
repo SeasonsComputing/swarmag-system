@@ -5,8 +5,8 @@
   gap: var(--sa-space-sm);
 }
 
-/* One contiguous progress rail, echoing the progress-bar language;
-   the fill inline-size is driven by the host per step. */
+/* One contiguous progress rail in the progress-bar language: the gradient spans the whole rail,
+   and the host's clip reveals it up to the current step, so the leading edge's color is the cue. */
 [data-shell='sequence-bar'] {
   background: var(--sa-bg-progress-track);
   border-radius: var(--sa-radius-full);
@@ -18,7 +18,8 @@
   background: var(--sa-gradient-brand);
   block-size: calc(var(--sa-progress-height) / 2);
   border-radius: var(--sa-radius-full);
-  transition: var(--sa-transition-base);
+  inline-size: 100%;
+  transition: var(--sa-progress-transition);
 }
 
 [data-shell='sequence-steps'] {

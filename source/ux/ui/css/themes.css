@@ -254,7 +254,7 @@
   /* Text */
   --sa-text-primary: oklch(40% 0.026 238);
   --sa-text-secondary: oklch(20% 0.018 236 / 0.6);
-  --sa-text-dim: oklch(79% 0.014 120);
+  --sa-text-dim: oklch(60% 0.014 120);
   --sa-text-disabled: oklch(70% 0.014 120);
   --sa-text-placeholder: oklch(58% 0.022 210);
   --sa-text-h1: oklch(17% 0.03 238);
