@@ -12,7 +12,7 @@ Q&A has no capture or execution surface, so Answer behavior has no end-to-end ve
 
 The Workflow version slice is implemented across the dictionary, abstraction, validator, schema,
 and affected test data. The adapter mapping and derived protocols carry the string unchanged.
-The edge source copy includes the version changes. The subsequent CA-authorized stage
+The edge source copy includes the version changes. The subsequent stage
 database reset applies the string version schema; this effort does not deploy edge functions.
 
 The three CRUD clients, `api.Workflows`, `api.Tasks`, and `api.Questions`, are composed with the
@@ -27,7 +27,7 @@ Architecture and construction conventions describe the pattern. The core contrac
 validators, and edge source copy include the capability.
 
 The two ordered junction clients are composed in `api`. Both canonical junction tables now
-include `UPDATE` policies matching their existing membership policies. The CA-authorized stage
+include `UPDATE` policies matching their existing membership policies. The stage
 genesis reset and `db-genesis-verify` passed on 2026-11-16. Live five-client verification passed
 through `workflow-api-test.ts` (one test, zero failures).
 
@@ -150,8 +150,8 @@ Domain artifacts are hand-edited as if produced from genesis. Genesis prompts an
 investigation are outside this scope.
 
 Answer and Note are embedded JSONB compositions; their field changes require no new schema
-columns. Development is greenfield, with stage as the only environment. The CA resets the
-database through `db-genesis`; there is no backfill or compatibility path. The schema/reset
+columns. Development is greenfield, with stage as the only environment. The database is reset
+through `db-genesis`; there is no backfill or compatibility path. The schema/reset
 approach follows the governing lifecycle alignment below.
 
 `deno task edge-sync` regenerates `supabase/functions/_shared/` from source, along with function
@@ -189,7 +189,7 @@ Changes outside this scope require escalation.
   identities and positions matching the requested change; zero-effect, partial, or mismatched
   confirmations invalidate the instance.
 - Unordered junction behavior retains its existing membership and replacement contract.
-- The CA runs `db-genesis`; the five clients read and write on stage.
+- `db-genesis` applies the schema; the five clients read and write on stage.
 
 ## Verification
 
@@ -212,7 +212,7 @@ and owner-set reads through the public test-administrator session. Test cleanup 
 links and soft-deleted its records. Genesis and genesis verification both passed.
 Answer validation and nested adapter round-trip are testable independently of the Runner;
 those tests are not present. Q&A end-to-end verification depends on the Runner capture surface.
-Workflow string versions round-tripped as `1.0` and `1.1` on stage after the authorized reset.
+Workflow string versions round-tripped as `1.0` and `1.1` on stage after the stage reset.
 
 ## Remaining work
 
@@ -224,16 +224,16 @@ Builder work remains in its own brief; Runner capture and end-to-end verificatio
 
 Schema lifecycle wording is reconciled in architecture-core §12.1, architecture-devops §12,
 and CONVENTIONS §14.3: incremental advancement preserves existing state through migrations;
-a CA-authorized greenfield genesis reset applies the complete canonical schema without a
+a greenfield genesis reset applies the complete canonical schema without a
 migration for changes already represented there.
 
 ## Amendment — 2026-11-16 · Review and closure preparation
 
-The CA authorized the review follow-up. The stage test now uses complete paginated reads for
+The stage test now uses complete paginated reads for
 membership and soft-delete exclusion assertions. Cleanup attempts every tracked owner and record,
 retaining the original test failure alongside cleanup failures. This supersedes the original
 first-page-only assertions and fail-fast cleanup. CONVENTIONS §14.3 now explicitly follows the
-approved lifecycle choice in architecture-core §12.1.
+lifecycle distinction in architecture-core §12.1.
 
 Earlier stage and repository verification results above describe the version before this test
 amendment. No checks or stage rerun were performed for the amendment, per CA instruction; it has

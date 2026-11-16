@@ -1170,10 +1170,13 @@ SQL DDL ownership is split by artifact type:
 
 #### 14.3.1 Rules
 
-- Keep canonical schema and migrations aligned; either artifact may be used to reconstruct expected runtime state.
+- Keep canonical schema and applicable migrations aligned. Lifecycle selection follows
+  architecture-core §12.1: a greenfield genesis reset requires no migration for
+  changes already represented in the canonical schema.
 - Canonical schema is idempotent and reproducible.
 - Migrations are append-only and never rewritten after application in shared environments.
-- One migration per conceptual change, named `YYYYMMDDHHMMSS_description.sql`.
+- For incremental advancement, one migration per conceptual change, named
+  `YYYYMMDDHHMMSS_description.sql`.
 - A migration expresses deltas only (`ALTER TABLE`, `CREATE INDEX`, policy changes); full table
   definitions belong in the canonical schema.
 - A migration changes only what is required for that versioned step.

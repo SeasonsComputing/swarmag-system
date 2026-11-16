@@ -704,7 +704,7 @@ a change to the tracked template at `source/devops/scripts/git-hooks-pre-commit`
 The canonical Supabase schema is `source/domain/schema/schema.sql`. It is the authoritative DDL for the stage and production Supabase instances. All table definitions, RLS policies, indexes, seed data, and RPC functions are owned by this file.
 
 Migrations in `source/back/migrations/` express forward-only deltas for incremental advancement
-while preserving existing state. A CA-authorized greenfield reset applies the complete canonical
+while preserving existing state. A greenfield reset applies the complete canonical
 schema instead, under architecture-core §12.1; it requires no migration for changes already
 represented in that schema. After genesis, apply only migrations whose deltas are not already
 represented in the applied canonical state.
