@@ -261,6 +261,7 @@ each within the approved scope.
 2. **Only the columns lose their gap.** `column-gap: 0` replaces `gap: 0`, so the row gap between
    the dialog's header and the panes stays. The header and accessory padding added to restore that
    spacing, including the below-480px rule, are removed.
+
 ## Amendment — 2026-11-15 — Tone in the variant
 
 The CA's direction to ACE during production, recorded here. It supersedes the "Tonal is a variant"
