@@ -38,8 +38,10 @@ api                          Shared API namespace for UX applications.
 ├ Services                   Service CRUD client.
 ├ ServiceRequiredAssetTypes  Required asset type membership by Service.
 ├ Tasks                      Task CRUD client.
+├ TaskQuestions              Ordered question membership by Task.
 ├ Users                      User CRUD with Supabase Auth synchronization.
-└ Workflows                  Workflow CRUD client.
+├ Workflows                  Workflow CRUD client.
+└ WorkflowTasks              Ordered task membership by Workflow.
 */
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
@@ -49,13 +51,25 @@ import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Facet } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
-import type { Question, Task, Workflow } from '@domain/abstractions/workflow.ts'
+import type {
+  Question,
+  Task,
+  TaskQuestion,
+  Workflow,
+  WorkflowTask
+} from '@domain/abstractions/workflow.ts'
 import { AssetAdapter, AssetTypeAdapter } from '@domain/adapters/asset-adapter.ts'
 import { ChemicalAdapter } from '@domain/adapters/chemical-adapter.ts'
 import { FacetAdapter } from '@domain/adapters/common-adapter.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { ServiceAdapter, ServiceRequiredAssetTypeAdapter } from '@domain/adapters/service-adapter.ts'
-import { QuestionAdapter, TaskAdapter, WorkflowAdapter } from '@domain/adapters/workflow-adapter.ts'
+import {
+  QuestionAdapter,
+  TaskAdapter,
+  TaskQuestionAdapter,
+  WorkflowAdapter,
+  WorkflowTaskAdapter
+} from '@domain/adapters/workflow-adapter.ts'
 import {
   validateAssetCreate,
   validateAssetTypeCreate,
@@ -74,8 +88,12 @@ import {
   validateQuestionCreate,
   validateQuestionUpdate,
   validateTaskCreate,
+  validateTaskQuestionCreate,
+  validateTaskQuestionUpdate,
   validateTaskUpdate,
   validateWorkflowCreate,
+  validateWorkflowTaskCreate,
+  validateWorkflowTaskUpdate,
   validateWorkflowUpdate
 } from '@domain/validators/workflow-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'
@@ -100,63 +118,50 @@ export const api = {
   BackgroundTasks,
 
   /** Domain clients. */
+
   AssetTypes: makeCrudSupabaseClient<AssetType>({
     table: 'asset_types',
     adapter: AssetTypeAdapter,
-    validator: {
-      validateCreate: validateAssetTypeCreate,
-      validateUpdate: validateAssetTypeUpdate
-    }
+    validator: { validateCreate: validateAssetTypeCreate, validateUpdate: validateAssetTypeUpdate }
   }),
+
   Assets: makeCrudSupabaseClient<Asset>({
     table: 'assets',
     adapter: AssetAdapter,
-    validator: {
-      validateCreate: validateAssetCreate,
-      validateUpdate: validateAssetUpdate
-    }
+    validator: { validateCreate: validateAssetCreate, validateUpdate: validateAssetUpdate }
   }),
+
   Chemicals: makeCrudSupabaseClient<Chemical>({
     table: 'chemicals',
     adapter: ChemicalAdapter,
-    validator: {
-      validateCreate: validateChemicalCreate,
-      validateUpdate: validateChemicalUpdate
-    }
+    validator: { validateCreate: validateChemicalCreate, validateUpdate: validateChemicalUpdate }
   }),
+
   Customers: makeCrudSupabaseClient<Customer>({
     table: 'customers',
     adapter: CustomerAdapter,
-    validator: {
-      validateCreate: validateCustomerCreate,
-      validateUpdate: validateCustomerUpdate
-    }
+    validator: { validateCreate: validateCustomerCreate, validateUpdate: validateCustomerUpdate }
   }),
+
   Facets: makeCrudSupabaseClient<Facet>({
     table: 'facets',
     adapter: FacetAdapter,
-    validator: {
-      validateCreate: validateFacetCreate,
-      validateUpdate: validateFacetUpdate
-    }
+    validator: { validateCreate: validateFacetCreate, validateUpdate: validateFacetUpdate }
   }),
   // Jobs: makeCrudSupabaseClient<Job>({ table: 'jobs', adapter: JobAdapter }),
+
   Questions: makeCrudSupabaseClient<Question>({
     table: 'questions',
     adapter: QuestionAdapter,
-    validator: {
-      validateCreate: validateQuestionCreate,
-      validateUpdate: validateQuestionUpdate
-    }
+    validator: { validateCreate: validateQuestionCreate, validateUpdate: validateQuestionUpdate }
   }),
+
   Services: makeCrudSupabaseClient<Service>({
     table: 'services',
     adapter: ServiceAdapter,
-    validator: {
-      validateCreate: validateServiceCreate,
-      validateUpdate: validateServiceUpdate
-    }
+    validator: { validateCreate: validateServiceCreate, validateUpdate: validateServiceUpdate }
   }),
+
   ServiceRequiredAssetTypes: makeJunctionSupabaseClient<ServiceRequiredAssetType>({
     table: 'service_required_asset_types',
     adapter: ServiceRequiredAssetTypeAdapter,
@@ -164,21 +169,41 @@ export const api = {
     owner: 'serviceId',
     partner: 'assetTypeId'
   }),
+
   Tasks: makeCrudSupabaseClient<Task>({
     table: 'tasks',
     adapter: TaskAdapter,
+    validator: { validateCreate: validateTaskCreate, validateUpdate: validateTaskUpdate }
+  }),
+
+  TaskQuestions: makeJunctionSupabaseClient<TaskQuestion>({
+    table: 'task_questions',
+    adapter: TaskQuestionAdapter,
     validator: {
-      validateCreate: validateTaskCreate,
-      validateUpdate: validateTaskUpdate
-    }
+      validateCreate: validateTaskQuestionCreate,
+      validateUpdate: validateTaskQuestionUpdate
+    },
+    owner: 'taskId',
+    partner: 'questionId',
+    sequence: 'sequence'
   }),
   Users: makeAuthUsers(),
+
   Workflows: makeCrudSupabaseClient<Workflow>({
     table: 'workflows',
     adapter: WorkflowAdapter,
+    validator: { validateCreate: validateWorkflowCreate, validateUpdate: validateWorkflowUpdate }
+  }),
+
+  WorkflowTasks: makeJunctionSupabaseClient<WorkflowTask>({
+    table: 'workflow_tasks',
+    adapter: WorkflowTaskAdapter,
     validator: {
-      validateCreate: validateWorkflowCreate,
-      validateUpdate: validateWorkflowUpdate
-    }
+      validateCreate: validateWorkflowTaskCreate,
+      validateUpdate: validateWorkflowTaskUpdate
+    },
+    owner: 'workflowId',
+    partner: 'taskId',
+    sequence: 'sequence'
   })
 }
