@@ -90,7 +90,7 @@ export const api = {
   /** Passwordless authentication and session observation. */
   Auth: AuthSupabaseClient,
 
-  /** Document Stores for Attachments and Field Binder. */
+  /** Document stores. */
   ...DocumentStoreAttachments,
   ...DocumentStoreFieldBinder,
 
