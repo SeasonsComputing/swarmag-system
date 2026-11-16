@@ -83,6 +83,12 @@
   font-weight: var(--sa-ui-font-weight);
 }
 
+/* An icon-only command keeps its touch box, so its glyph sits inside empty space; the command
+   moves into that space so the glyph starts where the content below it starts. */
+[data-shell-panel='header-title'] > [data-ui='action-button'][data-ui-label-mode='hidden'] {
+  margin-inline-start: calc(var(--sa-space-sm) * -1);
+}
+
 [data-shell-panel='header-title-divider'] {
   align-self: stretch;
   border-inline-start: var(--sa-border-default);
