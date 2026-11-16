@@ -1296,7 +1296,6 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 [data-ui='card'] {
-  backdrop-filter: var(--sa-filter-blur);
   background: var(--sa-card-panel-bg);
   border: var(--sa-card-panel-border);
   border-radius: var(--sa-card-border-radius);
@@ -1323,7 +1322,6 @@
 
 [data-ui='card'][data-ui-variant='tonal-light'],
 [data-ui='card'][data-ui-variant='tonal-dark'] {
-  backdrop-filter: none;
   border: none;
   box-shadow: none;
 }
