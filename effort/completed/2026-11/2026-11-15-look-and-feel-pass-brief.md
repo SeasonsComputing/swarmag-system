@@ -1,6 +1,6 @@
 # Look and Feel Pass — Brief
 
-**Active; items 1–6 and 8 done; item 7, the checks, is the CA's.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
+**Completed 2026-11-15.** Shipped from `e912128` to `55d1d67` and closed at the CA's direction; see "Closure" at the end. Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
 workbench panes shipped (`effort/completed/2026-11/2026-11-15-dialog-look-brief.md`), the CA and AI
 Architect reworked the suite's look in look-and-feel mode: hacked fast, committed as it settled.
 This brief records what shipped, the rules it settled, and the clean-up that makes it right.
@@ -102,5 +102,33 @@ CA decisions on governance and DevOps, not in ACE's scope:
    its height when a Back command appears.
 2. **`dprint`:** exclude `effort/completed/`; formatting keeps adding a line the
    completed-immutable guard refuses.
+
+## Closure — 2026-11-15
+
+The CA directed closure after reviewing the pass on screen throughout the session.
+
+**Shipped.** The rules above, in code and in the governing documents, from `e912128` to `55d1d67`,
+including the late changes of item 8.
+
+**Verified.** `deno task check` (types, lint, every guard) and `deno task fmt:check` pass. The unit
+suite, run with `--no-check`, passes 224 tests with 3 ignored — the count M-6's verification
+recorded — and fails 3: `users-api-test.ts` and `session-coordinator-test.ts`, known since
+2026-10-03 and waiting on stage configuration (B-34), and `library-levels-test.ts`, which since the
+Library brief (`217b724`) exits early on missing configuration and has never run.
+
+**Not done.**
+
+- **STYLE_AUDIT** was not performed: `check` covers what the guards encode; the reading pass over
+  the rest of CONVENTIONS (file headers' `PUBLIC` trees, ordering, naming, comment rules) was not
+  made on this pass's files. That gap is backlog B-15's.
+- **The browser test** `tests/cases/bootstrap-lifecycle-test.ts` has no recorded run, here or
+  under the Helm Menus brief whose acceptance named it; the probe rewrite of item 4 is unverified.
+
+**Settled on closing.**
+
+- **`library-levels-test.ts`** becomes backlog B-51: a unit test that cannot run without stage
+  configuration.
+- **CONVENTIONS §17** and the **`dprint`** exclusion stay with the CA, as "Outside this brief"
+  says.
 
 _End of Brief_

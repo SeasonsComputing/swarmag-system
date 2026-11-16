@@ -463,6 +463,16 @@ update scope, excluded-field preservation, optional-field clearing) have a conve
 Extending the testing convention to the UX layer is a `CONVENTIONS.md` amendment and needs CA
 authorization before any UX test lands.
 
+### B-51 · `library-levels-test.ts` cannot run without stage configuration
+
+**Observed:** 2026-11-15 · normal
+
+`source/tests/cases/library-levels-test.ts`, added with the Library (`217b724`), imports
+`LibraryLevels`, which loads the API configuration; without the stage keys the file calls
+`Deno.exit(1)` before any test runs, so its tests have never run. A unit test of the levels should
+not need stage configuration. Recorded at the close of
+`effort/completed/2026-11/2026-11-15-look-and-feel-pass-brief.md`.
+
 ## Core
 
 ### B-23 · A unique-key conflict with a soft-deleted record reports a general failure
