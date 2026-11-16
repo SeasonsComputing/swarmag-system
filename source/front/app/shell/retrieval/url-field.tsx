@@ -68,6 +68,7 @@ export const UrlField = (props: UrlFieldProps): UiComponent => {
       </UiField>
       <UiField label='Open' variant='caption'>
         <UiActionButton
+          decoration='ring'
           disabled={!valid()}
           icon='external-link'
           label='Open URL'

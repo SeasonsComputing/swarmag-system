@@ -117,6 +117,7 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
                       </UiTableCell>
                       <UiTableCell align='end'>
                         <UiActionButton
+                          decoration='ring'
                           density='dense'
                           icon='minus'
                           label={`Delete ${props.label(item, index())}`}

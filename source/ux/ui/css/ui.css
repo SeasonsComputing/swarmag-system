@@ -691,18 +691,16 @@
   margin-inline-start: var(--sa-rhythm-gap-tight);
 }
 
-/* In a table every cell is data; an icon-only action keeps its ring so it reads as a control. */
-[data-ui='table-cell'] [data-ui='action-button'][data-ui-label-mode='hidden']
-  [data-ui='action-button-frame'] {
+/* A ring marks a control set among data — a table's row actions, a button beside an input. The
+   caller declares it; nothing infers it from where the button sits. */
+[data-ui='action-button'][data-ui-decoration='ring'] [data-ui='action-button-frame'] {
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
 }
 
-[data-ui='table-cell']
-  [data-ui='action-button'][data-ui-label-mode='hidden']:not([data-ui-state='disabled']):hover
+[data-ui='action-button'][data-ui-decoration='ring']:not([data-ui-state='disabled']):hover
   [data-ui='action-button-frame'],
-[data-ui='table-cell'] [data-ui='action-button'][data-ui-label-mode='hidden']:focus-visible
-  [data-ui='action-button-frame'] {
+[data-ui='action-button'][data-ui-decoration='ring']:focus-visible [data-ui='action-button-frame'] {
   background: var(--sa-bg-hover);
   border-color: var(--sa-color-primary);
 }

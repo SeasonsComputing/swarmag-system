@@ -101,7 +101,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       {
         name: 'eject',
         label: 'Eject',
-        icon: 'exit',
+        icon: 'circle-backslash',
         confirmation: {
           title: 'Eject user?',
           message: user =>

@@ -312,6 +312,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
             />
             <UiField label='GPS' variant='caption'>
               <UiActionButton
+                decoration='ring'
                 disabled={!props.hasGeo}
                 icon='crosshair-2'
                 label='GPS'

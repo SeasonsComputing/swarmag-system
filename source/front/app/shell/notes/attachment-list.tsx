@@ -102,7 +102,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
       <Show when={error()}>
         <UiAlert variant='danger'>{error()}</UiAlert>
       </Show>
-      <UiFieldset variant='framed' legend='Attachments'>
+      <UiFieldset legend='Attachments'>
         <UiLayout>
           <UiLayout variant='inline-fit'>
             <UiActionButton
@@ -167,6 +167,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
                         </UiTableCell>
                         <UiTableCell align='end'>
                           <UiActionButton
+                            decoration='ring'
                             density='dense'
                             disabled={busy()}
                             icon='pencil-1'
@@ -178,6 +179,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
                             }}
                           />
                           <UiActionButton
+                            decoration='ring'
                             density='dense'
                             disabled={busy()}
                             icon='minus'

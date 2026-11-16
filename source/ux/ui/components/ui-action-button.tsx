@@ -19,6 +19,7 @@ PUBLIC
 UiActionButtonVariant    Action button variants.
 UiActionButtonLabelMode  Action button label presentation. The label is always the accessible name.
 UiActionButtonDensity    Action button visual density.
+UiActionButtonDecoration Action button decoration.
 UiActionButtonAlign      Action button icon alignment when the label is visible.
 UiActionButton           Compact icon button with an optional inline label.
 
@@ -26,6 +27,7 @@ COMPONENT PROPERTIES
 ───────────────────────────────────────────────────────────────────────────────
 UiActionButtonProps      Action button control props; extends filtered button attributes.
 ├ align                  Icon alignment beside the label.
+├ decoration             A ring around the glyph, for a control set among data.
 ├ disabled               Disables interaction.
 ├ density                Button density.
 ├ error                  Marks the error state.
@@ -50,6 +52,9 @@ export type UiActionButtonLabelMode = 'visible' | 'hidden'
 /** Action button visual density. */
 export type UiActionButtonDensity = 'standard' | 'dense'
 
+/** Action button decoration: a ring marks a control that sits among data. */
+export type UiActionButtonDecoration = 'ring'
+
 /** Action button icon alignment when the label is visible. */
 export type UiActionButtonAlign = 'start' | 'end'
 
@@ -64,6 +69,7 @@ export type UiActionButtonProps =
     | 'aria-label'
     | 'data-ui'
     | 'data-ui-align'
+    | 'data-ui-decoration'
     | 'data-ui-density'
     | 'data-ui-icon'
     | 'data-ui-label-mode'
@@ -73,6 +79,7 @@ export type UiActionButtonProps =
   & {
     align?: UiActionButtonAlign
     disabled?: boolean
+    decoration?: UiActionButtonDecoration
     density?: UiActionButtonDensity
     error?: boolean
     icon: string
@@ -85,6 +92,7 @@ export type UiActionButtonProps =
     style?: never
     'data-ui'?: never
     'data-ui-align'?: never
+    'data-ui-decoration'?: never
     'data-ui-density'?: never
     'data-ui-icon'?: never
     'data-ui-label-mode'?: never
@@ -97,6 +105,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'align',
     'disabled',
+    'decoration',
     'density',
     'error',
     'icon',
@@ -108,6 +117,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
     'classList',
     'style',
     'data-ui',
+    'data-ui-decoration',
     'data-ui-density',
     'data-ui-icon',
     'data-ui-label-mode',
@@ -121,6 +131,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       aria-label={local.label}
       data-ui='action-button'
       data-ui-align={local.align ?? 'end'}
+      data-ui-decoration={local.decoration}
       data-ui-density={local.density ?? 'standard'}
       data-ui-label-mode={local.labelMode ?? 'hidden'}
       data-ui-state={controlState(local)}

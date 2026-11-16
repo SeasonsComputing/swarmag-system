@@ -377,6 +377,7 @@ export const Manager = <T extends Instance, Draft>(
               <For each={props.provider.actions}>
                 {action => (
                   <UiActionButton
+                    decoration='ring'
                     density='dense'
                     disabled={savePending() || actionPending()}
                     icon={action.icon}
