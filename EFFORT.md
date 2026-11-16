@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Effort Methodology (1.4)
+# Effort Methodology (1.5)
 
 - Source: [EFFORT.md](EFFORT.md)
-- Version: 1.4
-- Published: 2026 November 6th
+- Version: 1.5
+- Published: 2026 November 15th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -31,7 +31,7 @@ Tracked work lives in `effort/`, in five namespaces:
 
 Status-bearing records come in two kinds, the brief (§4 The Brief) and the handoff (§5 The Handoff). Each is named `{yyyy-mm-dd}-{topic}-{kind}.md`, where the date is the day the record was written and `{kind}` is `brief` or `handoff`.
 
-A document's namespace and internal framing must state the same status. When a brief closes, update its opening line to state closure and move it to the completed namespace.
+A document's namespace and internal framing must state the same status. When a brief closes, update its opening line to state closure and move it to the completed namespace, into `effort/completed/{yyyy-mm}/` for the month its file name carries.
 
 A closed document's cross-references are frozen at closure. If a cited document later retires or moves, retain the original path as part of the historical record. A dangling path inside `effort/completed/` is not a defect and must not be repaired.
 
@@ -72,7 +72,7 @@ When a brief is created for work that already has a `project-backlog.md` entry, 
 
 - Settle every deferred or not-taken item: it becomes a backlog entry, joins a pending brief, or is dropped, and the brief says which.
 - Rewrite the brief's own opening framing to state closure plainly.
-- Move the file to `effort/completed/`.
+- Move the file to `effort/completed/{yyyy-mm}/`, the month in its file name.
 - Fix cross-references to the old path — in other documents and in AI memory — subject to the historical-reference rule in §2 The Effort Namespace.
 
 A brief carries the decision. Carrying an unfinished session's working state to the next one is a different job — see §5 The Handoff.
@@ -121,6 +121,7 @@ Each published version supersedes the one before it. Amendments reference sectio
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.5     | 2026 November 15th  | §2 The Effort Namespace and §4 The Brief: a closed record is filed in `effort/completed/{yyyy-mm}/`, the month its file name carries.                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 1.4     | 2026 November 6th   | §7 Milestones: a closed milestone's ID is permanent; one not yet closed is a position, renumbered as milestones are added, with live references updated in the same change.                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.3     | 2026 October 21st   | §4 The Brief: no work on a pending brief begins before it moves to `effort/active/`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 1.2     | 2026 October 20th   | §4 The Brief edits a draft in place, recording overturned directions in its Design history, and amends a brief only once dispatched; on closing, every deferred or not-taken item is settled. §7 Milestones names each numbered roadmap section a milestone, lists enablers ahead of features with ride-along work beside them, and reconciles the roadmap when a milestone closes. §3 Work Definitions gives every backlog and parking-lot entry a permanent ID, and asks backlog titles to state the gap and parking-lot titles the open question; §7 Milestones gives each milestone a permanent `M-n`. |
