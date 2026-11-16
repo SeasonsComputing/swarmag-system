@@ -1,6 +1,6 @@
 # Look and Feel Pass — Brief
 
-**Active; items 1–3 and 5 done, items 4, 6, and 7 ready for ACE.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
+**Active; items 1–3 and 5 done, items 4 and 6–8 ready for ACE.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
 workbench panes shipped (`effort/completed/2026-11-15-dialog-look-brief.md`), the CA and AI
 Architect reworked the suite's look in look-and-feel mode: hacked fast, committed as it settled.
 This brief records what shipped, the rules it settled, and the clean-up that makes it right.
@@ -74,6 +74,13 @@ under `source/`.
 6. **For ACE: comments** carry design reasons, not session notes; sweep this pass's CSS and TSX.
 7. **For ACE: checks.** None of this pass's commits has been checked; run the set below and fix
    in-scope failures.
+
+8. **For ACE: document the late changes** (`ae843cb`…`c19da43`): cards and dialogs no longer
+   blur (`backdrop-filter` was the long-standing interaction lag; header, footer, and select
+   dropdown keep it); dialogs take `--sa-dialog-bg` per theme, a step from the panes they hold;
+   the light theme's table and form sit on the popup surface; the site editor's sections are in
+   `PanelSections`; Notes tabs hold their content without fieldsets. ux-design-language §4.6 and
+   the internals token catalog (`--sa-dialog-bg`).
 
 Out of scope: new looks; the overlay-trigger brief (B-6), which is what lets the Helm's menu
 triggers become `UiActionButton`s too.
