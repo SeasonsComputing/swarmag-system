@@ -645,16 +645,19 @@ export const validateShapeCreate = (input: ShapeCreate): ExpectResult => {
 
 A protocol is the shape an abstraction takes crossing a boundary. Derive it from the abstraction
 with `@core/std/protocols.ts` (`CreateFromInstantiable<T>`, `UpdateFromInstantiable<T>`,
-`ScopedUpdate<T, K>`); never write one by hand. For a union, derive a protocol per variant and
-union the results: a derived shape applied to the union itself collapses its variants.
+`ScopedUpdate<T, K>`); never write one by hand. These primitives preserve union constituents.
+Domain protocol modules name each variant's protocol and export their union as the boundary
+type, following domain-archetypes §4.4. Generic client contracts derive the equivalent protocol
+directly from the abstraction.
 
 ```typescript
+export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
 export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
 export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
-export type QuestionCreate = ScalarQuestionCreate | SelectQuestionCreate
-
-// WRONG: applied to the union, the variants collapse
-export type QuestionCreate = CreateFromInstantiable<Question>
+export type QuestionCreate =
+  | InternalQuestionCreate
+  | ScalarQuestionCreate
+  | SelectQuestionCreate
 ```
 
 ### 9.6 Validators
