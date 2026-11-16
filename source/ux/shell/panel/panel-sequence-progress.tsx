@@ -28,7 +28,7 @@ export const PanelSequenceProgress = (props: { sequence: PanelSequenceControl })
           data-shell='sequence-bar-fill'
           style={{
             'clip-path': `inset(0 ${
-              (100 - (props.sequence.index() + 0.5) / props.sequence.steps().length * 100).toFixed(3)
+              (100 - (props.sequence.index() + 1) / props.sequence.steps().length * 100).toFixed(3)
             }% 0 0 round var(--sa-radius-full))`
           }}
         />
