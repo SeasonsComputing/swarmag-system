@@ -1354,7 +1354,7 @@
 }
 
 [data-ui='dialog'] {
-  background: var(--sa-bg-popup);
+  background: var(--sa-dialog-bg);
   border: var(--sa-border-card);
   border-radius: var(--sa-card-border-radius);
   box-shadow: var(--sa-shadow-card);

@@ -26,6 +26,7 @@ import type { SetStoreFunction } from '@solid-js/store'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.ts'
 import {
@@ -166,168 +167,170 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
       <Show when={siteError()}>
         <UiAlert variant='danger'>Complete the required site fields before saving.</UiAlert>
       </Show>
-      <UiFieldset legend='Identity'>
-        <SiteTextInput
-          index={props.index}
-          name='siteLabel'
-          label='Site Label'
-          value={draft.label}
-          required
-          error={saveAttempted() && draft.label.trim().length === 0}
-          placeholder='e.g., "Main Office" or "South Pasture"'
-          onValue={value => setDraft('label', value)}
-        />
-        <SiteTextInput
-          commit='change'
-          index={props.index}
-          name='siteAcreage'
-          label='Acreage'
-          type='number'
-          value={UiText.from(draft.acreage)}
-          onValue={value => setDraft('acreage', UiText.number(value))}
-        />
-      </UiFieldset>
-      <UiFieldset legend='Site Location'>
-        <UiToggleGroup<LocationMode> value={mode()} onChange={changeMode}>
-          <UiToggleItem value='address'>
-            <span>Address</span>
-          </UiToggleItem>
-          <UiToggleItem value='coordinates'>
-            <span>Coordinates</span>
-          </UiToggleItem>
-        </UiToggleGroup>
-        <Show when={mode() === 'address'}>
-          <UiLayout>
-            <SiteTextInput
-              index={props.index}
-              name='siteLine1'
-              label='Address'
-              value={siteLocation(draft).line1}
-              required
-              error={saveAttempted() && !siteLocation(draft).line1}
-              onValue={value =>
-                updateDraftLocation(setDraft, location => ({
-                  ...location,
-                  line1: UiText.optional(value)
-                }))}
-            />
-            <SiteTextInput
-              index={props.index}
-              name='siteLine2'
-              label='Unit'
-              value={siteLocation(draft).line2}
-              onValue={value =>
-                updateDraftLocation(setDraft, location => ({
-                  ...location,
-                  line2: UiText.optional(value)
-                }))}
-            />
-            <SiteTextInput
-              index={props.index}
-              name='siteCity'
-              label='City'
-              value={siteLocation(draft).city}
-              required
-              error={saveAttempted() && !siteLocation(draft).city}
-              onValue={value =>
-                updateDraftLocation(setDraft, location => ({
-                  ...location,
-                  city: UiText.optional(value)
-                }))}
-            />
-            <UiLayout variant='inline-fill'>
+      <PanelSections>
+        <UiFieldset legend='Identity'>
+          <SiteTextInput
+            index={props.index}
+            name='siteLabel'
+            label='Site Label'
+            value={draft.label}
+            required
+            error={saveAttempted() && draft.label.trim().length === 0}
+            placeholder='e.g., "Main Office" or "South Pasture"'
+            onValue={value => setDraft('label', value)}
+          />
+          <SiteTextInput
+            commit='change'
+            index={props.index}
+            name='siteAcreage'
+            label='Acreage'
+            type='number'
+            value={UiText.from(draft.acreage)}
+            onValue={value => setDraft('acreage', UiText.number(value))}
+          />
+        </UiFieldset>
+        <UiFieldset legend='Site Location'>
+          <UiToggleGroup<LocationMode> value={mode()} onChange={changeMode}>
+            <UiToggleItem value='address'>
+              <span>Address</span>
+            </UiToggleItem>
+            <UiToggleItem value='coordinates'>
+              <span>Coordinates</span>
+            </UiToggleItem>
+          </UiToggleGroup>
+          <Show when={mode() === 'address'}>
+            <UiLayout>
               <SiteTextInput
                 index={props.index}
-                name='siteState'
-                label='Region'
+                name='siteLine1'
+                label='Address'
+                value={siteLocation(draft).line1}
                 required
-                value={siteLocation(draft).state}
-                error={saveAttempted() && !siteLocation(draft).state}
+                error={saveAttempted() && !siteLocation(draft).line1}
                 onValue={value =>
                   updateDraftLocation(setDraft, location => ({
                     ...location,
-                    state: UiText.optional(value)
+                    line1: UiText.optional(value)
                   }))}
               />
               <SiteTextInput
                 index={props.index}
-                name='sitePostalCode'
-                label='Postal'
-                required
-                value={siteLocation(draft).postalCode}
-                error={saveAttempted() && !siteLocation(draft).postalCode}
+                name='siteLine2'
+                label='Unit'
+                value={siteLocation(draft).line2}
                 onValue={value =>
                   updateDraftLocation(setDraft, location => ({
                     ...location,
-                    postalCode: UiText.optional(value)
+                    line2: UiText.optional(value)
                   }))}
               />
               <SiteTextInput
                 index={props.index}
-                name='siteCountry'
-                label='Country'
+                name='siteCity'
+                label='City'
+                value={siteLocation(draft).city}
                 required
-                value={siteLocation(draft).country}
-                error={saveAttempted() && !siteLocation(draft).country}
+                error={saveAttempted() && !siteLocation(draft).city}
                 onValue={value =>
                   updateDraftLocation(setDraft, location => ({
                     ...location,
-                    country: UiText.optional(value)
+                    city: UiText.optional(value)
                   }))}
               />
+              <UiLayout variant='inline-fill'>
+                <SiteTextInput
+                  index={props.index}
+                  name='siteState'
+                  label='Region'
+                  required
+                  value={siteLocation(draft).state}
+                  error={saveAttempted() && !siteLocation(draft).state}
+                  onValue={value =>
+                    updateDraftLocation(setDraft, location => ({
+                      ...location,
+                      state: UiText.optional(value)
+                    }))}
+                />
+                <SiteTextInput
+                  index={props.index}
+                  name='sitePostalCode'
+                  label='Postal'
+                  required
+                  value={siteLocation(draft).postalCode}
+                  error={saveAttempted() && !siteLocation(draft).postalCode}
+                  onValue={value =>
+                    updateDraftLocation(setDraft, location => ({
+                      ...location,
+                      postalCode: UiText.optional(value)
+                    }))}
+                />
+                <SiteTextInput
+                  index={props.index}
+                  name='siteCountry'
+                  label='Country'
+                  required
+                  value={siteLocation(draft).country}
+                  error={saveAttempted() && !siteLocation(draft).country}
+                  onValue={value =>
+                    updateDraftLocation(setDraft, location => ({
+                      ...location,
+                      country: UiText.optional(value)
+                    }))}
+                />
+              </UiLayout>
             </UiLayout>
-          </UiLayout>
-        </Show>
-        <Show when={mode() === 'coordinates'}>
-          <UiLayout variant='inline-fit'>
-            <SiteTextInput
-              commit='change'
-              index={props.index}
-              name='siteLatitude'
-              label='Latitude'
-              value={UiText.from(siteLocation(draft).latitude)}
-              required
-              error={saveAttempted() && siteLocation(draft).latitude === undefined}
-              placeholder='e.g., 40.7128'
-              onValue={value =>
-                updateDraftLocation(setDraft, location => ({
-                  ...location,
-                  latitude: UiText.number(value)
-                }))}
-            />
-            <SiteTextInput
-              commit='change'
-              index={props.index}
-              name='siteLongitude'
-              label='Longitude'
-              value={UiText.from(siteLocation(draft).longitude)}
-              required
-              error={saveAttempted() && siteLocation(draft).longitude === undefined}
-              placeholder='e.g., -74.0060'
-              onValue={value =>
-                updateDraftLocation(setDraft, location => ({
-                  ...location,
-                  longitude: UiText.number(value)
-                }))}
-            />
-            <UiField label='GPS' variant='caption'>
-              <UiActionButton
-                decoration='ring'
-                disabled={!props.hasGeo}
-                icon='crosshair-2'
-                label='GPS'
-                onClick={() => captureLocation(setDraft, props.hasGeo, isActiveDraft)}
+          </Show>
+          <Show when={mode() === 'coordinates'}>
+            <UiLayout variant='inline-fit'>
+              <SiteTextInput
+                commit='change'
+                index={props.index}
+                name='siteLatitude'
+                label='Latitude'
+                value={UiText.from(siteLocation(draft).latitude)}
+                required
+                error={saveAttempted() && siteLocation(draft).latitude === undefined}
+                placeholder='e.g., 40.7128'
+                onValue={value =>
+                  updateDraftLocation(setDraft, location => ({
+                    ...location,
+                    latitude: UiText.number(value)
+                  }))}
               />
-            </UiField>
-          </UiLayout>
-        </Show>
-      </UiFieldset>
-      <NotesEditor
-        attach={props.attach}
-        notes={() => draft.notes}
-        onChange={notes => setDraft('notes', copyDraft(notes))}
-        drill={props.drill}
-      />
+              <SiteTextInput
+                commit='change'
+                index={props.index}
+                name='siteLongitude'
+                label='Longitude'
+                value={UiText.from(siteLocation(draft).longitude)}
+                required
+                error={saveAttempted() && siteLocation(draft).longitude === undefined}
+                placeholder='e.g., -74.0060'
+                onValue={value =>
+                  updateDraftLocation(setDraft, location => ({
+                    ...location,
+                    longitude: UiText.number(value)
+                  }))}
+              />
+              <UiField label='GPS' variant='caption'>
+                <UiActionButton
+                  decoration='ring'
+                  disabled={!props.hasGeo}
+                  icon='crosshair-2'
+                  label='GPS'
+                  onClick={() => captureLocation(setDraft, props.hasGeo, isActiveDraft)}
+                />
+              </UiField>
+            </UiLayout>
+          </Show>
+        </UiFieldset>
+        <NotesEditor
+          attach={props.attach}
+          notes={() => draft.notes}
+          onChange={notes => setDraft('notes', copyDraft(notes))}
+          drill={props.drill}
+        />
+      </PanelSections>
     </UiLayout>
   )
 }

@@ -31,7 +31,6 @@ import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.t
 import {
   UiAlert,
   UiField,
-  UiFieldset,
   UiLayout,
   UiTab,
   UiTabList,
@@ -159,29 +158,27 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
           </UiTab>
         </UiTabList>
         <UiTabPanel value='note'>
-          <UiFieldset legend='Note'>
-            <UiLayout>
-              <UiLayout data-app='note-content' gap='none'>
-                <time
-                  data-app='note-created-at'
-                  dateTime={draft.createdAt}
-                  title={new Date(draft.createdAt).toLocaleString()}
-                >
-                  {UiText.relativeTime(draft.createdAt)}
-                </time>
-                <UiField for='note-content' label='Content' required>
-                  <UiTextArea
-                    name='note-content'
-                    rows={6}
-                    value={draft.content}
-                    error={saveAttempted() && draft.content.trim().length === 0}
-                    onInput={event => setDraft('content', event.currentTarget.value)}
-                    required
-                  />
-                </UiField>
-              </UiLayout>
+          <UiLayout>
+            <UiLayout data-app='note-content' gap='none'>
+              <time
+                data-app='note-created-at'
+                dateTime={draft.createdAt}
+                title={new Date(draft.createdAt).toLocaleString()}
+              >
+                {UiText.relativeTime(draft.createdAt)}
+              </time>
+              <UiField for='note-content' label='Content' required>
+                <UiTextArea
+                  name='note-content'
+                  rows={6}
+                  value={draft.content}
+                  error={saveAttempted() && draft.content.trim().length === 0}
+                  onInput={event => setDraft('content', event.currentTarget.value)}
+                  required
+                />
+              </UiField>
             </UiLayout>
-          </UiFieldset>
+          </UiLayout>
         </UiTabPanel>
         <UiTabPanel value='attachments'>
           <AttachmentList

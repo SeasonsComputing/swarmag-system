@@ -43,6 +43,7 @@
 
   /* Dialog */
   --sa-dialog-pad: var(--sa-rhythm-pad);
+  --sa-dialog-bg: var(--sa-bg-popup);
 
   /* Fieldset */
   --sa-fieldset-bg: var(--sa-bg-control);
@@ -201,6 +202,9 @@
   /* Skeleton */
   --sa-skeleton-bg-shimmer: oklch(42% 0.025 252 / 0.6);
 
+  /* Dialog: the window's frame, a teal step above the panes it holds. */
+  --sa-dialog-bg: oklch(32% 0.035 220);
+
   /* Card */
   --sa-card-tonal-light-bg: oklch(28.5% 0.023 236);
   --sa-card-tonal-dark-bg: oklch(23.3% 0.019 247);
@@ -240,7 +244,7 @@
   --sa-bg-progress-track: oklch(89.5% 0.018 110);
   --sa-bg-overlay: oklch(18% 0.022 236 / 0.08);
   --sa-bg-popup: oklch(99.2% 0.008 100);
-  --sa-bg-table: oklch(90% 0.018 110 / 0.38);
+  --sa-bg-table: var(--sa-bg-popup);
   --sa-bg-hover: oklch(86% 0.062 185 / 0.38);
   --sa-bg-selected: oklch(80% 0.09 184 / 0.28);
   --sa-bg-control: oklch(97% 0.012 112);
@@ -389,9 +393,12 @@
   /* Skeleton */
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
+  /* Dialog: the window's frame sits a step below the panes it holds. */
+  --sa-dialog-bg: oklch(91% 0.012 100);
+
   /* Card */
-  --sa-card-tonal-light-bg: oklch(95% 0.006 98);
-  --sa-card-tonal-dark-bg: oklch(92% 0.01 98);
+  --sa-card-tonal-light-bg: var(--sa-bg-popup);
+  --sa-card-tonal-dark-bg: oklch(94.5% 0.008 100);
   --sa-card-panel-bg: var(--sa-bg-card);
   --sa-card-panel-border: 1px solid oklch(34% 0.035 220 / 0.1);
   --sa-card-panel-shadow: none;

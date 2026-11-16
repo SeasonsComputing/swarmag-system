@@ -33,7 +33,6 @@ import {
   UiConfirmDialog,
   UiDialog,
   UiField,
-  UiFieldset,
   UiFormActions,
   UiInput,
   UiLayout,
@@ -102,103 +101,101 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
       <Show when={error()}>
         <UiAlert variant='danger'>{error()}</UiAlert>
       </Show>
-      <UiFieldset legend='Attachments'>
-        <UiLayout>
-          <UiLayout variant='inline-fit'>
-            <UiActionButton
-              align='start'
-              density='dense'
-              disabled={busy()}
-              icon='plus'
-              label='Add Attachment'
-              labelMode='visible'
-              onClick={() => setPickerOpen(true)}
-            />
-          </UiLayout>
-          <Show when={pickerOpen()}>
-            <UiField label='Add files' for='note-files'>
-              <UiInput
-                name='note-files'
-                type='file'
-                multiple
-                disabled={busy() || !api.Attachments.accept(props.kinds)}
-                accept={api.Attachments.accept(props.kinds)}
-                onInput={event => {
-                  // Reset before the text-field primitive reads it; file inputs cannot accept text.
-                  const files = Array.from(event.currentTarget.files ?? [])
-                  event.currentTarget.value = ''
-                  void capture(files)
-                }}
-              />
-            </UiField>
-          </Show>
-          <Show when={busy()}>
-            <p role='status'>Attaching files…</p>
-          </Show>
-          <div data-app='attachment-list'>
-            <Show
-              when={props.attachments().length > 0}
-              fallback={
-                <p data-app='attachment-list-empty'>
-                  <span>
-                    No attachments yet. Use <kbd>Add Attachment</kbd> to add one.
-                  </span>
-                </p>
-              }
-            >
-              <UiTable>
-                <UiTableHeader>
-                  <UiTableCell>File</UiTableCell>
-                  <UiTableCell align='end'>Size</UiTableCell>
-                  <UiTableCell align='end'>Actions</UiTableCell>
-                </UiTableHeader>
-                <UiTableBody>
-                  <For each={props.attachments()}>
-                    {(attachment, index) => (
-                      <UiTableRow onActivate={() => void open(attachment)}>
-                        <UiTableCell>
-                          <LabelCell
-                            text={attachment.filename}
-                            icon={AttachmentIcons[attachment.kind]}
-                          />
-                        </UiTableCell>
-                        <UiTableCell align='end'>
-                          <AttachmentSize attachment={attachment} />
-                        </UiTableCell>
-                        <UiTableCell align='end'>
-                          <UiActionButton
-                            decoration='ring'
-                            density='dense'
-                            disabled={busy()}
-                            icon='pencil-1'
-                            label='Rename'
-                            onClick={event => {
-                              event.stopPropagation()
-                              setFilename(attachment.filename)
-                              setRename(index())
-                            }}
-                          />
-                          <UiActionButton
-                            decoration='ring'
-                            density='dense'
-                            disabled={busy()}
-                            icon='minus'
-                            label='Remove'
-                            onClick={event => {
-                              event.stopPropagation()
-                              setRemove(index())
-                            }}
-                          />
-                        </UiTableCell>
-                      </UiTableRow>
-                    )}
-                  </For>
-                </UiTableBody>
-              </UiTable>
-            </Show>
-          </div>
+      <UiLayout>
+        <UiLayout variant='inline-fit'>
+          <UiActionButton
+            align='start'
+            density='dense'
+            disabled={busy()}
+            icon='plus'
+            label='Add Attachment'
+            labelMode='visible'
+            onClick={() => setPickerOpen(true)}
+          />
         </UiLayout>
-      </UiFieldset>
+        <Show when={pickerOpen()}>
+          <UiField label='Add files' for='note-files'>
+            <UiInput
+              name='note-files'
+              type='file'
+              multiple
+              disabled={busy() || !api.Attachments.accept(props.kinds)}
+              accept={api.Attachments.accept(props.kinds)}
+              onInput={event => {
+                // Reset before the text-field primitive reads it; file inputs cannot accept text.
+                const files = Array.from(event.currentTarget.files ?? [])
+                event.currentTarget.value = ''
+                void capture(files)
+              }}
+            />
+          </UiField>
+        </Show>
+        <Show when={busy()}>
+          <p role='status'>Attaching files…</p>
+        </Show>
+        <div data-app='attachment-list'>
+          <Show
+            when={props.attachments().length > 0}
+            fallback={
+              <p data-app='attachment-list-empty'>
+                <span>
+                  No attachments yet. Use <kbd>Add Attachment</kbd> to add one.
+                </span>
+              </p>
+            }
+          >
+            <UiTable>
+              <UiTableHeader>
+                <UiTableCell>File</UiTableCell>
+                <UiTableCell align='end'>Size</UiTableCell>
+                <UiTableCell align='end'>Actions</UiTableCell>
+              </UiTableHeader>
+              <UiTableBody>
+                <For each={props.attachments()}>
+                  {(attachment, index) => (
+                    <UiTableRow onActivate={() => void open(attachment)}>
+                      <UiTableCell>
+                        <LabelCell
+                          text={attachment.filename}
+                          icon={AttachmentIcons[attachment.kind]}
+                        />
+                      </UiTableCell>
+                      <UiTableCell align='end'>
+                        <AttachmentSize attachment={attachment} />
+                      </UiTableCell>
+                      <UiTableCell align='end'>
+                        <UiActionButton
+                          decoration='ring'
+                          density='dense'
+                          disabled={busy()}
+                          icon='pencil-1'
+                          label='Rename'
+                          onClick={event => {
+                            event.stopPropagation()
+                            setFilename(attachment.filename)
+                            setRename(index())
+                          }}
+                        />
+                        <UiActionButton
+                          decoration='ring'
+                          density='dense'
+                          disabled={busy()}
+                          icon='minus'
+                          label='Remove'
+                          onClick={event => {
+                            event.stopPropagation()
+                            setRemove(index())
+                          }}
+                        />
+                      </UiTableCell>
+                    </UiTableRow>
+                  )}
+                </For>
+              </UiTableBody>
+            </UiTable>
+          </Show>
+        </div>
+      </UiLayout>
       <Show when={remove() !== null}>
         <UiConfirmDialog
           title='Remove attachment?'
