@@ -233,7 +233,7 @@ the API client without proving that an existing reference points to them.
 
 Designs must preserve the ability to anonymize personal data on its record. References carry ids,
 never copies of the target's personal data, so anonymizing the target changes the label
-resolved by every reference to it. Anonymization implementation is deferred.
+resolved by every reference to it. Anonymize implementation is deferred.
 
 ### 3.3 Non-Goals
 
@@ -321,10 +321,14 @@ export const api = {
 
 Clients conform to the contracts in `@core/std/api-contracts.ts`. CONVENTIONS §10 shows how they
 are declared and used; the `core/std` module headers state their semantics, including list
-filtering, search, ordering, and cursors (`make-query.ts`, `api-contracts.ts`). A junction client
-edits a many-to-many from its owning side: it reads an owner's partners and replaces them
-(`ApiJunctionContract`). A table with its own id and life cycle is a record, edited through CRUD,
-not a junction.
+filtering, search, ordering, and cursors (`make-query.ts`, `api-contracts.ts`).
+
+A junction client edits a many-to-many from its owning side. Unordered junctions manage partner
+membership as a set. Ordered junctions preserve sequence and expose a mutator bound to one
+owner. Callers identify partners; the client owns sequence arithmetic and persistence of affected
+links. The capability is independent of domain topic and presentation.
+
+A table with its own id and life cycle is a record, edited through CRUD, not a junction.
 
 This system relies on these properties of every client:
 
