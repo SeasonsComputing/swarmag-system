@@ -810,7 +810,7 @@ into its API namespace and consumed from there. Choose the family by what you ar
 | Family         | Contract                   | For                                                           |
 | -------------- | -------------------------- | ------------------------------------------------------------- |
 | CRUD           | `ApiCrudContract`          | Records of an abstraction: create, read, update, delete, list |
-| Junction       | `ApiJunctionContract`      | An owner's set of partners in a many-to-many association      |
+| Junction       | `ApiJunctionContract`      | An owner's partner membership in a many-to-many association   |
 | Business rule  | `ApiBusRuleContract`       | One operation that runs on the server                         |
 | Document store | `ApiDocumentStoreContract` | Files and images (§10.8)                                      |
 
@@ -828,10 +828,13 @@ adapted: it writes through a scope's adapter, `update(scope.adapter, source)`, w
 to columns. An HTTP client is direct: the service receives the domain shape, `update(source)`.
 Never collapse the two forms into one.
 
-A junction client reads an owner's partners and replaces them as a set (`partners`, `replace`):
-removed pairs are hard-deleted and added pairs validated and inserted. A list of owners reads its
-partners in one set-based read (`partnersOf`), never one read per owner. The specification names the
-owner and partner by domain field; the adapter supplies their columns.
+A junction specification names the owner and partner by domain field; the adapter supplies their
+columns. An ordered specification also names the sequence field and supplies create and update
+validators. An unordered specification supplies a create validator.
+
+Junction reads across owners use set-based access (`partnersOf`), never one read per owner.
+Removed pairs are hard-deleted. Ordering, replacement, and owner-bound mutation semantics are
+stated in the client contract and maker headers.
 
 ```typescript
 const Questions = makeCrudSupabaseClient<Question>({ table: 'questions', adapter: QuestionAdapter })
@@ -1102,7 +1105,8 @@ Columns within a table follow this order:
 - Define policies immediately after each `CREATE TABLE` block.
 - Policy naming: `"{table}_{operation}_{scope}"` (lowercase, double-quoted).
 - Operation tokens: `select`, `insert`, `update`, `delete`.
-- Junction tables: `SELECT`, `INSERT`, `DELETE` only — no `UPDATE` policy.
+- Pure-key junction tables: `SELECT`, `INSERT`, `DELETE` only — no `UPDATE` policy.
+- State-bearing junction tables: also define an `UPDATE` policy.
 - `InstantiableOnly` (append-only) tables: `SELECT`, `INSERT` only — no `UPDATE`, no `DELETE` policy.
 
 #### 14.2.9 JSONB columns
