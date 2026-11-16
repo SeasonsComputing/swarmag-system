@@ -1,6 +1,6 @@
 # Look and Feel Pass — Brief
 
-**Active, not dispatched.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
+**Active; items 1–3 done, items 4–7 ready for ACE.** Recorded 2026-11-15 from a CA + AI Architect session. After the tonal
 workbench panes shipped (`effort/completed/2026-11-15-dialog-look-brief.md`), the CA and AI
 Architect reworked the suite's look in look-and-feel mode: hacked fast, committed as it settled.
 This brief records what shipped, the rules it settled, and the clean-up that makes it right.
@@ -41,28 +41,36 @@ No checks were run on any of these commits.
 
 ## Clean-up scope
 
-The CA and the AI Architect do this work directly; ACE is not available for it. Paths are under
-`source/`.
+The CA and the AI Architect did items 1–3 directly on 2026-11-15; items 4–7 are ACE's. Paths are
+under `source/`.
 
-1. **Documentation leads the code it now trails:**
-   - ux-components-guide: `UiActionButton` (the glyph, bar, and label; `decoration='ring'`),
-     `UiSingleSelect` (fits its choices), and the shell's `PanelRowIdentity` `pill` and `DrillDown`
-     `axis`, wherever the shell's components are described.
-   - ux-design-language §4.6: the action rule and the ring for controls among data.
-   - ux-components-internals: anything the catalog lists for the action-button frame and select.
+1. **Documentation.** Done:
+   - ux-components-guide §3.16 `UiActionButton`: glyph, bar, and label; `decoration='ring'` for an
+     action among data; the touch box; the examples. §3.4 `UiSingleSelect`: fits its choices.
+   - ux-design-language §4.6: actions are bare and wear a ring among data, declared by the caller;
+     a sheet's single region is the dark tonal card.
+   - ux-components-internals: `data-ui-decoration='ring'` on `action-button`; its intent line.
 2. **The action-button ring is declared.** Done: `UiActionButton` takes `decoration='ring'`
    (`data-ui-decoration`, already on `guard-css`'s list); the table-cell context rule is gone; the
    Manager's row actions, `CollectionPanel`'s Delete, the attachment list's Rename and Remove,
    UrlField's Open, and the Sites GPS button declare it. The frame part stays in the markup as the
    touch box.
-3. **`HelmButton`** (`ux/widgets/helm-button.tsx`) is unused since Helm commands became
-   `UiActionButton`s; remove it and its CSS rules that only it consumed. `HelmButtonGlyph` stays
-   for popover triggers.
-4. **Sheets:** `Lister` hard-codes `variant='tonal-dark'`; `DrillNavigator` takes a `variant`. Make
-   the sheet's tone one stated choice, documented with §4.6.
-5. **Redundant CSS:** `front/app-admin/customers/customer-step-detail.css`'s
-   `customer-account-manager` width rules, now that selects fit their choices.
-6. **Comments** carry design reasons, not session notes; sweep today's CSS for any that do not.
+3. **Sheets.** Done: the design language states a sheet's single region is the dark tonal card;
+   `Lister` (always a sheet) and the Library's `DrillNavigator` follow it.
+4. **For ACE: remove `HelmButton`** (`ux/widgets/helm-button.tsx`) and the `helm-button.css` rules
+   only it consumed; `HelmButtonGlyph` and its trigger rules stay for popover triggers. The browser
+   test `tests/cases/bootstrap-lifecycle-test.ts` still mounts `HelmButton` as a probe (loading,
+   `aria-busy`, ref forwarding, `aria-describedby`, click count, a centered glyph in a frameless
+   target) and asserts the toolbar holds no `UiActionButton` — a decision this pass reversed.
+   Rewrite the probe around a dense `UiActionButton`, drop that assertion, and add a plain command
+   to the test toolbar so the command path, with its hover glow (`helm-widget.css`), is covered.
+   Run the browser test (`-- --browser`).
+5. **For ACE: redundant CSS.** `front/app-admin/customers/customer-step-detail.css`'s
+   `customer-account-manager` rules set the Manager picker's width; selects now fit their choices.
+   Remove what no longer changes the result; verify the Manager picker on screen.
+6. **For ACE: comments** carry design reasons, not session notes; sweep this pass's CSS and TSX.
+7. **For ACE: checks.** None of this pass's commits has been checked; run the set below and fix
+   in-scope failures.
 
 Out of scope: new looks; the overlay-trigger brief (B-6), which is what lets the Helm's menu
 triggers become `UiActionButton`s too.
@@ -80,7 +88,9 @@ STYLE_AUDIT.
 
 CA decisions on governance and DevOps, not in ACE's scope:
 
-1. **CONVENTIONS:** a `PanelSections` entry beside `DrillDown` and `CollectionPanel`.
+1. **CONVENTIONS §17,** which documents the shell's panel components: a `PanelSections` entry;
+   `PanelRowIdentity`'s `pill` (§17.2); `DrillDown`'s `axis` (§17.5); and the header title holding
+   its height when a Back command appears.
 2. **`dprint`:** exclude `effort/completed/`; formatting keeps adding a line the
    completed-immutable guard refuses.
 

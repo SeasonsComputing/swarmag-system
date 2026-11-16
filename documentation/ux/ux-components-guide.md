@@ -311,6 +311,9 @@ Dropdown single-value picker.
 
 Use when the user must choose exactly one value from a known option list.
 
+A select sizes to its choices, not to its column: at least `--sa-size-wrap` wide, never wider than
+its field.
+
 **Props**
 
 | Prop           | Type                      | Required | Default | Description                   |
@@ -813,7 +816,7 @@ batch completion.
 
 ### 3.16 UiActionButton
 
-Compact icon action button for dense surfaces such as tables and toolbars.
+Compact icon action: a glyph, and when the label shows, a bar and the label.
 
 **Use When**
 
@@ -823,7 +826,12 @@ whether or not it is drawn. `labelMode` decides only whether the label is also
 rendered inline, and defaults to `hidden`, the dense case. Use
 `labelMode='visible'` when the action sits in sparse command chrome and the
 label should be part of the hit target. Use `variant='danger'` for destructive
-actions.
+actions. Use `decoration='ring'` when the action sits among data — a table's row actions, or a
+button beside an input — so it reads as a control rather than a value.
+
+The button draws no frame of its own. With a visible label, a bar sits midway between glyph and
+label. The glyph rests in the label's color and takes the primary color under the pointer or
+focus; a danger action keeps its own color.
 
 Nothing reveals a hidden label on hover, by design: a control-layer hover rule
 outranks a consumer hiding labels for space, so label presence stays the
@@ -833,27 +841,29 @@ consumer's decision at every viewport.
 
 Extends native button attributes, excluding styling and semantic hook props.
 
-| Prop        | Type                    | Default      | Description                                       |
-| ----------- | ----------------------- | ------------ | ------------------------------------------------- |
-| `icon`      | `string`                | —            | Icon catalog name to display.                     |
-| `label`     | `string`                | —            | Accessible label and optional visible label text. |
-| `labelMode` | `'visible' \| 'hidden'` | `'hidden'`   | Whether the label is also rendered inline.        |
-| `density`   | `'standard' \| 'dense'` | `'standard'` | Visual ring and glyph density.                    |
-| `align`     | `'start' \| 'end'`      | `'end'`      | Icon position when the label is visible.          |
-| `variant`   | `'default' \| 'danger'` | unset        | Visual/action priority.                           |
-| `error`     | `boolean`               | `false`      | Emits error state.                                |
-| `loading`   | `boolean`               | `false`      | Emits loading state; disables button.             |
-| `disabled`  | `boolean`               | `false`      | Native disabled behavior.                         |
+| Prop         | Type                    | Default      | Description                                        |
+| ------------ | ----------------------- | ------------ | -------------------------------------------------- |
+| `icon`       | `string`                | —            | Icon catalog name to display.                      |
+| `label`      | `string`                | —            | Accessible label and optional visible label text.  |
+| `labelMode`  | `'visible' \| 'hidden'` | `'hidden'`   | Whether the label is also rendered inline.         |
+| `density`    | `'standard' \| 'dense'` | `'standard'` | Touch box and glyph density.                       |
+| `align`      | `'start' \| 'end'`      | `'end'`      | Icon position when the label is visible.           |
+| `decoration` | `'ring'`                | unset        | A ring around the glyph, for an action among data. |
+| `variant`    | `'default' \| 'danger'` | unset        | Visual/action priority.                            |
+| `error`      | `boolean`               | `false`      | Emits error state.                                 |
+| `loading`    | `boolean`               | `false`      | Emits loading state; disables button.              |
+| `disabled`   | `boolean`               | `false`      | Native disabled behavior.                          |
 
 `loading` and `disabled` both disable the rendered button and suppress tab focus.
 
 **Emitted Attributes**
 
-`data-ui='action-button'`, `data-ui-align`, `data-ui-density`, `data-ui-label-mode`,
-`data-ui-state`, `data-ui-variant`. Its glyph is a `UiIcon` (§4.8).
+`data-ui='action-button'`, `data-ui-align`, `data-ui-decoration`, `data-ui-density`,
+`data-ui-label-mode`, `data-ui-state`, `data-ui-variant`. Its glyph is a `UiIcon` (§4.8).
 
-`density` scales the circular button and glyph together. Use `standard` for ordinary
-actions and `dense` for constrained action rows.
+`density` scales the button's touch box and glyph together. Use `standard` for ordinary
+actions and `dense` for constrained action rows. An icon-only action keeps its touch box
+whether or not it draws a ring.
 
 The `icon` value passes directly to the icon catalog (`icons.css`). Every
 catalog name is valid for an action button.
@@ -861,11 +871,10 @@ catalog name is valid for an action button.
 **Example**
 
 ```tsx
-<UiActionButton icon='pencil-1' label='Edit user' onClick={onEdit} />
+<UiActionButton decoration='ring' icon='pencil-1' label='Edit user' onClick={onEdit} />
 <UiActionButton icon='info-circled' label='About' onClick={onAbout} />
 <UiActionButton icon='person' label='Users' onClick={onUsers} />
-<UiActionButton icon='exit' label='Eject user' onClick={onEject} />
-<UiActionButton icon='trash' label='Delete record' variant='danger' onClick={onDelete} />
+<UiActionButton decoration='ring' icon='minus' label='Delete record' onClick={onDelete} />
 <UiActionButton icon='check' label='Save' labelMode='visible' type='submit' />
 <UiActionButton icon='arrow-left' label='Back' labelMode='visible' align='start' onClick={onBack} />
 ```

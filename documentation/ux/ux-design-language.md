@@ -342,6 +342,14 @@ rounded surface divided by tone.
 each section is an unframed fieldset whose legend is a small uppercase label, and a hairline
 separates it from the next. A frame is kept for what is a separate thing, not for what is a group.
 
+**Actions are bare; among data they wear a ring.** An action is a glyph, a bar, and its label,
+with no frame of its own: in a toolbar or a header every item is a control, so nothing needs
+marking. Among data — a table's row actions, a button beside an input — a control must stand out
+from the values around it, so it wears a ring. The caller declares the ring; nothing infers it.
+
+**A region is tonal.** A sheet's single region, like a workbench's panes, is a tonal card: the
+dark tone.
+
 ## 5. Geometry, Layout, And Motion
 
 ### 5.1 Spacing Scale

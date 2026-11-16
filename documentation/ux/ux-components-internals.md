@@ -170,6 +170,7 @@ Controls and parts may additionally declare these extension attributes:
 | Control / Part    | Attribute             | Declared Values                                                      |
 | ----------------- | --------------------- | -------------------------------------------------------------------- |
 | `action-button`   | `data-ui-align`       | `start`, `end`                                                       |
+| `action-button`   | `data-ui-decoration`  | `ring`                                                               |
 | `action-button`   | `data-ui-icon`        | Any `icons.css` catalog name                                         |
 | `badge`           | `data-ui-color`       | `gray`, `yellow`, `green`, `red`, `blue`, `purple`, `orange`, `cyan` |
 | `layout`          | `data-ui-gap`         | `loose`, `tight`, `none`                                             |
@@ -387,7 +388,7 @@ This selector shape is invalid because one element cannot hold two different `da
 | Control          | Intent                                                                 |
 | ---------------- | ---------------------------------------------------------------------- |
 | `button`         | Action trigger with primary, secondary, ghost, and danger variants     |
-| `action-button`  | Compact icon action button for dense surfaces; icon via `data-ui-icon` |
+| `action-button`  | Glyph, bar, and label action; a declared ring among data               |
 | `input`          | Single-line text entry                                                 |
 | `textarea`       | Multi-line text entry                                                  |
 | `single-select`  | Dropdown single-value picker                                           |
