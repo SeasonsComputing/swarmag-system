@@ -21,7 +21,14 @@ protocols and scoped drafts preserve union constituents. Lifecycle helpers and C
 retain their existing implementations. Client typing passes verification; stage CRUD has no
 verification claim.
 
-Ordered junctions and their two clients remain undispatched.
+The ordered junction capability is implemented under
+[B-36](../project/project-backlog.md#b-36--ordered-junctions-have-no-client): shared complete
+membership reads, ordered replacement, and an owner-bound list mutator with confirmed writes.
+Architecture and construction conventions describe the pattern. The core contracts, maker,
+validators, and edge source copy include the capability.
+
+The two junction client compositions, schema `UPDATE` policies, and stage verification remain
+outside the implemented slices.
 
 ## Design
 
@@ -78,11 +85,30 @@ constituents over common fields; variant-specific scopes use the corresponding c
 Question's named per-variant protocols remain the domain boundary vocabulary. The generic CRUD
 maker and validator shape consume the preserved union without Question-specific behavior.
 
-The ordered junction follows [B-36](../project/project-backlog.md#b-36--ordered-junctions-have-no-client):
-a `sequence` field in the specification makes `partners` return in order and `replace` write
-`sequence`; `JunctionValidator<J>` includes `validateUpdate`. Unordered junction behavior is
-unchanged. Each junction's primary key is the pair: a Task appears at most once in a Workflow,
-and a Question at most once in a Task.
+### Ordered junctions
+
+An ordered specification names the `sequence` field and supplies `OrderedJunctionValidator<J>`,
+with create and update validation. Unordered specifications retain create-only
+`JunctionValidator<J>`. Both forms use the same owner batching and pair-key pagination.
+
+`partners` and `partnersOf` return partner IDs in sequence order. `replace` establishes the
+supplied membership and order, assigning positions from one. Its multi-request writes are
+non-atomic; replay converges without competing writers.
+
+`list(owner)` opens an owner-bound mutator. Callers identify partners by ID through `add`,
+`remove`, `moveBack`, and `moveForward`; `items` returns an isolated snapshot. Sequence positions
+are distinct within the owner; gaps are valid. Add appends one link, remove leaves gaps, and
+movement exchanges positions with the adjacent link. Boundary moves perform no write. Opening
+a list with tied positions fails without rewriting data; `replace` explicitly establishes valid
+order.
+
+Mutations write only affected links and confirm the returned identities and positions before
+publishing local state. Commands serialize within one instance. A failed or unconfirmed write
+invalidates it; reopening reconciles persisted state. Relative moves are not automatically
+replayed. Other writers require a fresh list.
+
+Each junction's primary key is the pair: a Task appears at most once in a Workflow, and a
+Question at most once in a Task. The Builder owns domain operations such as clone.
 
 ### Facets
 
@@ -95,6 +121,8 @@ Documentation leads implementation:
 - **domain-data-dictionary §5.4 and §11:** optional Note `content`, captured Answer `type`,
   optional Answer `value`, and Workflow `version` as a string.
 - **architecture-core §5:** the junction client family includes an ordered variant.
+- **CONVENTIONS §10.6 and §14.2.8:** ordered specifications supply sequence metadata and update
+  validation; state-bearing junction tables include `UPDATE` policies.
 - **domain-seed-data:** Workflow versions use the string form wherever present.
 
 ## Production scope
@@ -110,7 +138,7 @@ Paths are under `source/`.
 | `domain/validators/common-validator.ts`               | Optional Note text shape validation                               |
 | `front/app/shell/notes/notes-editor.tsx`              | Text or attachments satisfy content; absent text handling         |
 | `domain/schema/schema.sql`                            | `version TEXT`; junction `UPDATE` policies                        |
-| `core/cli/make-supabase-client.ts`                    | Ordered junction variant                                          |
+| `core/cli/make-supabase-client.ts`                    | Shared junction reader, ordered replacement, and bound mutator    |
 | `core/std/protocols.ts`, `core/std/make-scope.ts`     | Union-preserving mutation protocols and scoped drafts             |
 | `core/std/validators.ts`, `core/std/api-contracts.ts` | Junction validator and client contracts                           |
 | `front/api/api.ts`                                    | The five clients                                                  |
@@ -151,25 +179,47 @@ Changes outside this scope require escalation.
 - The edge domain copy contains the source abstractions, adapters, and validators.
 - Workflow version validation accepts nonempty strings; create requires a version and update
   permits its omission. Interpretation of the string belongs to the Builder.
-- `WorkflowTasks.partners` returns Tasks in `sequence` order; `replace` writes the supplied order;
-  a replayed `replace` converges.
+- Ordered single-owner and owner-set reads return complete membership in sequence order.
+- Ordered replacement writes the supplied membership and order; replay converges after partial
+  failure without competing writers.
+- The bound mutator appends, removes without renumbering, and exchanges adjacent positions.
+  It serializes commands, leaves boundary moves unchanged, and exposes isolated snapshots.
+- Opening a mutator rejects tied positions without writing. Mutation success requires returned
+  identities and positions matching the requested change; zero-effect, partial, or mismatched
+  confirmations invalidate the instance.
+- Unordered junction behavior retains its existing membership and replacement contract.
 - The CA runs `db-genesis`; the five clients read and write on stage.
 
-Implementation verification comprises `deno task check`, `deno task fmt:check`, the permitted
-unit suite, and STYLE_AUDIT. `deno task check` passes, including guards, source types, and lint.
-The scope and list-client suites pass all 18 tests with type checking enabled, including Question
-create/update equivalence, required select options, and union scope projections. Targeted
-formatting and STYLE_AUDIT cover the core repair, API composition, and affected scope tests.
+## Verification
+
+`deno task check` passes, including guards, source types, and lint. The junction and list-client
+suites pass all 32 tests with type checking enabled. Coverage includes unordered regression,
+ordered paging and batching, affected-link writes, command serialization, failed and ambiguous
+responses, and zero-effect, partial, and mismatched write confirmations.
+
+The mutation protocol and scope tests establish Question create/update equivalence, required
+select options, and union scope projections. Targeted formatting passes; `STYLE_AUDIT: PASS`
+covers the changed core contracts, maker, validator shape, API composition, and tests.
+Repository-wide `fmt:check` reports formatting differences in
+`source/domain/validators/common-validator.ts` and `workflow-validator.ts`, outside the ordered
+junction repair.
+
 Stage behavior verification is limited to the CA's attachment-only User Note Save on screen.
 Answer validation and nested adapter round-trip are testable independently of the Runner;
 those tests are not present. Q&A end-to-end verification depends on the Runner capture surface.
 The Workflow version schema applies through the CA's greenfield database reset; its stage
 behavior has no verification claim.
 
+## Remaining work
+
+- Compose `api.WorkflowTasks` and `api.TaskQuestions` with their domain adapters and validators.
+- Add `UPDATE` policies to `workflow_tasks` and `task_questions` in the canonical schema.
+- Apply the schema through the CA's greenfield database reset and verify the five clients on stage.
+
 ## Open
 
-1. **Governing alignment.** Ordered junction `UPDATE` policies conflict with CONVENTIONS §14.2.8.
-   The schema/reset approach also conflicts with architecture-core §12.1's migration requirement.
-   Both require CA resolution before the remaining implementation scope is dispatched.
+1. **Schema lifecycle wording.** Architecture-core §12.1 prescribes migrations. Its wording needs
+   reconciliation with the CA's greenfield `db-genesis` scope; this effort includes no migration
+   or genesis prompt changes.
 
 _End of Brief_

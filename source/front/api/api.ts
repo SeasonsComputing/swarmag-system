@@ -148,6 +148,7 @@ export const api = {
     adapter: FacetAdapter,
     validator: { validateCreate: validateFacetCreate, validateUpdate: validateFacetUpdate }
   }),
+  
   // Jobs: makeCrudSupabaseClient<Job>({ table: 'jobs', adapter: JobAdapter }),
 
   Questions: makeCrudSupabaseClient<Question>({
