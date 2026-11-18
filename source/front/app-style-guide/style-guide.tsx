@@ -17,6 +17,7 @@ import type { UiComponent, UiContainerProps } from '@ux/ui'
 
 import '@ux/css'
 import './style-guide.css'
+import { ManagerExample } from './manager-example.tsx'
 
 import icon from './favicon.ico'
 import logo from './swarmag-logo-wordmark.png'
@@ -432,7 +433,9 @@ export const StyleGuide = (): UiComponent => {
                   <UiAvatar>AG</UiAvatar>
                 </UiFieldset>
                 <UiFieldset legend='UiSpinner'>
-                  <UiSpinner />
+                  <div data-app='style-guide-spinner'>
+                    <UiSpinner />
+                  </div>
                 </UiFieldset>
               </UiLayout>
               <UiFieldset legend='UiSeparator'>
@@ -850,6 +853,14 @@ export const StyleGuide = (): UiComponent => {
                 <UiBadge variant='warning'>Wind watch</UiBadge>
                 <UiBadge variant='danger'>Blocked</UiBadge>
                 <UiBadge variant='info'>Assessment</UiBadge>
+                <UiBadge variant='color' color='gray'>Gray</UiBadge>
+                <UiBadge variant='color' color='yellow'>Yellow</UiBadge>
+                <UiBadge variant='color' color='green'>Green</UiBadge>
+                <UiBadge variant='color' color='red'>Red</UiBadge>
+                <UiBadge variant='color' color='blue'>Blue</UiBadge>
+                <UiBadge variant='color' color='purple'>Purple</UiBadge>
+                <UiBadge variant='color' color='orange'>Orange</UiBadge>
+                <UiBadge variant='color' color='cyan'>Cyan</UiBadge>
               </UiLayout>
             </UiFieldset>
           </SgSection>
@@ -1036,6 +1047,9 @@ export const StyleGuide = (): UiComponent => {
             </UiFieldset>
           </SgSection>
         </UiLayout>
+        <SgSection title='Manager selection'>
+          <ManagerExample />
+        </SgSection>
       </SgMain>
 
       <SgFooter />

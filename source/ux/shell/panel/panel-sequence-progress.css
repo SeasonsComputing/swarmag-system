@@ -37,9 +37,9 @@
   padding-inline-start: 0;
 }
 
-/* Labels sit beneath the rail, one per segment; upcoming is the dim default. */
+/* Labels sit beneath the rail, one per segment; upcoming uses secondary text and completed steps recede. */
 [data-shell='sequence-step'] {
-  color: var(--sa-text-dim);
+  color: var(--sa-text-secondary);
   display: flex;
   flex: 0 1 auto;
   font-size: var(--sa-ui-font-size-compact);
@@ -48,7 +48,7 @@
 }
 
 [data-shell='sequence-step'][data-shell-state='done'] {
-  color: var(--sa-text-secondary);
+  color: var(--sa-text-dim);
 }
 
 [data-shell='sequence-step'][data-shell-state='current'] {

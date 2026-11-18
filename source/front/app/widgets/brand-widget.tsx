@@ -11,6 +11,10 @@ shared shell identity service.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+BrandWidgetProps  Optional page identity overrides.
+├ image           Logo source; defaults to the suite logo.
+├ title           Replaces the application name (the prominent line).
+└ subtitle        Replaces the product name (the small line).
 BrandWidget  Dashboard header brand widget.
 */
 
@@ -20,21 +24,32 @@ import type { UiComponent } from '@ux/ui'
 import './brand-widget.css'
 import headerLogo from '@front/app/assets/swarmag-ops-logo-flat.png'
 
-/** Dashboard header brand widget. */
-export const BrandWidget = (): UiComponent => {
+/**
+ * Page identity overrides; omitted properties retain application defaults.
+ * `title` replaces the application name (the prominent line); `subtitle`
+ * replaces the product name (the small line).
+ */
+export type BrandWidgetProps = {
+  image?: string
+  title?: string
+  subtitle?: string
+}
+
+/** Dashboard or independently framed page identity widget. */
+export const BrandWidget = (props: BrandWidgetProps = {}): UiComponent => {
   const identity = getShellIdentity()
   return (
     <div data-app='brand-widget'>
       <img
         data-app='brand-widget-logo'
-        src={headerLogo}
+        src={props.image ?? headerLogo}
         alt=''
         width={64}
         height={64}
       />
       <div data-app='brand-widget-names'>
-        <span data-app='brand-widget-product'>{identity.productName}</span>
-        <span data-app='brand-widget-application'>{identity.applicationName}</span>
+        <span data-app='brand-widget-product'>{props.subtitle ?? identity.productName}</span>
+        <span data-app='brand-widget-application'>{props.title ?? identity.applicationName}</span>
       </div>
     </div>
   )

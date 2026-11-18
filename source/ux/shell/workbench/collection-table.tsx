@@ -25,7 +25,7 @@ CollectionTable       Collection heading, feedback, and table.
 import type { Instance } from '@core/std'
 import { For, Show } from '@solid-js'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
-import { UiAlert, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow } from '@ux/ui'
+import { UiAlert, UiLayout, UiSpinner, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { UiCardProps } from '@ux/ui/components/ui-card.tsx'
 import type { CollectionContract } from './collection-contract.ts'
@@ -56,7 +56,7 @@ export const CollectionTable = <T extends Instance>(props: CollectionTableProps<
       variant={props.variant}
       header={{
         leading: <h2>{props.provider.entityLabel}s</h2>,
-        trailing: props.headingActions
+        trailing: <UiLayout variant='inline-fit'>{props.headingActions}</UiLayout>
       }}
     >
       <Show when={props.error}>
@@ -67,7 +67,7 @@ export const CollectionTable = <T extends Instance>(props: CollectionTableProps<
       </Show>
       <Show
         when={!props.provider.isListLoading()}
-        fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
+        fallback={<UiSpinner aria-label={`Loading ${props.provider.entityLabel.toLowerCase()}s`} />}
       >
         <div data-shell='collection-table'>
           <UiTable>

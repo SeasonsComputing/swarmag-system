@@ -30,7 +30,6 @@ export const PanelSheet = (props: PanelSheetProps): UiComponent => (
         leading={<h1>{props.title}</h1>}
         trailing={
           <UiActionButton
-            density='dense'
             disabled={props.busy === true}
             icon='cross-1'
             label='Close'

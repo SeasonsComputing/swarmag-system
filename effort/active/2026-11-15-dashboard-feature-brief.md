@@ -30,7 +30,6 @@ Verified against the code on 2026-11-15:
 
 _[Superseded by the amendment "After ACE review", item 1: `ShellFrame` is extracted and composed, not taken over.]_
 
-
 Some features are the place a person works, not an overlay on it. The Workflow Builder is the
 first; Job Assessment and Job Plan will open it on a clone, and other features may follow. This is
 a general shell capability, not one feature's special case.
@@ -67,7 +66,6 @@ the application's toolbar already has. Leaving the route gives the frame back.
 ### Manager returns the Item picked
 
 _[Amended by the amendment "After ACE review", item 3: Add returns the persisted Item.]_
-
 
 A Manager opened to choose an Item returns it.
 
@@ -200,5 +198,16 @@ ACE's production scope, as authorized by the CA, with one change.
    identity and logo defaults, Helm presentation only as needed). `onPick` is awaited before the
    Manager closes; a synchronous throw or rejection is reported and the Manager stays open.
    `ShellFrame` is accepted through the Builder's first slice.
+
+## Amendment — 2026-11-16 — Pick is collapsed
+
+The CA's decision on reviewing slice 1. Amends "Manager returns the Item picked".
+
+1. **A Manager given `pick` is collapsed at any width.** Choosing an Item to return is
+   Index-Detail: the list, then the chosen Item's Detail. The layout is declared, not inferred
+   from the dialog's width: `PanelContainer` takes an optional `layout: 'collapsed'`, rendered as
+   `data-shell-layout`, and `manager.css` applies its narrow-container rules under that attribute
+   as well as under the container query. Without `pick`, the Manager's layout follows its width
+   as before.
 
 _End of Brief_

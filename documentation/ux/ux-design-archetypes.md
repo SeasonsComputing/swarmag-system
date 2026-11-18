@@ -390,6 +390,19 @@ The machinery this repository already builds for the common cases. Reach for the
 | Gate steps in order, in any workbench            | `createPanelSequence`                                       | Sequence                            |
 | A per-application configurable surface           | dashboard + widget catalog                                  | Chassis-Part                        |
 
+A caller-hosted `Manager` may offer an optional `pick` action whose label belongs to the caller
+(for example, Add). It returns the persisted Item, never an unsaved draft. Existing dirty-exit
+confirmation applies before returning an edited Item; Save remains explicit. Creating an Item
+returns that newly persisted Item immediately. Manager awaits `onPick(item)` before closing;
+a throw or rejection leaves it open with error feedback. With `pick`, Manager presents collapsed
+at any width: the Index, then the chosen Item's Detail. Its caller opens it in a `sheet`-sized
+dialog. Without `pick`, behavior is unchanged.
+
+Authenticated pages compose `ShellFrame` for a fixed header and a scrolling body whose footer
+follows the content in flow. Dashboard composes it around its rows; independent work pages compose
+their own instance. Brand, intermediate fields, and Helm are explicit header slots. Locally hosted
+Managers leave the owning page mounted. No frame registration or takeover state is involved.
+
 `Manager` and `Wizard` host Steps; `Lister` hosts none. _Editor_ is reserved for a reusable form
 kind, such as a notes editor, or a drill-down editor inside a Step.
 

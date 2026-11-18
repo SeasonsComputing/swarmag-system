@@ -781,6 +781,23 @@ executable behavior arrives through bindings declared in `ux/widgets/helm-widget
 Per-widget `settings` shape is that widget's own contract, not restated here —
 see `source/front/app-admin/dashboard-admin.json` for a live, current example.
 
+Authenticated work pages register `Routes.page` in `makeAuthenticatedShell(routes)`, alongside
+the dashboard shell. This shell supplies route-level authentication, a semantic `main`, and an
+outlet; the page composes its own `ShellFrame`. Exit navigates to `/`. Anonymous pages remain
+unframed, and existing dashboard overlay routing is unchanged.
+
+`ShellFrame` (`ux/shell/runtime/shell-frame.tsx`) owns the fixed header layout and the scroll
+region containing body content followed by the footer. Short or empty content fills the available
+height so the footer rests at the bottom; longer content pushes it down in flow. Its header slots are `brand`, optional
+`fields`, and optional `toolbar`; footer is a supplied component. Dashboard's public API is
+unchanged: it resolves configured widgets into these slots and supplies its rows as children.
+Frame layout styles live with the frame; dashboard row and card styles stay with Dashboard.
+
+`BrandWidget` accepts optional image, title, and subtitle properties, retaining the suite logo and
+shell identity as defaults. Feature toolbars use existing Helm settings and explicit command
+bindings, including reactive disabled predicates and status readers. Generic frame code imports
+no application branding or behavior. Each page owns its frame; no runtime registration is used.
+
 ### 10.4 Views Catalog
 
 UX projection types — shapes that exist because the domain model does not surface cleanly to the UI as-is. No infrastructure imports, no SolidJS imports. Pure types only. Files follow the `{domain}-views.ts` naming convention.
@@ -984,7 +1001,7 @@ until an attachment or note is provided.
 ## 12. Shell/App Split Bindings
 
 The app-tier shell makers bind Login, About, auth-backed logout, and a footer component.
-Dashboard owns footer placement; the supplied component owns content and branding. Generic makers
+ShellFrame owns footer placement; the supplied component owns content and branding. Generic makers
 use `ShellPageView` and `ShellOverlayView` for route components, not rendered `UiComponent` values.
 All logo assets live flat in `front/app/assets/`. The style guide owns a separate local logo copy.
 Moved presentation imports generic helpers through `@ux/`; only co-located imports stay relative.

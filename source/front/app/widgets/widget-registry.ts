@@ -14,4 +14,4 @@ import type { WidgetRegistry } from '@ux/shell/dashboard/widget-contract.ts'
 import { BrandWidget } from './brand-widget.tsx'
 
 /** swarmAg-suite widget catalog. */
-export const AppWidgetRegistry: WidgetRegistry = { BrandWidget }
+export const AppWidgetRegistry: WidgetRegistry = { BrandWidget: () => BrandWidget() }

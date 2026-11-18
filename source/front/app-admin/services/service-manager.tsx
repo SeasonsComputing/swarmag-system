@@ -76,9 +76,7 @@ export const ServiceManager = (props: ServiceManagerProps): UiComponent => {
             annotation={
               <Show when={item.requiredAssetTypes.length > 0} fallback='No required asset types'>
                 <Show when={!referenceFailure()} fallback='Unable to load asset types.'>
-                  <Show when={references.isSuccess} fallback='Loading asset types…'>
-                    {serviceAssetTypeLabels(item.requiredAssetTypes, references.data!)}
-                  </Show>
+                  {serviceAssetTypeLabels(item.requiredAssetTypes, references.data!)}
                 </Show>
               </Show>
             }
@@ -88,7 +86,8 @@ export const ServiceManager = (props: ServiceManagerProps): UiComponent => {
       { label: 'SKU', align: 'end', render: item => <span>{item.sku}</span> }
     ],
     list: () => query.data ?? [],
-    isListLoading: () => query.isPending,
+    isListLoading: () =>
+      query.isPending || (!referenceFailure() && partners().length > 0 && !references.isSuccess),
     listError: () => query.error,
     refresh: async () => {
       await query.refetch()

@@ -15,6 +15,7 @@ Dashboard  Shared shell dashboard component.
 */
 
 import { For, Show } from '@solid-js'
+import { ShellFrame } from '@ux/shell/runtime/shell-frame.tsx'
 import { UiCard } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { DashboardStateContract, DashboardStoreWidget } from './dashboard-state.ts'
@@ -44,25 +45,23 @@ export const Dashboard = (props: {
   }
 
   return (
-    <div data-shell='dashboard'>
-      <header data-shell='dashboard-header'>
-        <div data-shell='dashboard-header-contents'>
-          <Show when={headerIdentity()}>
-            {widget => <DashboardWidgetContent widget={widget()} />}
-          </Show>
-          <For each={headerFields()}>
-            {widget => <DashboardWidgetContent widget={widget} />}
-          </For>
-          <Show when={headerTerminal()}>
-            {widget => (
-              <div data-shell='dashboard-header-terminal-field'>
-                <DashboardWidgetContent widget={widget()} />
-              </div>
-            )}
-          </Show>
-        </div>
-      </header>
-
+    <ShellFrame
+      header={{
+        get brand() {
+          return (
+            <Show when={headerIdentity()}>{widget => <DashboardWidgetContent widget={widget()} />}</Show>
+          )
+        },
+        get fields() {
+          return <For each={headerFields()}>{widget => <DashboardWidgetContent widget={widget} />}</For>
+        },
+        get toolbar() {
+          const widget = headerTerminal()
+          return widget ? <DashboardWidgetContent widget={widget} /> : undefined
+        }
+      }}
+      footer={props.footer}
+    >
       <div data-shell='dashboard-body'>
         <For each={dashboard.rows}>
           {row => (
@@ -77,9 +76,7 @@ export const Dashboard = (props: {
           )}
         </For>
       </div>
-
-      <props.footer />
-    </div>
+    </ShellFrame>
   )
 
   /** Dashboard widget frame for card-backed body widgets. */

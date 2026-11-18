@@ -93,6 +93,7 @@ const ALLOWED_DATA_ATTRIBUTES = new StringSet([
   'data-ui-gap',
   'data-ui-icon',
   'data-ui-interactive',
+  'data-ui-label-mode',
   'data-ui-layout',
   'data-ui-overflow',
   'data-ui-state',

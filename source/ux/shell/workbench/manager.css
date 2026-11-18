@@ -88,13 +88,81 @@
 
 /* Only the shared seam changes the cards' own corners, while both panes show. */
 @container (width > 660px) {
-  [data-shell='manager'] > [data-shell-panel='aside'] > [data-shell-panel] > [data-ui='card'] {
+  [data-shell='manager']:not([data-shell-layout='collapsed'])
+    > [data-shell-panel='aside']
+    > [data-shell-panel]
+    > [data-ui='card'] {
     border-start-end-radius: 0;
     border-end-end-radius: 0;
   }
 
-  [data-shell='manager'] > [data-shell-panel='main'] > [data-shell-panel] > [data-ui='card'] {
+  [data-shell='manager']:not([data-shell-layout='collapsed'])
+    > [data-shell-panel='main']
+    > [data-shell-panel]
+    > [data-ui='card'] {
     border-start-start-radius: 0;
     border-end-start-radius: 0;
   }
+}
+
+/* A Manager opened to return an Item is collapsed at any width: the same rules as the narrow
+   container, keyed to its declared layout. */
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-panel='container'] {
+  grid-template-columns: 1fr;
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'] > [data-shell-panel='aside'],
+[data-shell='manager'][data-shell-layout='collapsed'] > [data-shell-panel='main'] {
+  block-size: 100%;
+  grid-column: 1;
+  grid-row: 2;
+  min-block-size: 0;
+  transition: var(--sa-transition-panel);
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-mode='list']
+  > [data-shell-panel='aside'],
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-mode='editor']
+  > [data-shell-panel='main'] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  transition: var(--sa-transition-panel-active);
+  visibility: visible;
+  z-index: var(--sa-z-base);
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-mode='list']
+  > [data-shell-panel='main'],
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-mode='editor']
+  > [data-shell-panel='aside'] {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: var(--sa-z-below);
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-mode='editor']
+  > [data-shell-panel='aside'] {
+  transform: translateX(calc(var(--sa-space-xl) * -1));
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'][data-shell-mode='list']
+  > [data-shell-panel='main'] {
+  transform: translateX(var(--sa-space-xl));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-shell='manager'][data-shell-layout='collapsed'] > [data-shell-panel='aside'],
+  [data-shell='manager'][data-shell-layout='collapsed'] > [data-shell-panel='main'] {
+    transition: none;
+  }
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'] [data-shell='manager-collapse-action'] {
+  display: block;
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'] [data-shell='manager-expanded-title'] {
+  display: none;
 }

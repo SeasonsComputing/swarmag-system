@@ -29,22 +29,14 @@ import { ATTACHMENT_KINDS } from '@domain/abstractions/common.ts'
 import { AttachmentFormats } from '@front/api/attachment-formats.ts'
 import type { FieldBinderUploadSource } from '@front/api/field-binder-inventory.ts'
 import { UploadTask } from '@front/api/upload-task.ts'
+import { FieldBinderSourceBadge } from '@front/app/shell/field-binder/field-binder-source.tsx'
 import { UrlField } from '@front/app/shell/retrieval/url-field.tsx'
 import { onCleanup, Show } from '@solid-js'
 import { PanelSections } from '@ux/shell/panel/panel-sections.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
 import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
-import {
-  UiField,
-  UiFieldset,
-  UiInput,
-  UiLayout,
-  UiText,
-  UiTextArea,
-  UiToggleGroup,
-  UiToggleItem
-} from '@ux/ui'
+import { UiField, UiFieldset, UiInput, UiLayout, UiTextArea, UiToggleGroup, UiToggleItem } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { FieldBinderChemicalDialog } from './field-binder-chemical-dialog.tsx'
 import { FieldBinderLibraryDialog } from './field-binder-library-dialog.tsx'
@@ -120,14 +112,23 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
   return (
     <form ref={form} inert={props.context.busy()} onSubmit={event => event.preventDefault()}>
       <PanelSections>
-        <UiFieldset legend='Source'>
+        <UiFieldset legend='Library'>
           <UiLayout>
             <Show
               when={state.adding}
               fallback={
-                <UiField label='Upload' variant='caption'>
-                  <p>{uploadLine(props.state)}</p>
-                </UiField>
+                <UiLayout variant='inline-fit'>
+                  <UiField label='Uploaded' variant='caption'>
+                    <p>
+                      {state.uploadedAt ? new Date(state.uploadedAt).toLocaleDateString() : 'Pending'}
+                    </p>
+                  </UiField>
+                  <UiField label='Source' variant='caption'>
+                    <p>
+                      <FieldBinderSourceBadge source={state.source()} />
+                    </p>
+                  </UiField>
+                </UiLayout>
               }
             >
               <UiToggleGroup
@@ -222,18 +223,3 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
 
 /** A Chemicals step's direction until a chemical document is selected. */
 const CHEMICAL_FIRST = 'Select chemical document first.'
-
-/** How each document arrives, as the Edit line says it. */
-const SOURCE_LABELS: { [Source in FieldBinderUploadSource]: string } = {
-  upload: 'Upload',
-  library: 'Library',
-  url: 'Chemicals'
-}
-
-/** Source, kind, and the upload date, or Pending while the document has not arrived. */
-const uploadLine = (state: FieldBinderState): string => {
-  const parts = [SOURCE_LABELS[state.source()], UiText.label(state.kind() ?? 'document')]
-  const arrived = state.uploadedAt ? new Date(state.uploadedAt).toLocaleDateString() : 'Pending'
-  const source = state.delivered && state.url() ? ` · ${state.url()}` : ''
-  return `${[...parts, arrived].join(' · ')}${source}`
-}

@@ -1,0 +1,86 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Shell frame styles                                                           ║
+║ Fixed header fitting and page scroll region.                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-shell='shell-frame'] {
+  block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+[data-shell='shell-frame-header'] {
+  --shell-frame-field-short: var(--sa-touch-target-sm);
+  backdrop-filter: var(--sa-shell-filter);
+  container: shell-frame-header / inline-size;
+  background: var(--sa-shell-bg);
+  border-block-end: var(--sa-shell-border);
+  box-shadow: var(--sa-shell-shadow);
+  flex-shrink: 0;
+  padding-block: 0;
+  padding-inline: clamp(
+    var(--sa-rhythm-gutter),
+    calc(-2.514rem + 12.793vw),
+    calc(var(--sa-rhythm-gutter) * 3)
+  );
+  z-index: var(--sa-z-docked);
+}
+
+[data-shell='shell-frame-header-contents'] {
+  align-items: stretch;
+  column-gap: var(--sa-rhythm-gap);
+  display: flex;
+  flex-wrap: nowrap;
+  inline-size: 100%;
+  justify-content: flex-start;
+  margin-inline: auto;
+  max-inline-size: var(--sa-size-lg);
+  min-block-size: var(--sa-size-bar);
+  min-inline-size: 0;
+}
+
+[data-shell='shell-frame-toolbar'] {
+  align-items: stretch;
+  container: shell-frame-toolbar / inline-size;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  min-block-size: var(--shell-frame-field-short);
+  min-inline-size: 0;
+}
+
+/* Stacked header: brand and terminal fields no longer share a row. */
+/* Threshold is the width below which the compact brand cluster + gap + dense
+   actions stop fitting. A container query cannot take a token, so a changed
+   threshold must be repeated in helm-widget.css and the app's brand-widget.css. */
+@container shell-frame-header (max-width: 485px) {
+  [data-shell='shell-frame-header-contents'] {
+    flex-wrap: wrap;
+  }
+
+  [data-shell='shell-frame-toolbar'] {
+    align-items: center;
+    flex-basis: 100%;
+    justify-content: center;
+  }
+}
+
+[data-shell='shell-frame-scroll'] {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+}
+
+[data-shell='shell-frame-scroll'] > * {
+  flex-shrink: 0;
+}
+
+[data-shell='shell-frame-body'] {
+  flex: 1 0 auto;
+  min-inline-size: 0;
+}

@@ -173,6 +173,7 @@ Controls and parts may additionally declare these extension attributes:
 | `action-button`   | `data-ui-align`       | `start`, `end`                                                       |
 | `action-button`   | `data-ui-decoration`  | `ring`                                                               |
 | `action-button`   | `data-ui-icon`        | Any `icons.css` catalog name                                         |
+| `action-button`   | `data-ui-label-mode`  | `visible`, `hidden`                                                  |
 | `badge`           | `data-ui-color`       | `gray`, `yellow`, `green`, `red`, `blue`, `purple`, `orange`, `cyan` |
 | `layout`          | `data-ui-gap`         | `loose`, `tight`, `none`                                             |
 | `tab-list`        | `data-ui-drag`        | `enabled`, `active`                                                  |
@@ -191,8 +192,8 @@ Badge emits `data-ui-color` only with `data-ui-variant='color'`. Its public prop
 for that variant and prohibit color on semantic or default variants. The color prop is consumed
 by the component rather than forwarded as a native span attribute. Consumers cannot supply
 `data-ui-color` directly. Color selectors match both the variant and color attributes, use the
-corresponding `--sa-bg-color-*` role for the background, and keep the default badge text and
-border roles. Semantic variants use their `--sa-state-*` roles.
+corresponding `--sa-bg-color-*` role for the background, and the named color for text and
+border. Semantic variants use their `--sa-state-*` roles.
 
 The `data-ui-icon` glyph set is defined in `icons.css`, which maps the
 full icon library: each entry binds its asset filename to the matching SVG via the inherited

@@ -11,6 +11,9 @@ form rendering, persistence operations, and named instance actions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+ManagerPick                Caller-labelled return of a persisted Item.
+├ label                    Visible action label.
+└ onPick                   Receives the persisted Item before Manager closes.
 ManagerActionConfirmation  Confirmation copy for a consequential action.
 ├ message                  Item-specific confirmation message.
 └ title                    Confirmation title.
@@ -47,6 +50,12 @@ import type { Instance } from '@core/std'
 import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
 import type { UiActionButtonVariant } from '@ux/ui'
 import type { CollectionContract, CollectionListColumn } from './collection-contract.ts'
+
+/** Caller-owned action that returns a persisted Item. */
+export type ManagerPick<T extends Instance> = {
+  label: string
+  onPick: (item: T) => void | Promise<void>
+}
 
 /** Confirmation copy for a consequential item action. */
 export type ManagerActionConfirmation<T extends Instance> = {

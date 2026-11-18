@@ -104,7 +104,6 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
             leading={<h1>{props.contract.formTitle}</h1>}
             trailing={
               <UiActionButton
-                density='dense'
                 disabled={committing()}
                 icon='cross-1'
                 label='Cancel'

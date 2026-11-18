@@ -54,5 +54,7 @@ export type PanelContainerProps = {
   accessory?: UiComponent
   aside?: UiComponent
   mode?: string
+  /** Declares the collapsed layout at any width; without it, the layout follows the container. */
+  layout?: 'collapsed'
   mainRef?: (element: HTMLElement) => void
 }

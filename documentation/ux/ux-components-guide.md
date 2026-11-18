@@ -887,7 +887,10 @@ catalog name is valid for an action button.
 
 ### 4.1 UiBadge
 
-Inline pill for semantic status or category identification by color.
+Inline pill for semantic status or category identification by color. Semantic variants use solid
+text in the pill color family, retaining their softer background and border. Block padding is half
+the smallest spacing token; inline padding remains the small spacing token. Labels use the strong
+UI font weight.
 
 **Props**
 
@@ -902,8 +905,8 @@ Extends native `span` attributes, excluding styling and semantic hook props.
 | `loading`  | `boolean`                                                                            | `false` | Emits loading state.                      |
 
 `variant='color'` requires `color`. Semantic variants and the omitted/default variant do not
-accept `color`; the props enforce these alternatives. The color treatment selects the background
-and keeps the default badge text and border roles.
+accept `color`; the props enforce these alternatives. The color treatment uses its named color for background, text, and border, as the semantic
+variants use theirs.
 
 **Emitted Attributes**
 
@@ -1059,7 +1062,7 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 | `error`    | `boolean` | `false` | Emits error state.    |
 | `loading`  | `boolean` | `false` | Emits loading state.  |
 
-`UiSpinner` renders with `role='status'`.
+`UiSpinner` renders with `role='status'` and centers itself in its card.
 
 **Example**
 
@@ -1455,5 +1458,13 @@ the shared chart barrel.
 | `bar`        | Frequency or volume by category. |
 | `line`       | Trend over a time period.        |
 | `spark-line` | Inline mini trend.               |
+
+## Manager selection contract
+
+`Manager` accepts optional `pick: { label, onPick }`. The label names the caller's action;
+`onPick(item)` receives the persisted Item and may return a promise. Manager closes only after
+success and shows callback errors while staying open. With `pick`, Manager is collapsed at any
+width, and its caller opens it in a `sheet`-sized dialog. See the design archetypes for dirty-draft, creation, and composition rules. Omit `pick`
+for ordinary management.
 
 _End of Component Guide Document_

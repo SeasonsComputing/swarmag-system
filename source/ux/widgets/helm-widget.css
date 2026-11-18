@@ -14,7 +14,7 @@
   min-inline-size: 0;
 }
 
-@container dashboard-header (max-width: 485px) {
+@container shell-frame-header (max-width: 485px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
     justify-content: center;

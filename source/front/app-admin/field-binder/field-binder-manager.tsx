@@ -23,13 +23,14 @@ FieldBinderManager       Remote-source collection and metadata editor.
 import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 import { FieldBinderMetadata } from '@front/api/field-binder-inventory.ts'
-import type { FieldBinderEntry, FieldBinderUploadSource } from '@front/api/field-binder-inventory.ts'
+import type { FieldBinderEntry } from '@front/api/field-binder-inventory.ts'
+import { FieldBinderSourceBadge } from '@front/app/shell/field-binder/field-binder-source.tsx'
 import { createEffect, createMemo, on, onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { ManagerContract } from '@ux/shell/workbench/manager-contract.ts'
 import { Manager } from '@ux/shell/workbench/manager.tsx'
-import { UiBadge, UiWindow } from '@ux/ui'
+import { UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { DocumentDrain } from '../document-drain.ts'
 import { createFieldBinderState } from './field-binder-state.ts'
@@ -88,11 +89,7 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
           <PanelRowIdentity
             title={entry.description}
             subtitle={documentOf(entry)?.name ?? 'Pending'}
-            annotation={
-              <UiBadge variant='info'>
-                {SOURCE_LABELS[entry.upload.source]}
-              </UiBadge>
-            }
+            annotation={<FieldBinderSourceBadge source={entry.upload.source} />}
           />
         </span>
       )
@@ -162,13 +159,6 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     }
   }
   return <Manager provider={provider} onCancel={props.onCancel} />
-}
-
-/** How each entry's document arrived, as its row's pill says it. */
-const SOURCE_LABELS: { [Source in FieldBinderUploadSource]: string } = {
-  upload: 'Upload',
-  library: 'Library',
-  url: 'Chemicals'
 }
 
 /** Open a source document in a new window, reporting expected failures and surfacing the rest. */

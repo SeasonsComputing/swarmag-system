@@ -13,7 +13,8 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ManagerProps  Props for a generic item manager.
 ├ onCancel    Closes the manager.
-└ provider    Item-specific list and editor provider.
+├ provider    Item-specific list and editor provider.
+└ pick        Optional caller-labelled persisted Item action.
 Manager       Generic list+panel manager component.
 
 SEMANTICS
@@ -33,6 +34,9 @@ Snapshots the draft when it opens an Item. Any exit that would discard a
 changed draft asks first: another Item, New, the collapsed return, and Cancel.
 Hosted in a non-dismissible dialog, it exits only through these explicit
 controls and their dirty checks.
+
+Given pick, it is collapsed at any width and its header offers the caller's
+action for the selected Item: it returns the persisted Item, then closes.
 */
 
 import type { Instance } from '@core/std'
@@ -44,10 +48,15 @@ import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
 import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
-import { UiActionButton, UiConfirmDialog } from '@ux/ui'
+import { UiActionButton, UiConfirmDialog, UiLayout } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { CollectionTable } from './collection-table.tsx'
-import type { ManagerAction, ManagerCollectionAction, ManagerContract } from './manager-contract.ts'
+import type {
+  ManagerAction,
+  ManagerCollectionAction,
+  ManagerContract,
+  ManagerPick
+} from './manager-contract.ts'
 import { FORM_FEEDBACK_MESSAGE } from './use-form-feedback.ts'
 import { focusFirstField } from './use-form-keyboard.ts'
 import { createWorkbenchContext } from './workbench-context.ts'
@@ -59,6 +68,7 @@ import './manager.css'
 export type ManagerProps<T extends Instance, Draft> = {
   onCancel: () => void
   provider: ManagerContract<T, Draft>
+  pick?: ManagerPick<T>
 }
 
 /** Mode of the manager: 'list' or 'editor'. */
@@ -139,6 +149,7 @@ export const Manager = <T extends Instance, Draft>(
     else action()
   }
 
+  /** Closes the Manager after confirming any unsaved draft discard. */
   const cancelDialog = (): void => requestExit(props.onCancel)
 
   /** Resolve display copy for an item. */
@@ -154,6 +165,36 @@ export const Manager = <T extends Instance, Draft>(
     requestAnimationFrame(() => {
       panelRef?.querySelector<HTMLElement>('[data-shell-panel="form-feedback"]')?.focus()
     })
+  }
+
+  /** Returns the persisted Item; a failed callback leaves the Manager open. */
+  const returnItem = async (pick: ManagerPick<T>, item: T): Promise<void> => {
+    setActionPending(true)
+    setEditorFeedback(null)
+    try {
+      await pick.onPick(item)
+    } catch (error) {
+      setEditorFeedback({
+        message: error instanceof Error ? error.message : `${pick.label} failed.`,
+        variant: 'danger'
+      })
+      return
+    } finally {
+      setActionPending(false)
+    }
+    props.onCancel()
+  }
+
+  /** Applies dirty-exit confirmation before returning the persisted selection. */
+  const pickSelected = (): void => {
+    const pick = props.pick
+    const item = selected()
+    if (pick && item) {
+      requestExit(() => {
+        bumpEditorEpoch(false)
+        void returnItem(pick, item)
+      })
+    }
   }
 
   /** Validates and persists the active editor draft. */
@@ -183,9 +224,16 @@ export const Manager = <T extends Instance, Draft>(
         focusFeedback()
       } else {
         const created = await props.provider.create(draft)
+        const pick = props.pick
         await props.provider.refresh()
-        openFreshNew(false)
-        setEditorFeedback({ message: `Created ${itemLabel(created)}.`, variant: 'success' })
+        if (pick) {
+          setSelected(() => created)
+          bumpEditorEpoch(false)
+          await returnItem(pick, created)
+        } else {
+          openFreshNew(false)
+          setEditorFeedback({ message: `Created ${itemLabel(created)}.`, variant: 'success' })
+        }
       }
     } catch (error) {
       setEditorFeedback({
@@ -326,19 +374,32 @@ export const Manager = <T extends Instance, Draft>(
     <>
       <PanelContainer
         feature='manager'
+        layout={props.pick ? 'collapsed' : undefined}
         mode={mode()}
         header={
           <PanelHeader
             leading={<h1>{props.provider.formTitle}</h1>}
             trailing={
-              <UiActionButton
-                density='dense'
-                disabled={savePending() || actionPending()}
-                icon='cross-1'
-                label='Cancel'
-                labelMode='visible'
-                onClick={cancelDialog}
-              />
+              <UiLayout variant='inline-fit'>
+                <Show when={props.pick}>
+                  {pick => (
+                    <UiActionButton
+                      disabled={!selected() || savePending() || actionPending()}
+                      icon='check'
+                      label={pick().label}
+                      labelMode='visible'
+                      onClick={pickSelected}
+                    />
+                  )}
+                </Show>
+                <UiActionButton
+                  disabled={savePending() || actionPending()}
+                  icon='cross-1'
+                  label='Cancel'
+                  labelMode='visible'
+                  onClick={cancelDialog}
+                />
+              </UiLayout>
             }
           />
         }

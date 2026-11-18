@@ -49,7 +49,7 @@
 
 /* Stacked header: the brand row sizes to its content, with the rhythm gap above it. */
 /* Threshold is owned by dashboard.css. */
-@container dashboard-header (max-width: 485px) {
+@container shell-frame-header (max-width: 485px) {
   [data-app='brand-widget'] {
     flex: 1 0 100%;
     justify-content: center;

@@ -44,6 +44,8 @@
   /* Dialog */
   --sa-dialog-pad: var(--sa-rhythm-pad);
   --sa-dialog-bg: var(--sa-bg-popup);
+  --sa-confirm-dialog-bg: color-mix(in oklch, var(--sa-dialog-bg) 25%, transparent);
+  --sa-confirm-dialog-filter: var(--sa-filter-blur);
 
   /* Fieldset */
   --sa-fieldset-bg: var(--sa-bg-control);
@@ -100,6 +102,14 @@
     rgb(51 65 85 / 0.6) 100%
   );
   --sa-bg-backdrop: oklch(0% 0 0 / 0.33);
+  --sa-bg-color-gray: oklch(var(--sa-lch-neutral-1) / 0.12);
+  --sa-bg-color-yellow: oklch(var(--sa-lch-warning) / 0.12);
+  --sa-bg-color-green: oklch(var(--sa-lch-success) / 0.12);
+  --sa-bg-color-red: oklch(var(--sa-lch-danger) / 0.12);
+  --sa-bg-color-blue: oklch(var(--sa-lch-info) / 0.12);
+  --sa-bg-color-purple: oklch(var(--sa-lch-purple) / 0.12);
+  --sa-bg-color-orange: oklch(var(--sa-lch-orange) / 0.12);
+  --sa-bg-color-cyan: oklch(var(--sa-lch-cyan) / 0.12);
 
   /* Text */
   --sa-text-primary: oklch(var(--sa-lch-neutral-1));
@@ -250,6 +260,30 @@
   --sa-bg-control: oklch(97% 0.012 112);
   --sa-bg-card: var(--sa-gradient-card);
   --sa-bg-backdrop: oklch(15% 0.018 236 / 0.42);
+  --sa-bg-color-gray: oklch(32% 0.026 230 / 0.08);
+  --sa-bg-color-yellow: oklch(var(--sa-lch-warning) / 0.16);
+  --sa-bg-color-green: oklch(var(--sa-lch-success) / 0.16);
+  --sa-bg-color-red: oklch(var(--sa-lch-danger) / 0.16);
+  --sa-bg-color-blue: oklch(var(--sa-lch-info) / 0.16);
+  --sa-bg-color-purple: oklch(var(--sa-lch-purple) / 0.16);
+  --sa-bg-color-orange: oklch(var(--sa-lch-orange) / 0.16);
+  --sa-bg-color-cyan: oklch(var(--sa-lch-cyan) / 0.16);
+  --sa-border-color-gray: oklch(32% 0.026 230 / 0.22);
+  --sa-border-color-yellow: oklch(var(--sa-lch-warning) / 0.36);
+  --sa-border-color-green: oklch(var(--sa-lch-success) / 0.36);
+  --sa-border-color-red: oklch(var(--sa-lch-danger) / 0.36);
+  --sa-border-color-blue: oklch(var(--sa-lch-info) / 0.36);
+  --sa-border-color-purple: oklch(var(--sa-lch-purple) / 0.36);
+  --sa-border-color-orange: oklch(var(--sa-lch-orange) / 0.36);
+  --sa-border-color-cyan: oklch(var(--sa-lch-cyan) / 0.36);
+  --sa-text-color-gray: oklch(32% 0.026 230);
+  --sa-text-color-yellow: oklch(50% 0.12 80);
+  --sa-text-color-green: oklch(46% 0.13 150);
+  --sa-text-color-red: oklch(50% 0.19 29);
+  --sa-text-color-blue: oklch(46% 0.1 225);
+  --sa-text-color-purple: oklch(46% 0.18 300);
+  --sa-text-color-orange: oklch(52% 0.15 50);
+  --sa-text-color-cyan: oklch(48% 0.09 200);
 
   /* Text */
   --sa-text-primary: oklch(40% 0.026 238);
@@ -394,11 +428,13 @@
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
   /* Dialog */
-  --sa-dialog-bg: oklch(91% 0.012 100);
+  --sa-dialog-bg: oklch(88.5% 0.012 100);
+  --sa-confirm-dialog-bg: var(--sa-dialog-bg);
+  --sa-confirm-dialog-filter: none;
 
   /* Card */
   --sa-card-tonal-light-bg: var(--sa-bg-popup);
-  --sa-card-tonal-dark-bg: oklch(94.5% 0.008 100);
+  --sa-card-tonal-dark-bg: oklch(92% 0.005 100);
   --sa-card-panel-bg: var(--sa-bg-card);
   --sa-card-panel-border: 1px solid oklch(34% 0.035 220 / 0.1);
   --sa-card-panel-shadow: none;

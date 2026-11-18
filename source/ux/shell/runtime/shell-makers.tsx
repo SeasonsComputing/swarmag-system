@@ -10,8 +10,9 @@ Creates the shared shell implementations and shell route declarations.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-makeAnonymousShell  Creates a shell with no authentication required.
-makeDashboardShell  Creates a dashboard shell with authentication required.
+makeAnonymousShell      Creates a shell with no authentication required.
+makeAuthenticatedShell  Creates a guarded outlet for independently framed pages.
+makeDashboardShell      Creates a dashboard shell with authentication required.
 */
 
 import { Outlet } from '@tanstack/solid-router'
@@ -59,3 +60,16 @@ export const makeDashboardShell = (
     ]
   }
 }
+
+/** Create an authenticated route stack whose pages compose their own frames. */
+export const makeAuthenticatedShell = (routes: ShellRoute[]): Shell => ({
+  component: (): UiComponent => (
+    <AuthGuard>
+      <main>
+        <Outlet />
+      </main>
+    </AuthGuard>
+  ),
+  initializers: [],
+  routes
+})

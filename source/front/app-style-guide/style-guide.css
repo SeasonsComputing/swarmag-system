@@ -29,6 +29,11 @@
   border-radius: var(--sa-radius-sm);
 }
 
+[data-app='style-guide-spinner'] {
+  min-block-size: var(--sa-touch-target-sm);
+  position: relative;
+}
+
 [data-app='style-guide-popover-image'] {
   block-size: auto;
   display: block;
