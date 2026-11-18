@@ -188,8 +188,19 @@
   color: var(--sa-button-bg-danger-hover);
 }
 
+/* The ring stands off the control, so the surface beneath shows between them; it reaches
+   further along the inline axis than the block axis. */
 [data-ui='action-button']:focus-visible {
-  box-shadow: var(--sa-focus-ring);
+  box-shadow: none;
+}
+
+[data-ui='action-button']:focus-visible::after {
+  border: 2px solid var(--sa-focus-ring-color);
+  border-radius: var(--sa-radius-full);
+  content: '';
+  inset: -3px calc(var(--sa-space-sm) * -1);
+  pointer-events: none;
+  position: absolute;
 }
 
 [data-ui='action-button']:not([data-ui-state='disabled']):hover [data-ui='action-button-frame'],

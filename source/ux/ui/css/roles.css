@@ -251,6 +251,7 @@
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(13.2% 0.012 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
+  --sa-focus-ring-color: oklch(82% 0.13 185 / 0.42);
   --sa-blockquote-border: 3px solid var(--sa-color-accent);
 
   /* Radial background accents */

@@ -163,6 +163,7 @@
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(13.2% 0.012 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
+  --sa-focus-ring-color: oklch(82% 0.13 185 / 0.42);
 
   /* Shell chrome */
   --sa-shell-bg: var(--sa-bg-control);
@@ -380,6 +381,7 @@
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(99.4% 0.006 98), 0 0 0 4px oklch(57% 0.13 186 / 0.42);
+  --sa-focus-ring-color: oklch(57% 0.13 186 / 0.42);
 
   /* Shell chrome */
   --sa-shell-bg: oklch(98.6% 0.018 112);
