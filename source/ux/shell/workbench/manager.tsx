@@ -395,7 +395,7 @@ export const Manager = <T extends Instance, Draft>(
                 <UiActionButton
                   disabled={savePending() || actionPending()}
                   icon='cross-1'
-                  label='Cancel'
+                  label='Close'
                   labelMode='visible'
                   onClick={cancelDialog}
                 />

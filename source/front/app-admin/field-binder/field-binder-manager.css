@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Field Binder Manager                                                         ║
-║ A pending row is dimmed until its document is delivered.                     ║
+║ Pending rows and secondary chemical-document guidance.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -11,4 +11,8 @@
 
 [data-app='field-binder-row'][data-app-pending] {
   opacity: 0.6;
+}
+
+[data-app='field-binder-guidance'] {
+  color: var(--sa-text-secondary);
 }

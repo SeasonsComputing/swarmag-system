@@ -93,7 +93,7 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
     />
   )
   const chooseFile = (): UiComponent => (
-    <UiField for='document' label='Choose file' required>
+    <UiField for='document' label='File on your device' required>
       <UiInput
         type='file'
         name='document'
@@ -145,41 +145,60 @@ export const FieldBinderStepDetail = (props: FieldBinderStepDetailProps): UiComp
             <Show when={state.adding && !chemicals()}>
               <Show
                 when={state.source() === 'library'}
-                fallback={chooseFile()}
+                fallback={
+                  <UiLayout gap='tight'>
+                    <h5>Upload a document from your device.</h5>
+                    {chooseFile()}
+                  </UiLayout>
+                }
               >
-                <FieldBinderLibraryDialog
-                  disabled={props.context.busy()}
-                  name='document'
-                  error={validation.isInvalid('document')}
-                  onChoose={(name, read, record) => choose(() => state.choose(name, read, record))}
-                />
+                <UiLayout gap='tight'>
+                  <h5>Add an existing document from the library.</h5>
+                  <FieldBinderLibraryDialog
+                    disabled={props.context.busy()}
+                    name='document'
+                    error={validation.isInvalid('document')}
+                    onChoose={(name, read, record) => choose(() => state.choose(name, read, record))}
+                  />
+                </UiLayout>
               </Show>
             </Show>
             <Show when={chemicals()}>
-              <UiField label='1. Select chemical document' variant='caption'>
-                <FieldBinderChemicalDialog
-                  disabled={props.context.busy()}
-                  name='link'
-                  error={validation.isInvalid('link')}
-                  onChoose={chosen => {
-                    state.chooseLink(chosen.name, chosen.url)
-                    validation.changeField('link')
-                  }}
-                />
-              </UiField>
-              <UiField label='2. Open document and save to your device' variant='caption'>
-                <Show when={state.link()} fallback={<p>{CHEMICAL_FIRST}</p>}>
-                  <UiLayout gap='tight'>
-                    <p>{state.link()}</p>
-                    {sourceUrl()}
-                  </UiLayout>
-                </Show>
-              </UiField>
-              <UiField label='3. Upload document' variant='caption'>
-                <Show when={state.link()} fallback={<p>{CHEMICAL_FIRST}</p>}>
-                  {chooseFile()}
-                </Show>
-              </UiField>
+              <UiLayout>
+                <UiLayout gap='tight'>
+                  <h5>Select a chemical document</h5>
+                  <FieldBinderChemicalDialog
+                    disabled={props.context.busy()}
+                    name='link'
+                    error={validation.isInvalid('link')}
+                    onChoose={chosen => {
+                      state.chooseLink(chosen.name, chosen.url)
+                      validation.changeField('link')
+                    }}
+                  />
+                </UiLayout>
+                <UiLayout gap='tight'>
+                  <h5>Then open the document and save to your device</h5>
+                  <Show
+                    when={state.link()}
+                    fallback={<p data-app='field-binder-guidance'>{CHEMICAL_FIRST}</p>}
+                  >
+                    <UiLayout gap='tight'>
+                      <p data-app='field-binder-guidance'>{state.link()}</p>
+                      {sourceUrl()}
+                    </UiLayout>
+                  </Show>
+                </UiLayout>
+                <UiLayout gap='tight'>
+                  <h5>Finally upload that document to remote storage.</h5>
+                  <Show
+                    when={state.link()}
+                    fallback={<p data-app='field-binder-guidance'>{CHEMICAL_FIRST}</p>}
+                  >
+                    {chooseFile()}
+                  </Show>
+                </UiLayout>
+              </UiLayout>
             </Show>
           </UiLayout>
         </UiFieldset>
