@@ -29,7 +29,7 @@ import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiText } from '@ux/ui'
-import type { UiBadgeVariant, UiComponent } from '@ux/ui'
+import type { UiBadgeColor, UiComponent } from '@ux/ui'
 import { chemicalDraft, createChemicalState } from './chemical-state.ts'
 import type { ChemicalDraft } from './chemical-state.ts'
 import { ChemicalStepDetail } from './chemical-step-detail.tsx'
@@ -62,7 +62,7 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
           <PanelRowIdentity
             pill={
               <StatusBadge
-                variant={ChemicalSignalBadges[item.signalWord].variant}
+                color={ChemicalSignalColors[item.signalWord]}
                 label={UiText.label(item.signalWord)}
               />
             }
@@ -127,10 +127,10 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
   )
 }
 
-/** Signal word presentations cover the complete domain vocabulary. */
-const ChemicalSignalBadges: Record<ChemicalSignalWord, { variant: UiBadgeVariant }> = {
-  none: { variant: 'info' },
-  danger: { variant: 'danger' },
-  warning: { variant: 'warning' },
-  caution: { variant: 'warning' }
+/** Every signal word has its hazard color: DANGER red, WARNING orange, CAUTION yellow. */
+const ChemicalSignalColors: Record<ChemicalSignalWord, UiBadgeColor> = {
+  none: 'gray',
+  danger: 'red',
+  warning: 'orange',
+  caution: 'yellow'
 }

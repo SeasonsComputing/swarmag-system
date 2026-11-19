@@ -31,7 +31,7 @@ import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiText } from '@ux/ui'
-import type { UiBadgeVariant, UiComponent } from '@ux/ui'
+import type { UiBadgeColor, UiComponent } from '@ux/ui'
 import { createCustomerState, customerDraft } from './customer-state.ts'
 import type { CustomerDraft } from './customer-state.ts'
 import { customerSteps } from './customer-steps.tsx'
@@ -66,7 +66,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
           <PanelRowIdentity
             pill={
               <StatusBadge
-                variant={CustomerStatusBadges[customer.status].variant}
+                color={CustomerStatusColors[customer.status]}
                 label={UiText.label(customer.status)}
               />
             }
@@ -143,9 +143,9 @@ const customerAddress = (customer: Customer): string =>
     customer.country
   ].filter(Boolean).join(', ')
 
-/** Status tones and glyphs cover every Customer status. */
-const CustomerStatusBadges: Record<CustomerStatus, { variant: UiBadgeVariant }> = {
-  active: { variant: 'success' },
-  inactive: { variant: 'warning' },
-  prospect: { variant: 'info' }
+/** Every Customer status has its pill color. */
+const CustomerStatusColors: Record<CustomerStatus, UiBadgeColor> = {
+  active: 'green',
+  inactive: 'gray',
+  prospect: 'blue'
 }

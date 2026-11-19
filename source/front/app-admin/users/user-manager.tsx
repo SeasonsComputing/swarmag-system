@@ -64,7 +64,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
           <PanelRowIdentity
             pill={
               <StatusBadge
-                variant={user.status === 'active' ? 'success' : 'warning'}
+                color={user.status === 'active' ? 'green' : 'gray'}
                 label={UiText.label(user.status)}
               />
             }

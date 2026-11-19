@@ -29,7 +29,7 @@ import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiText } from '@ux/ui'
-import type { UiBadgeVariant, UiComponent } from '@ux/ui'
+import type { UiBadgeColor, UiComponent } from '@ux/ui'
 import { assetDraft, createAssetState } from './asset-state.ts'
 import type { AssetDraft } from './asset-state.ts'
 import { AssetStepDetail } from './asset-step-detail.tsx'
@@ -62,7 +62,7 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
           <PanelRowIdentity
             pill={
               <StatusBadge
-                variant={AssetStatusBadges[item.status].variant}
+                color={AssetStatusColors[item.status]}
                 label={UiText.label(item.status)}
               />
             }
@@ -126,10 +126,10 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
   )
 }
 
-/** Every Asset status has a named tone and glyph. */
-const AssetStatusBadges: Record<AssetStatus, { variant: UiBadgeVariant }> = {
-  active: { variant: 'success' },
-  maintenance: { variant: 'warning' },
-  retired: { variant: 'info' },
-  reserved: { variant: 'info' }
+/** Every Asset status has its pill color. */
+const AssetStatusColors: Record<AssetStatus, UiBadgeColor> = {
+  active: 'green',
+  maintenance: 'orange',
+  retired: 'gray',
+  reserved: 'purple'
 }

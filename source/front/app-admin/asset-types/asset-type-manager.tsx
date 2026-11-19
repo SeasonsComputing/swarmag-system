@@ -49,7 +49,7 @@ export const AssetTypeManager = (props: AssetTypeManagerProps): UiComponent => {
           <PanelRowIdentity
             pill={
               <StatusBadge
-                variant={item.active ? 'success' : 'warning'}
+                color={item.active ? 'green' : 'gray'}
                 label={item.active ? 'Active' : 'Inactive'}
               />
             }
