@@ -11,7 +11,7 @@ import { ApiError } from '@core/stdx'
 import { assertEquals, assertRejects } from '@std/assert'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 
-Deno.test('DocumentDrain runs a loop per pair, backs off, and surfaces unexpected errors', async () => {
+Deno.test('AppDrain runs a loop per pair, backs off, and surfaces unexpected errors', async () => {
   const Values: StringDictionary = {
     SUPABASE_RDBMS_URL: 'http://drain.test',
     SUPABASE_PUBLIC_KEY: 'drain-public-key',
@@ -30,7 +30,7 @@ Deno.test('DocumentDrain runs a loop per pair, backs off, and surfaces unexpecte
     }
   }, Object.keys(Values))
   const { api } = await import('@front/api/api.ts')
-  const { DocumentDrain } = await import('@front/app-admin/document-drain.ts')
+  const { AppDrain } = await import('@front/app-admin/app-drain.tsx')
   const drain = api.AttachmentsUploads.drain
   const binderDrain = api.FieldBinderUploads.drain
   const prepared = api.SessionState.isPrepared
@@ -100,12 +100,12 @@ Deno.test('DocumentDrain runs a loop per pair, backs off, and surfaces unexpecte
     return Promise.resolve({ drained: 0, remaining })
   }
   try {
-    await DocumentDrain.start()
+    await AppDrain.start()
     await relabel()
     assertEquals(calls, 0)
     assertEquals(delays, [60_000])
     ready = true
-    await DocumentDrain.start()
+    await AppDrain.start()
     assertEquals(calls, 0)
     assertEquals(scheduledDelays.get('field-binder-drain'), [60_000])
     await scheduledPass()
@@ -185,7 +185,7 @@ Deno.test('DocumentDrain runs a loop per pair, backs off, and surfaces unexpecte
     await scheduledPass()
     assertEquals(calls, beforeLogout)
     ready = true
-    await DocumentDrain.start()
+    await AppDrain.start()
     assertEquals(calls, beforeLogout)
     const scheduled = delays.length
     failure = new TypeError('Programming error')

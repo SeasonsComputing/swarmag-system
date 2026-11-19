@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Admin document drain                                                         ║
+║ Admin app drain                                                              ║
 ║ One single-tab delivery loop per upload pair, with bounded retry pacing.     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -17,18 +17,18 @@ during a pass and after aggregate failure.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-DocumentDrain  Admin's document delivery loops.
-├ taskKeys     Each loop's report key.
-└ start        Run each loop's first pass and schedule the next.
+AppDrain    Admin's document delivery loops.
+├ taskKeys  Each loop's report key.
+└ start     Run each loop's first pass and schedule the next.
 */
 
 import type { Uploads } from '@core/cli/docstore-uploads.ts'
 import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 
-/** Admin's document delivery loops, started once at application mount. */
+/** Document delivery loops, start once at application mount. */
 let started = false
-export const DocumentDrain = {
+export const AppDrain = {
   taskKeys: { attachments: 'attachment-delivery', binder: 'field-binder-delivery' },
   async start(): Promise<void> {
     if (started) return
@@ -36,12 +36,12 @@ export const DocumentDrain = {
     await Promise.all([
       new DrainLoop(api.AttachmentsUploads, {
         lock: 'document-drain',
-        key: DocumentDrain.taskKeys.attachments,
+        key: AppDrain.taskKeys.attachments,
         label: 'Attachment delivery'
       }).run(),
       new DrainLoop(api.FieldBinderUploads, {
         lock: 'field-binder-drain',
-        key: DocumentDrain.taskKeys.binder,
+        key: AppDrain.taskKeys.binder,
         label: 'Field Binder delivery'
       }).run()
     ])

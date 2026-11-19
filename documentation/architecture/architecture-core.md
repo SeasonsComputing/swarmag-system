@@ -854,7 +854,8 @@ physical root mappings.
 - **The device does no content processing.** Photos are not scaled. Consumers own accepted
   formats and content-type normalization; Uploads preserves the supplied content.
 - **Each app owns delivery scheduling.** Uploads runs explicit passes and owns no timers.
-  - **Admin:** its root starts `DocumentDrain`, one loop per pair (AttachmentsUploads and
+  - **Admin:** its root starts `AppDrain` from `front/app-admin/app-drain.tsx`,
+    one loop per pair (AttachmentsUploads and
     FieldBinderUploads), each under a prepared session, its own Web Lock that excludes other tabs,
     and its own task key. Each pass settles before the next is scheduled; expected delivery
     failures back off and unexpected failures stop that loop. Binder preparation has its own

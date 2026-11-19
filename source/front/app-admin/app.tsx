@@ -32,7 +32,7 @@ import { BackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnin
 import { Routes } from '@ux/shell/runtime/shell.ts'
 import { makeHelmWidget } from '@ux/widgets/make-helm-widget.tsx'
 import { UxWidgetRegistry } from '@ux/widgets/widget-registry.ts'
-import { DocumentDrain } from './document-drain.ts'
+import { AppDrain } from './app-drain.tsx'
 
 // application specialized dashboard
 import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
@@ -68,6 +68,6 @@ void bootstrap(
   rootServices(
     api.FieldBinder.start,
     BackgroundTaskWarnings.start,
-    DocumentDrain.start
+    AppDrain.start
   )
 )

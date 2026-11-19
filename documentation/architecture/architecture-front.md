@@ -299,7 +299,8 @@ logical document and destination bucket identities, not physical object keys.
 Consumers own save ordering and staged-file lifetime; Uploads owns neither form state nor scheduling.
 Every upload is a background task: the consumer mints the document id when the document is chosen,
 stages it with progress, and places it after Save; Save waits for no transfer. Admin's
-DocumentDrain runs one loop per pair, over `api.AttachmentsUploads` and `api.FieldBinderUploads`,
+`AppDrain` in `front/app-admin/app-drain.tsx` runs one loop per pair,
+over `api.AttachmentsUploads` and `api.FieldBinderUploads`,
 each with its own lock name and task key. The application root starts the loops after bootstrap;
 each loop owns session eligibility, Web Lock exclusion, and retry pacing. Binder preparation is an
 independently bound application operation.

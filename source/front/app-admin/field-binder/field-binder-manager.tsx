@@ -16,7 +16,7 @@ remain visible without turning a confirmed publication into a failed Save.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 FieldBinderManagerProps  Workbench route props.
-└ onCancel             Close the workbench.
+└ onCancel               Close the workbench.
 FieldBinderManager       Remote-source collection and metadata editor.
 */
 
@@ -24,6 +24,7 @@ import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 import { FieldBinderMetadata } from '@front/api/field-binder-inventory.ts'
 import type { FieldBinderEntry } from '@front/api/field-binder-inventory.ts'
+import { AppDrain } from '@front/app-admin/app-drain.tsx'
 import { FieldBinderSourceBadge } from '@front/app/shell/field-binder/field-binder-source.tsx'
 import { createEffect, createMemo, on, onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
@@ -32,10 +33,10 @@ import type { ManagerContract } from '@ux/shell/workbench/manager-contract.ts'
 import { Manager } from '@ux/shell/workbench/manager.tsx'
 import { UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { DocumentDrain } from '../document-drain.ts'
 import { createFieldBinderState } from './field-binder-state.ts'
 import type { FieldBinderDraft, FieldBinderState } from './field-binder-state.ts'
 import { FieldBinderStepDetail } from './field-binder-step-detail.tsx'
+
 import './field-binder-manager.css'
 
 /** The one report key for this Manager's source failures. */
@@ -66,7 +67,7 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
   // Delivery shows when the Binder drain's remaining count changes; a running pass is no change,
   // and there is no polling.
   const remaining = createMemo<number | undefined>(previous => {
-    const task = api.BackgroundTasks.store[DocumentDrain.taskKeys.binder]
+    const task = api.BackgroundTasks.store[AppDrain.taskKeys.binder]
     if (task?.phase === 'running') return previous
     return task?.remaining?.count ?? 0
   }, undefined)
