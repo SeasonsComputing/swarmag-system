@@ -44,8 +44,8 @@
   /* Dialog */
   --sa-dialog-pad: var(--sa-rhythm-pad);
   --sa-dialog-bg: var(--sa-bg-popup);
-  --sa-confirm-dialog-bg: color-mix(in oklch, var(--sa-dialog-bg) 25%, transparent);
-  --sa-confirm-dialog-filter: var(--sa-filter-blur);
+  --sa-liquid-surface-bg: color-mix(in oklch, var(--sa-dialog-bg) 25%, transparent);
+  --sa-liquid-surface-filter: var(--sa-filter-blur);
 
   /* Fieldset */
   --sa-fieldset-bg: var(--sa-bg-control);
@@ -431,8 +431,8 @@
 
   /* Dialog */
   --sa-dialog-bg: oklch(88.5% 0.012 100);
-  --sa-confirm-dialog-bg: var(--sa-dialog-bg);
-  --sa-confirm-dialog-filter: none;
+  --sa-liquid-surface-bg: var(--sa-dialog-bg);
+  --sa-liquid-surface-filter: none;
 
   /* Card */
   --sa-card-tonal-light-bg: var(--sa-bg-popup);

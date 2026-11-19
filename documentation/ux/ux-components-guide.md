@@ -661,6 +661,7 @@ externally.
 | ---------------- | ------------------------------------------------ | -------- | ------------- | ---------------------------------------------------------------- |
 | `trigger`        | `UiComponent`                                    | no       | unset         | Opener button content. Omit for controlled mode.                 |
 | `triggerVariant` | `UiButtonVariant`                                | no       | `'secondary'` | Trigger button variant.                                          |
+| `surface`        | `'liquid'`                                       | no       | unset         | Opt-in theme-controlled liquid surface.                          |
 | `size`           | `'content' \| 'panel' \| 'workbench' \| 'sheet'` | no       | `'panel'`     | Dialog width treatment.                                          |
 | `children`       | `UiComponent`                                    | no       | unset         | Dialog content.                                                  |
 | `open`           | `boolean`                                        | no       | unset         | Controlled open state.                                           |
@@ -705,7 +706,7 @@ externally.
 **Confirmation: `UiConfirmDialog`**
 
 The one confirmation dialog: a title, an optional message, Cancel, and one action, at `content`
-size. It renders open; the host shows it while a confirmation is pending and closes it from its
+size with the liquid surface selected internally. It renders open; the host shows it while a confirmation is pending and closes it from its
 handlers.
 
 | Prop        | Type                                                 | Required | Default | Description                                          |
@@ -748,7 +749,8 @@ modal interruption.
 
 **Props**
 
-Same open-state and trigger props as `UiDialog`.
+Same open-state and trigger props as `UiDialog`. Optional `surface='liquid'` selects the
+shared liquid treatment; omitting it retains the standard popover surface.
 
 **Example**
 
@@ -771,7 +773,8 @@ Use for short helper text that clarifies an adjacent action or status.
 
 **Props**
 
-Same open-state and trigger props as `UiDialog`.
+Same open-state and trigger props as `UiDialog`. Optional `surface='liquid'` selects the
+shared liquid treatment; omitting it retains the standard popover surface.
 
 **Example**
 

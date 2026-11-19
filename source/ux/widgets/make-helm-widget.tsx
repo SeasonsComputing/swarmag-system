@@ -127,6 +127,7 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
   }
   const menu = (surface: HelmToolbarItem, spec: HelmMenuSpec): UiComponent => (
     <UiPopover
+      surface='liquid'
       trigger={<HelmButtonGlyph label={surface.label} icon={spec.icon} />}
       triggerVariant='ghost'
       disabled={spec.disabled()}

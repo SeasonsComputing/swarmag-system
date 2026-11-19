@@ -1496,12 +1496,6 @@
 /* CONFIRM DIALOG                                                              */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
-[data-ui='dialog']:has(> [data-ui='confirm-dialog']) {
-  backdrop-filter: var(--sa-confirm-dialog-filter);
-  background: var(--sa-confirm-dialog-bg);
-  box-shadow: var(--sa-card-elevation-floating-shadow);
-}
-
 [data-ui='confirm-dialog'] {
   display: grid;
   gap: var(--sa-rhythm-gap);
@@ -1532,6 +1526,13 @@
   max-inline-size: 16rem;
   padding: var(--sa-space-md);
   z-index: var(--sa-z-popover);
+}
+
+[data-ui='dialog'][data-ui-variant='liquid'],
+[data-ui='popover'][data-ui-variant='liquid'] {
+  backdrop-filter: var(--sa-liquid-surface-filter);
+  background: var(--sa-liquid-surface-bg);
+  box-shadow: var(--sa-card-elevation-floating-shadow);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

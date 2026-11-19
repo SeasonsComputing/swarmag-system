@@ -67,6 +67,7 @@ export const UiConfirmDialog = (props: UiConfirmDialogProps): UiComponent => {
     <UiDialog
       open
       size='content'
+      surface='liquid'
       dismissible={!busy()}
       onOpenChange={open => {
         if (!open && !busy()) props.onCancel()

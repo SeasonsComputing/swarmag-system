@@ -17,6 +17,7 @@ COMPONENT PROPERTIES
 UiPopoverProps    Popover control props; extends UiComponentProps.
 ├ trigger         Content of the built-in trigger button.
 ├ triggerVariant  Visual variant of the trigger button.
+├ surface         Optional liquid surface treatment.
 ├ open            Controlled open state.
 ├ defaultOpen     Initial uncontrolled open state.
 ├ error           Marks the error state.
@@ -35,6 +36,7 @@ import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 export type UiPopoverProps = UiComponentProps & {
   trigger?: UiComponent
   triggerVariant?: UiButtonVariant
+  surface?: 'liquid'
   open?: boolean
   defaultOpen?: boolean
   error?: boolean
@@ -46,6 +48,7 @@ export type UiPopoverProps = UiComponentProps & {
   style?: never
   'data-ui'?: never
   'data-ui-state'?: never
+  'data-ui-variant'?: never
 }
 
 /** Popover control with declared states. */
@@ -54,6 +57,7 @@ export const UiPopover = (props: UiPopoverProps): UiComponent => {
     'children',
     'trigger',
     'triggerVariant',
+    'surface',
     'open',
     'defaultOpen',
     'error',
@@ -71,7 +75,11 @@ export const UiPopover = (props: UiPopoverProps): UiComponent => {
         {local.trigger}
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content data-ui='popover' data-ui-state={controlState(local)}>
+        <Popover.Content
+          data-ui='popover'
+          data-ui-variant={local.surface}
+          data-ui-state={controlState(local)}
+        >
           {local.children}
         </Popover.Content>
       </Popover.Portal>

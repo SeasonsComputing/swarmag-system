@@ -50,6 +50,12 @@ darker tonal region fills in each theme. `UiCard` emits its `variant='tonal-ligh
 Shell chrome is a first-class component token family. It lets app frame surfaces diverge from
 card surfaces without changing generic panel or card roles.
 
+Dialogs and popovers emit `surface='liquid'` as `data-ui-variant='liquid'` on their
+portaled content surface. The shared `--sa-liquid-surface-bg` and
+`--sa-liquid-surface-filter` theme tokens supply its fill and backdrop filter; floating
+card elevation supplies its shadow. Confirmation dialogs opt in internally, independently
+of their content identity. An omitted surface emits no variant and preserves standard styling.
+
 ### 2.2 Common Component Structure
 
 ```text

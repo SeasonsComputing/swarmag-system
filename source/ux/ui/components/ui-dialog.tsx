@@ -18,6 +18,7 @@ COMPONENT PROPERTIES
 UiDialogProps     Dialog control props; extends UiComponentProps.
 ├ trigger         Content of the built-in trigger button.
 ├ triggerVariant  Visual variant of the trigger button.
+├ surface         Optional liquid surface treatment.
 ├ size            Dialog size treatment.
 ├ open            Controlled open state.
 ├ defaultOpen     Initial uncontrolled open state.
@@ -42,6 +43,7 @@ export type UiDialogSize = 'content' | 'panel' | 'workbench' | 'sheet'
 export type UiDialogProps = UiComponentProps & {
   trigger?: UiComponent
   triggerVariant?: UiButtonVariant
+  surface?: 'liquid'
   size?: UiDialogSize
   open?: boolean
   defaultOpen?: boolean
@@ -56,6 +58,7 @@ export type UiDialogProps = UiComponentProps & {
   style?: never
   'data-ui'?: never
   'data-ui-state'?: never
+  'data-ui-variant'?: never
 }
 
 /** Dialog control with declared states. */
@@ -64,6 +67,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
     'children',
     'trigger',
     'triggerVariant',
+    'surface',
     'size',
     'open',
     'defaultOpen',
@@ -94,6 +98,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
         <Dialog.Overlay data-ui='dialog-overlay' />
         <Dialog.Content
           data-ui='dialog'
+          data-ui-variant={local.surface}
           data-ui-size={local.size ?? 'panel'}
           data-ui-state={controlState(local)}
           onEscapeKeyDown={event => {

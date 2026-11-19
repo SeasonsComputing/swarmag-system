@@ -345,10 +345,11 @@ rounded surface divided by tone.
 A dialog's own surface is `--sa-dialog-bg`, a step from the panes it holds, so the window reads as
 the frame around them. Work surfaces are opaque; backdrop blur belongs to thin chrome over moving
 content — the dashboard header, the footer, a select's dropdown — because blurring a large surface
-makes every interaction beneath it repaint. The compact `UiConfirmDialog` is an exception: its
-dialog surface is `--sa-confirm-dialog-bg` with `--sa-confirm-dialog-filter`, which a theme sets:
-a translucent tint of `--sa-dialog-bg` and the shared blur for a liquid effect, or opaque.
-Other dialogs retain their opaque surface, and the overlay keeps its theme background.
+makes every interaction beneath it repaint. Compact dialogs and popovers may opt into `surface='liquid'`: their surface uses
+`--sa-liquid-surface-bg` and `--sa-liquid-surface-filter`, which each theme sets to a
+translucent tint of `--sa-dialog-bg` with shared blur, or an opaque fill without blur.
+`UiConfirmDialog` selects this treatment internally; Helm popups and attachment Rename opt in.
+Other dialogs and popovers retain their standard surface, and dialog overlays remain unchanged.
 
 **Sections divide a region.** Inside a region, a form's sections are divided by a rule, not boxed:
 each section is an unframed fieldset whose legend is a small uppercase label, and a hairline

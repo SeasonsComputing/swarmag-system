@@ -209,7 +209,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
         />
       </Show>
       <Show when={rename() !== null}>
-        <UiDialog open size='panel' onOpenChange={open => !open && setRename(null)}>
+        <UiDialog open size='panel' surface='liquid' onOpenChange={open => !open && setRename(null)}>
           <UiLayout>
             <h2>Rename attachment</h2>
             <UiField label='Filename' for='attachment-name'>
