@@ -25,7 +25,16 @@ CollectionTable       Collection heading, feedback, and table.
 import type { Instance } from '@core/std'
 import { For, Show } from '@solid-js'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
-import { UiAlert, UiLayout, UiSpinner, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow } from '@ux/ui'
+import {
+  UiAlert,
+  UiLayout,
+  UiSpinner,
+  UiTable,
+  UiTableBody,
+  UiTableCell,
+  UiTableHeader,
+  UiTableRow
+} from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { UiCardProps } from '@ux/ui/components/ui-card.tsx'
 import type { CollectionContract } from './collection-contract.ts'
