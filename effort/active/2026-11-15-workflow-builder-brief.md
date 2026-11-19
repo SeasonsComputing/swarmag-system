@@ -3,7 +3,7 @@
 **Active, not dispatched.** Drafted 2026-11-15 from a CA + AI Architect exploration session. The
 M-7 feature. Feature mode, in `front/app-admin/workflows/`. Depends on the Workflow Domain brief
 (`effort/completed/2026-11/2026-11-15-workflow-domain-brief.md`) and the Dashboard Feature brief
-(`2026-11-15-dashboard-feature-brief.md`). Facets ride along
+(`effort/completed/2026-11/2026-11-15-dashboard-feature-brief.md`). Facets ride along
 (`2026-10-06-facets-workflow-seeding-brief.md`). The CA's prototype
 (`workflow_builder_workbench.html`, held by the CA) is the spec for the cards, mapped onto the
 design language.
@@ -145,6 +145,8 @@ Escalate any change outside this scope.
 - Saving raises the minor; Release raises the major.
 - Clone repoints only this stack's link; the original is unchanged.
 - A deleted Task or Question shows as deleted.
+- The Builder's `ShellFrame` shows its brand and toolbar; the header stays fixed and the footer
+  follows the body. This accepts `ShellFrame` from the Dashboard Feature brief.
 - Exit returns the dashboard to its body.
 - CA verifies on screen in Admin.
 

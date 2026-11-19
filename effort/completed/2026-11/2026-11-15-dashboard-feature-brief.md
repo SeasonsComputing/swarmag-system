@@ -1,7 +1,8 @@
 # Dashboard Feature — Brief
 
-**Active, reviewed by ACE 2026-11-16; amended after that review.** Drafted 2026-11-15 from a CA + AI Architect exploration session. The
-second M-7 enabler: what the Workflow Builder (`2026-11-15-workflow-builder-brief.md`) needs from
+**Completed 2026-11-18.** Shipped in `581391a` and closed at the CA's direction; see "Closure" at
+the end. `ShellFrame`'s acceptance moves to the Workflow Builder brief. Drafted 2026-11-15 from a
+CA + AI Architect exploration session. The second M-7 enabler: what the Workflow Builder (`2026-11-15-workflow-builder-brief.md`) needs from
 the shell. Foundation mode: `ux/shell` and `ux/widgets` are locked namespaces. Independent of the
 Workflow Domain brief; the two can run side by side.
 
@@ -209,5 +210,34 @@ The CA's decision on reviewing slice 1. Amends "Manager returns the Item picked"
    `data-shell-layout`, and `manager.css` applies its narrow-container rules under that attribute
    as well as under the container query. Without `pick`, the Manager's layout follows its width
    as before.
+
+## Closure — 2026-11-18
+
+The CA directed closure.
+
+**Shipped** (`581391a`). Manager `pick`: the caller's labelled action returns the persisted Item,
+including one just created, awaiting `onPick` before closing; a Manager given `pick` is collapsed
+at any width. `ShellFrame` in `ux/shell/runtime/shell-frame.tsx`, composed by `Dashboard` around
+its rows. `makeAuthenticatedShell(routes)`. The Brand takes an image, title, and subtitle as
+properties. A style-guide Manager example. The governing documents above.
+
+**Verified.** The CA verified Manager `pick` on screen in the style guide.
+
+**Not run.** `manager-pick-test.ts` and `shell-frame-test.ts`; `deno task check`, `deno task
+fmt:check`, the unit suite, and STYLE_AUDIT for this closure.
+
+**Departures from the drafted design,** settled by the CA:
+
+- The Brand's status line is `subtitle`: it replaces the product name.
+- The caller hosts a picking Manager in a `sheet`-sized dialog; the pick and Cancel actions sit
+  in an inline layout in its header.
+- `PanelContainer` takes `layout: 'collapsed'` (the amendment "Pick is collapsed").
+- A window's own actions in `panel-sheet.tsx` and `wizard.tsx` are standard density, not dense.
+  Both files were outside the listed scope.
+
+**Settled on closing.**
+
+- **`ShellFrame` and the Builder's route stack** are accepted through the Workflow Builder brief,
+  their only consumer.
 
 _End of Brief_

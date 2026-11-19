@@ -299,8 +299,10 @@ seeding can't be built until this exists.
   type at capture; Note text is optional; `Workflow.version` is a string; `api.Workflows`,
   `api.Tasks`, and `api.Questions`; the ordered junction family with `api.WorkflowTasks` and
   `api.TaskQuestions`.
-- **Dashboard Feature** — active, `effort/active/2026-11-15-dashboard-feature-brief.md`: a feature
-  that takes over the dashboard frame; a Manager opened to return the Item picked.
+- **Dashboard Feature** — closed 2026-11-18, `581391a`,
+  `effort/completed/2026-11/2026-11-15-dashboard-feature-brief.md`: `ShellFrame` composed by the
+  dashboard and the Builder; `makeAuthenticatedShell`; a Manager given `pick` returns the persisted
+  Item. `ShellFrame` is accepted through the Workflow Builder.
 
 **Features:**
 
