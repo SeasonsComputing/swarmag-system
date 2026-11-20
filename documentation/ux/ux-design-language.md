@@ -355,11 +355,11 @@ Other dialogs and popovers retain their standard surface, and dialog overlays re
 
 A dialog may select `surface='frameless'` when its panels supply the visible surfaces. The host
 has no fill, border, or padding, while retaining modal focus containment, overlay, sizing, and
-dismissal policy. `--sa-dialog-frameless-shadow` supplies floating elevation in dark mode and no
-shadow in light mode. The host matches the cards' outer radius; full-screen phone dialogs are
+dismissal policy. `--sa-dialog-frameless-shadow` supplies the host's elevation; each theme sets
+its own. The host matches the cards' outer radius; full-screen phone dialogs are
 square and shadowless. This treatment is independent of the liquid surface.
 
-Panel context is uppercase, semibold, and text-primary, with line height 1.
+Panel context is uppercase, semibold, and text-primary.
 `--sa-panel-header-context-size` sets the context's font size. Context and title use `UiLayout gap='none'`.
 `--sa-panel-header-title-height` defines the title row's minimum height. Shared alignment uses
 these same metrics.
