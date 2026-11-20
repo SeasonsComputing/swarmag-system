@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Library dialog                                                               ║
-║ Catalog launchers and document browsing within one tonal panel.                ║
+║ Catalog launchers and document browsing within one tonal panel.              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
