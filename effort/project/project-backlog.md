@@ -653,18 +653,17 @@ guard-css rule B7. Then each app that installs adds `viewport-fit=cover` to its 
 
 **Picking this up:** when Ops becomes installable.
 
-### B-48 · Loading shows as text where `UiSpinner` exists
+### B-54 · Wizard steps don't say what comes next
 
-**Observed:** 2026-11-13 · normal
+**Observed:** 2026-11-20 · low
 
-Lists say they are loading in words: `CollectionTable`'s _"Loading {entity}s."_, behind every
-Manager and Lister, and the Service manager's _"Loading asset types…"_ cell. `UiSpinner` is the
-design system's loading indicator; the Field Binder's library and chemical dialogs already use
-it. Each is a one-line swap. Select placeholders (_"Loading Users…"_, _"Loading asset types…"_)
-are text inside a dropdown, where a spinner cannot go; they stay unless the select gains a loading
-state.
+A Wizard's main header reserves its context line on every step so the title holds still, but only
+the first step shows context there. From step 2 on, the reserved line could carry the next step,
+for example _"NEXT: JOB SITES"_, which orients the user most when the steps tree is absent below
+the collapse threshold. The context line is `PanelHeader`'s `contextTitle`; the Wizard passes it
+from `wizard.tsx`.
 
-**Picking this up:** with the next `ux/shell` change.
+**Picking this up:** with the next Wizard change.
 
 ## Document Storage
 
