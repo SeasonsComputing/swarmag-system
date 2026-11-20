@@ -27,8 +27,22 @@
   }
 }
 
+/* Main's header always reserves the context line, so its title holds one position whether the
+   line shows, steps change, or the aside sits beside it. */
+[data-shell='wizard'] > [data-shell-panel='main'] [data-shell-panel='header-leading'] {
+  align-items: flex-end;
+  min-block-size: calc(var(--sa-panel-header-context-size) + var(--sa-panel-header-title-height));
+}
+
 /* Only the shared seam changes the cards' own corners, while both panes show. */
 @container (width > 660px) {
+  /* Context sits on the first panel displayed. Here that is the aside, so main hides its copy. */
+  [data-shell='wizard']:has(> [data-shell-panel='aside'])
+    > [data-shell-panel='main']
+    [data-shell-panel='header-context'] {
+    display: none;
+  }
+
   [data-shell='wizard']:has(> [data-shell-panel='aside'])
     > [data-shell-panel='aside']
     > [data-shell-panel]

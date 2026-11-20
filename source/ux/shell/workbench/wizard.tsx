@@ -125,6 +125,7 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
             header={
               <PanelSequenceHeader
                 sequence={sequence}
+                contextTitle={sequence.isFirst() ? props.contract.formTitle : undefined}
                 hostActions={
                   <UiActionButton
                     disabled={committing()}
