@@ -46,6 +46,7 @@ action for the selected Item: it returns the persisted Item, then closes.
 
 import type { Instance } from '@core/std'
 import { createEffect, createSignal, For, onCleanup, Show, untrack } from '@solid-js'
+import { PanelClose } from '@ux/shell/panel/panel-close.tsx'
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
@@ -309,14 +310,9 @@ export const Manager = <T extends Instance, Draft>(
           />
         )}
       </Show>
-      <UiActionButton
+      <PanelClose
         data-shell={collapsedOnly ? 'manager-collapsed-action' : undefined}
         disabled={savePending() || actionPending()}
-        icon='cross-1'
-        label='Close'
-        labelMode='hidden'
-        decoration='ring'
-        density='dense'
         onClick={cancelDialog}
       />
     </>

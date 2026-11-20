@@ -21,6 +21,7 @@ DrillDialog       Trigger and sheet.
 */
 
 import { createSignal, Show } from '@solid-js'
+import { PanelClose } from '@ux/shell/panel/panel-close.tsx'
 import { UiActionButton, UiDialog, UiLayout } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { DrillNavigator } from './drill-navigator.tsx'
@@ -64,14 +65,7 @@ export const DrillDialog = (props: DrillDialogProps): UiComponent => {
             root={props.root}
             onChoose={close}
             hostActions={
-              <UiActionButton
-                icon='cross-1'
-                label='Close'
-                labelMode='hidden'
-                decoration='ring'
-                density='dense'
-                onClick={close}
-              />
+              <PanelClose onClick={close} />
             }
           />
         </UiDialog>

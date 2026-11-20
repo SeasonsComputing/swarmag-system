@@ -22,7 +22,7 @@ Lister       Standalone Collection sheet.
 
 import type { Instance } from '@core/std'
 import { createSignal } from '@solid-js'
-import { UiActionButton } from '@ux/ui'
+import { PanelClose } from '@ux/shell/panel/panel-close.tsx'
 import type { UiComponent } from '@ux/ui'
 import type { CollectionContract } from './collection-contract.ts'
 import { CollectionTable } from './collection-table.tsx'
@@ -62,13 +62,8 @@ export const Lister = <T extends Instance>(props: ListerProps<T>): UiComponent =
       activate={item => void activate(item)}
       error={error()}
       headingActions={
-        <UiActionButton
+        <PanelClose
           disabled={pending()}
-          icon='cross-1'
-          label='Close'
-          labelMode='hidden'
-          decoration='ring'
-          density='dense'
           onClick={() => {
             if (!pending()) props.onCancel()
           }}

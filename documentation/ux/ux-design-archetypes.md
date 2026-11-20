@@ -394,7 +394,7 @@ in the document panel's toolbar. Field Binder's read-only Lister places context 
 collection header. Feedback from activating a document stays inside that panel.
 
 `DrillDialog` uses the same frameless sheet host. Its trigger label supplies panel context,
-while the navigator owns the title/path and Back control. A dense, ringed Close sits in the
+while the navigator owns the title/path and Back control. `PanelClose` sits in the
 panel header. Choosing a leaf closes the sheet before running its action. Sheet remains the
 host sizing variant; no separate outer sheet-header wrapper is involved.
 

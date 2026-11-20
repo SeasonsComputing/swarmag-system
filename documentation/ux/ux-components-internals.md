@@ -72,6 +72,10 @@ slot; each panel supplies its own header.
 default gaps; callers supply action contents. `CollectionTable` uses `PanelHeaderTitle` when a
 context title is supplied, keeping title-row geometry consistent with the editor.
 
+`PanelClose` is the window's own Close: a dense, ringed icon with its accessible label. Every
+panel-owned window places it among its header's trailing actions; the host supplies `onClick` and
+`disabled`.
+
 Wizard providers may set `stepsTitle`; the stepflow header defaults to Steps. Onboarding supplies
 Onboarding steps. The tree's items and states derive from the composed sequence.
 

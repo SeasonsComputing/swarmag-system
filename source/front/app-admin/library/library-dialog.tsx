@@ -21,6 +21,7 @@ import { api } from '@front/api/api.ts'
 import { DrillNavigator } from '@front/app/shell/retrieval/drill-navigator.tsx'
 import { LibraryLevels } from '@front/app/shell/retrieval/library-levels.ts'
 import { createSignal } from '@solid-js'
+import { PanelClose } from '@ux/shell/panel/panel-close.tsx'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
 import { UiActionButton, UiLayout, UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
@@ -91,14 +92,7 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent => {
           </UiLayout>
         }
         hostActions={
-          <UiActionButton
-            icon='cross-1'
-            label='Close'
-            labelMode='hidden'
-            decoration='ring'
-            density='dense'
-            onClick={props.onCancel}
-          />
+          <PanelClose onClick={props.onCancel} />
         }
       />
     </UiLayout>

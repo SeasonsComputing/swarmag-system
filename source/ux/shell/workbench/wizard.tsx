@@ -30,6 +30,7 @@ preserves the aggregate draft and its baseline across step mounts.
 */
 
 import { createMemo, createSignal, Show } from '@solid-js'
+import { PanelClose } from '@ux/shell/panel/panel-close.tsx'
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
@@ -38,7 +39,7 @@ import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
 import { PanelStepflow } from '@ux/shell/panel/panel-stepflow.tsx'
-import { UiActionButton, UiConfirmDialog } from '@ux/ui'
+import { UiConfirmDialog } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { FORM_FEEDBACK_MESSAGE } from './use-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
@@ -127,15 +128,7 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
                 sequence={sequence}
                 contextTitle={sequence.isFirst() ? props.contract.formTitle : undefined}
                 hostActions={
-                  <UiActionButton
-                    disabled={committing()}
-                    icon='cross-1'
-                    label='Close'
-                    labelMode='hidden'
-                    decoration='ring'
-                    density='dense'
-                    onClick={cancel}
-                  />
+                  <PanelClose disabled={committing()} onClick={cancel} />
                 }
                 busy={committing()}
                 drillReturn={workbench.drillReturn()}
