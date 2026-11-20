@@ -103,7 +103,10 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
           ? (
             <PanelStepflow
               variant='tonal-dark'
-              header={{ leading: <PanelHeaderTitle title={props.contract.stepsTitle ?? 'Steps'} /> }}
+              header={{
+                contextTitle: props.contract.formTitle,
+                leading: <PanelHeaderTitle title={props.contract.stepsTitle ?? 'Steps'} />
+              }}
               items={props.contract.steps.map((step, index) => ({
                 title: step.title,
                 state: index < sequence.index()
@@ -122,7 +125,6 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
             header={
               <PanelSequenceHeader
                 sequence={sequence}
-                contextTitle={props.contract.formTitle}
                 hostActions={
                   <UiActionButton
                     disabled={committing()}

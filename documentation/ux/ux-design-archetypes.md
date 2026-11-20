@@ -295,8 +295,9 @@ Rules for the composition:
 **Known uses.** The customer onboarding wizard in Admin; its job-sites Step hosts the sites and notes Index-Detail.
 
 **Wizard progress.** Above the collapse threshold, a titled steps panel presents the stepflow
-tree. Below the threshold the aside is absent. Context, navigation, and guarded Close belong to
-main. The step title and Next or Finish orient the user when the tree is absent.
+tree, and its header carries the context, as a Manager's collection does. Below the threshold
+the aside is absent. Navigation and guarded Close belong to main. The step title and Next or
+Finish orient the user when the tree is absent.
 
 ### 4.3 Chassis-Part
 
