@@ -659,6 +659,7 @@ externally.
 
 | Prop             | Type                                             | Required | Default       | Description                                                      |
 | ---------------- | ------------------------------------------------ | -------- | ------------- | ---------------------------------------------------------------- |
+| `label`          | `string`                                         | no       | unset         | Accessible name: the window's name, as its header shows it.      |
 | `trigger`        | `UiComponent`                                    | no       | unset         | Opener button content. Omit for controlled mode.                 |
 | `triggerVariant` | `UiButtonVariant`                                | no       | `'secondary'` | Trigger button variant.                                          |
 | `surface`        | `'liquid' \| 'frameless'`                        | no       | unset         | Liquid surface, or a frameless host for child panels.            |

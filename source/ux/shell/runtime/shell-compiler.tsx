@@ -105,6 +105,7 @@ const ShellOverlayRoute = (props: {
   return (
     <UiDialog
       open
+      label={props.options.label}
       size={props.options.size}
       surface={props.options.surface}
       dismissible={props.options.dismissible}

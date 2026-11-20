@@ -16,6 +16,7 @@ UiDialog          Dialog control with declared states.
 COMPONENT PROPERTIES
 ───────────────────────────────────────────────────────────────────────────────
 UiDialogProps     Dialog control props; extends UiComponentProps.
+├ label           The dialog's accessible name.
 ├ trigger         Content of the built-in trigger button.
 ├ triggerVariant  Visual variant of the trigger button.
 ├ surface         Optional liquid or frameless surface treatment.
@@ -41,6 +42,8 @@ export type UiDialogSize = 'content' | 'panel' | 'workbench' | 'sheet'
 
 /** Dialog control props. */
 export type UiDialogProps = UiComponentProps & {
+  /** The dialog's accessible name; the window's name, as its header shows it. */
+  label?: string
   trigger?: UiComponent
   triggerVariant?: UiButtonVariant
   surface?: 'liquid' | 'frameless'
@@ -65,6 +68,7 @@ export type UiDialogProps = UiComponentProps & {
 export const UiDialog = (props: UiDialogProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
+    'label',
     'trigger',
     'triggerVariant',
     'surface',
@@ -97,6 +101,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
       <Dialog.Portal>
         <Dialog.Overlay data-ui='dialog-overlay' />
         <Dialog.Content
+          aria-label={local.label}
           data-ui='dialog'
           data-ui-variant={local.surface}
           data-ui-size={local.size ?? 'panel'}

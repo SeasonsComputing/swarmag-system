@@ -57,16 +57,20 @@ export const DrillDialog = (props: DrillDialogProps): UiComponent => {
         onClick={() => setOpen(true)}
       />
       <Show when={open()}>
-        <UiDialog open size='sheet' surface='frameless' onOpenChange={next => !next && close()}>
+        <UiDialog
+          open
+          label={props.label}
+          size='sheet'
+          surface='frameless'
+          onOpenChange={next => !next && close()}
+        >
           <DrillNavigator
             variant='tonal-dark'
             contextTitle={props.label}
             title={props.title}
             root={props.root}
             onChoose={close}
-            hostActions={
-              <PanelClose onClick={close} />
-            }
+            hostActions={<PanelClose onClick={close} />}
           />
         </UiDialog>
       </Show>

@@ -127,9 +127,7 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
               <PanelSequenceHeader
                 sequence={sequence}
                 contextTitle={sequence.isFirst() ? props.contract.formTitle : undefined}
-                hostActions={
-                  <PanelClose disabled={committing()} onClick={cancel} />
-                }
+                hostActions={<PanelClose disabled={committing()} onClick={cancel} />}
                 busy={committing()}
                 drillReturn={workbench.drillReturn()}
                 trailingAction={workbench.trailingAction()}

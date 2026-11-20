@@ -888,7 +888,7 @@ export const StyleGuide = (): UiComponent => {
               </UiFieldset>
               <UiFieldset legend='UiDialog'>
                 <UiLayout variant='inline-fit'>
-                  <UiDialog trigger='Open dispatch dialog'>
+                  <UiDialog label='Dispatch' trigger='Open dispatch dialog'>
                     <UiLayout>
                       <p>Confirm crew assignment before dispatch.</p>
                     </UiLayout>

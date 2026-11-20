@@ -101,7 +101,13 @@ export const ManagerExample = (): UiComponent => {
       </UiButton>
       <p role='status'>{result()}</p>
       <Show when={open()}>
-        <UiDialog open size={choosing() ? 'sheet' : 'workbench'} surface='frameless' dismissible={false}>
+        <UiDialog
+          open
+          label='Example questions'
+          size={choosing() ? 'sheet' : 'workbench'}
+          surface='frameless'
+          dismissible={false}
+        >
           <Manager
             provider={provider}
             onCancel={() => setOpen(false)}

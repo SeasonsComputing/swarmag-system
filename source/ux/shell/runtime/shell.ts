@@ -134,6 +134,8 @@ export type ShellOverlayView = (props: { onCancel: () => void }) => UiComponent
 
 /** Shell overlay presentation options. */
 export type ShellOverlayOptions = {
+  /** The overlay's accessible name. */
+  label: string
   size: UiDialogSize
   dismissible: boolean
   surface?: UiDialogProps['surface']
@@ -162,7 +164,7 @@ const page = (
 const workbench = (
   path: string,
   component: ShellOverlayView,
-  options?: Pick<ShellOverlayOptions, 'surface'>
+  options: Pick<ShellOverlayOptions, 'label' | 'surface'>
 ): ShellOverlay => ({
   kind: 'overlay',
   path,
@@ -174,7 +176,7 @@ const workbench = (
 const sheet = (
   path: string,
   component: ShellOverlayView,
-  options?: Pick<ShellOverlayOptions, 'surface'>
+  options: Pick<ShellOverlayOptions, 'label' | 'surface'>
 ): ShellOverlay => ({
   kind: 'overlay',
   path,

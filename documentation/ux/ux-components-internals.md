@@ -87,7 +87,8 @@ serialized activation, local error reporting, and a Close action disabled while 
 and a Close action through the existing navigator slots. The leaf-selection callback closes
 before activation. Outside interaction and Escape retain the existing dismissal behavior.
 
-`Routes.workbench` and `Routes.sheet` accept an optional surface override forwarded to `UiDialog`.
+`Routes.workbench` and `Routes.sheet` take the overlay's label, its accessible name, and an
+optional surface override, both forwarded to `UiDialog`.
 Table body rows at rest consume `--sa-table-bg-row`, aliased to `--sa-card-tonal-light-bg`;
 section and interactive-hover treatments remain independent.
 

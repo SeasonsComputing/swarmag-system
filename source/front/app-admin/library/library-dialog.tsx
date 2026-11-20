@@ -91,9 +91,7 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent => {
             />
           </UiLayout>
         }
-        hostActions={
-          <PanelClose onClick={props.onCancel} />
-        }
+        hostActions={<PanelClose onClick={props.onCancel} />}
       />
     </UiLayout>
   )

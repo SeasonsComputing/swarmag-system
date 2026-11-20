@@ -16,7 +16,7 @@ UiConfirmDialog       Confirmation dialog at content size.
 COMPONENT PROPERTIES
 ───────────────────────────────────────────────────────────────────────────────
 UiConfirmDialogProps  Question, action, and handlers.
-├ title               The question.
+├ title               The question; also the dialog's accessible name.
 ├ message             What confirming does.
 ├ action              The action button's label and variant (default danger).
 ├ onConfirm           Runs the action; a returned promise makes the dialog busy.
@@ -66,6 +66,7 @@ export const UiConfirmDialog = (props: UiConfirmDialogProps): UiComponent => {
   return (
     <UiDialog
       open
+      label={props.title}
       size='content'
       surface='liquid'
       dismissible={!busy()}

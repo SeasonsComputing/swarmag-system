@@ -50,16 +50,37 @@ void bootstrap(
           HelmWidget: makeHelmWidget(FieldBinderHelm)
         },
         [
-          Routes.workbench('/onboarding', OnboardingWizard, { surface: 'frameless' }),
-          Routes.workbench('/users', UserManager, { surface: 'frameless' }),
-          Routes.workbench('/customers', CustomerManager, { surface: 'frameless' }),
-          Routes.workbench('/asset-types', AssetTypeManager, { surface: 'frameless' }),
-          Routes.workbench('/assets', AssetManager, { surface: 'frameless' }),
-          Routes.workbench('/chemicals', ChemicalManager, { surface: 'frameless' }),
-          Routes.workbench('/services', ServiceManager, { surface: 'frameless' }),
-          Routes.workbench('/field-binder-manager', FieldBinderManager, { surface: 'frameless' }),
-          Routes.sheet('/field-binder', FieldBinderDialog, { surface: 'frameless' }),
-          Routes.sheet('/library', LibraryDialog, { surface: 'frameless' })
+          Routes.workbench('/onboarding', OnboardingWizard, {
+            label: 'Customer Onboarding',
+            surface: 'frameless'
+          }),
+          Routes.workbench('/users', UserManager, { label: 'User Manager', surface: 'frameless' }),
+          Routes.workbench('/customers', CustomerManager, {
+            label: 'Customer Manager',
+            surface: 'frameless'
+          }),
+          Routes.workbench('/asset-types', AssetTypeManager, {
+            label: 'Asset Type Manager',
+            surface: 'frameless'
+          }),
+          Routes.workbench('/assets', AssetManager, { label: 'Asset Manager', surface: 'frameless' }),
+          Routes.workbench('/chemicals', ChemicalManager, {
+            label: 'Chemical Manager',
+            surface: 'frameless'
+          }),
+          Routes.workbench('/services', ServiceManager, {
+            label: 'Service Manager',
+            surface: 'frameless'
+          }),
+          Routes.workbench('/field-binder-manager', FieldBinderManager, {
+            label: 'Field Binder Manager',
+            surface: 'frameless'
+          }),
+          Routes.sheet('/field-binder', FieldBinderDialog, {
+            label: 'Field Binder',
+            surface: 'frameless'
+          }),
+          Routes.sheet('/library', LibraryDialog, { label: 'Library', surface: 'frameless' })
         ]
       )
     ],

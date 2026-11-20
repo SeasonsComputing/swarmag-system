@@ -666,7 +666,8 @@ Field Binder — use panel-owned chrome in frameless workbench hosts. The style-
 specimen uses the same host treatment in management and picker modes. Picker callbacks,
 modal dismissal policy, and dirty-exit behavior retain their existing contracts.
 
-`Routes.workbench` and `Routes.sheet` forward an optional surface override to `UiDialog`.
+`Routes.workbench` and `Routes.sheet` forward the overlay's label and an optional surface override
+to `UiDialog`.
 Onboarding, Library, and the read-only Field Binder sheet also select frameless hosts. Their
 panel compositions are specified in UX Design Archetypes §§3.2, 4.2, and 5.5. `DrillDialog`
 also uses a frameless sheet and supplies context and Close to its navigator panel. The `sheet`

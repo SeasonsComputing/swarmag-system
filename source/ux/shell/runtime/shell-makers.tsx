@@ -55,7 +55,7 @@ export const makeDashboardShell = (
     initializers: [(): Promise<void> => DashboardState.init(seed)],
     routes: [
       Routes.index(),
-      Routes.dialog('/about', About, { size: 'content', dismissible: true }),
+      Routes.dialog('/about', About, { label: 'About', size: 'content', dismissible: true }),
       ...routes
     ]
   }
