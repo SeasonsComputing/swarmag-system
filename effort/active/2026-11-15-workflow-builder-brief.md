@@ -4,9 +4,10 @@
 M-7 feature. Feature mode, in `front/app-admin/workflows/`. Depends on the Workflow Domain brief
 (`effort/completed/2026-11/2026-11-15-workflow-domain-brief.md`) and the Dashboard Feature brief
 (`effort/completed/2026-11/2026-11-15-dashboard-feature-brief.md`). Facets ride along
-(`2026-10-06-facets-workflow-seeding-brief.md`). The CA's prototype
-(`workflow_builder_workbench.html`, held by the CA) is the spec for the cards, mapped onto the
-design language.
+(`2026-10-06-facets-workflow-seeding-brief.md`). The spec is the mockup canvas
+[Workflow Builder Mockup](https://claude.ai/artifact/UWyqKXwh5xZ35esEA4ao6G): the Main board for
+the Builder, the TaskLibraryCurrent and QuestionLibraryCurrent boards for the libraries. Its
+elements are mapped onto the design language before dispatch (Open).
 
 ## The model
 
@@ -22,22 +23,29 @@ design language.
 
 ### Entry and exit
 
-- **Workflows** is a command on the Admin Helm toolbar. It opens the Builder as a feature that takes
-  over the dashboard frame.
+The Builder is the first view in the system that is not an archetype: a novel composition, and the
+application's full-screen view.
+
+- **Workflows** is a command on the Admin Helm toolbar. It navigates to the Builder's own
+  authenticated route stack, `makeAuthenticatedShell` holding `Routes.page('/workflows', …)`,
+  outside the dashboard shell.
 - The Builder opens on the last Workflow opened, or on New when there is none.
 - Admin is one entry point. Assessment and Plan will open the Builder on a clone (M-8); nothing here
   ties it to Admin alone.
 
 ### The frame
 
-- **Brand:** the Workflow's name, its version (`v4.2`), and whether it has unsaved changes.
+The Builder composes its own `ShellFrame` around the stack and inspector.
+
+- **Brand:** the Workflow's name, its version (`v4.2`), and whether it has unsaved changes, through
+  the Brand's `title` and `subtitle`.
 - **Helm:** Open, New, Clone, Save, Release, Exit.
   - **Open** shows a Lister sheet of Workflows; picking one opens it.
   - **New** starts a Workflow at `1.0`.
   - **Clone** creates a copy of the Workflow with its Task links, at `1.0`, and opens it.
   - **Save** saves the item in the inspector.
   - **Release** raises the major version (`4.3` → `5.0`).
-  - **Exit** returns the dashboard to its own body.
+  - **Exit** navigates to `/`.
 - The header stays fixed; the page scrolls; the footer follows the stack in flow.
 
 ### The body
@@ -52,9 +60,11 @@ Two regions side by side: the stack, and a fixed inspector on the right.
   Questions.
 - Each **Question row** shows its type as a `UiBadge` in a named color and its prompt, with controls
   to move up, move down, clone, and remove.
-- **Add Task** and **Add Question** open the Task or Question library.
+- **Add Task** and **Add Question** open the Task or Question library. They are the libraries'
+  only entry; the libraries live in `workflows/`, not as Admin namespaces.
 - **Remove** takes the item out of this stack. It deletes nothing.
-- A deleted reference shows as deleted.
+- A deleted reference shows a "Deleted" `UiBadge` in a named color: a record status, not a state
+  variant.
 - The stack controls are custom, not `UiActionButton`.
 
 **The inspector** edits the selected card: the Workflow, a Task, or a Question.
@@ -68,8 +78,10 @@ Two regions side by side: the stack, and a fixed inspector on the right.
 
 ### The libraries
 
-- The **Task library** and **Question library** are Managers, opened with `pick` labelled
-  **Add**. Add puts the item in the stack at the chosen place; New creates one and adds it.
+- The **Task library** and **Question library** are hosted locally in a `sheet`-sized frameless
+  dialog with a `label`. As Managers, they are opened with `pick` labelled **Add**, collapsed,
+  with Add and Cancel in the header. Add puts the item in the stack at the chosen place; New
+  creates one and adds it. Manager or Lister is Open.
 - A stack holds an item at most once (each junction's key is the pair). The library says so rather
   than failing.
 
@@ -146,17 +158,23 @@ Escalate any change outside this scope.
 - Clone repoints only this stack's link; the original is unchanged.
 - A deleted Task or Question shows as deleted.
 - The Builder's `ShellFrame` shows its brand and toolbar; the header stays fixed and the footer
-  follows the body. This accepts `ShellFrame` from the Dashboard Feature brief.
-- Exit returns the dashboard to its body.
+  follows the body. This accepts `ShellFrame` and the Builder's route stack from the Dashboard
+  Feature brief.
+- Exit navigates to `/`.
 - CA verifies on screen in Admin.
 
 Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYLE_AUDIT.
 
 ## Open
 
-1. **Search in the libraries:** whether a Manager's list is enough.
-2. **One open card:** whether expanding one Task card collapses the others.
-3. **Release:** whether it asks the author anything.
+1. **Mapping the mockup to the design language.** The mockup's elements are mapped onto shipped
+   controls and tokens before dispatch. Settled so far: a Question's type and "Deleted" are
+   named-color badges.
+2. **Lister or Manager for the libraries.** A Lister lists and activates; the inspector already
+   edits the item. A Manager adds Detail and New.
+3. **Search in the libraries:** whether a list is enough.
+4. **One open card:** whether expanding one Task card collapses the others.
+5. **Release:** whether it asks the author anything.
 
 ## Records
 
@@ -171,6 +189,10 @@ Run `deno task check`, `deno task fmt:check`, the permitted unit suite, and STYL
 
 ## Design history
 
+- The Builder first took over the dashboard frame. The frame was extracted as `ShellFrame` instead,
+  and the Builder composes its own on its own route stack (Dashboard Feature brief).
+- The CA's prototype `workflow_builder_workbench.html` was the first spec; the mockup canvas
+  replaced it.
 - Index-Detail recursion was proposed for the stack and rejected; the stack uses selective
   disclosure.
 - Facets on Task and Question were proposed and dropped; the domain carries facets on Workflow only.
