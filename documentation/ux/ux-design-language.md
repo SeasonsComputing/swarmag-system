@@ -360,7 +360,7 @@ shadow in light mode. The host matches the cards' outer radius; full-screen phon
 square and shadowless. This treatment is independent of the liquid surface.
 
 Panel context is uppercase, semibold, and text-primary, with line height 1.
-`--sa-panel-header-context-size` defaults to 90% of xs. Context and title use `UiLayout gap='none'`.
+`--sa-panel-header-context-size` sets the context's font size. Context and title use `UiLayout gap='none'`.
 `--sa-panel-header-title-height` defines the title row's minimum height. Shared alignment uses
 these same metrics.
 
