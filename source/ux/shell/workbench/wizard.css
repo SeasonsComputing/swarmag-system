@@ -34,6 +34,12 @@
   min-block-size: calc(var(--sa-panel-header-context-size) + var(--sa-panel-header-title-height));
 }
 
+/* The actions sit on the title row, not centered against the reserved line above it. */
+[data-shell='wizard'] > [data-shell-panel='main'] [data-shell-panel='header-trailing'] {
+  align-self: flex-end;
+  min-block-size: var(--sa-panel-header-title-height);
+}
+
 /* Only the shared seam changes the cards' own corners, while both panes show. */
 @container (width > 660px) {
   /* Context sits on the first panel displayed. Here that is the aside, so main hides its copy. */

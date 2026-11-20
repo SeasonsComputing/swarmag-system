@@ -88,12 +88,13 @@
 }
 
 [data-shell-panel='header-title-divider'] {
-  align-self: stretch;
+  align-self: center;
+  /* The header command is dense, so its vbar matches a dense action's own. */
+  block-size: var(--sa-action-button-ring-size-dense);
   border-inline-start: var(--sa-border-default);
   /* An icon-only command keeps its touch box, so its glyph sits inside empty space; the bar moves
      into that space to sit midway between glyph and title. */
   margin-inline-start: calc(var(--sa-space-sm) * -1);
-  min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
 }
 
 [data-shell-panel='header-context'] {

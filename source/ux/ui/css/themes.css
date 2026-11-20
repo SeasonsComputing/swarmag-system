@@ -45,6 +45,9 @@
   --sa-panel-header-context-size: calc(var(--sa-font-size-xs) * 0.9);
   --sa-panel-header-title-height: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
 
+  /* Action button */
+  --sa-action-button-ring-size-dense: calc(var(--sa-touch-target-sm) - var(--sa-space-md));
+
   /* Dialog */
   --sa-dialog-pad: var(--sa-rhythm-pad);
   --sa-dialog-bg: var(--sa-bg-popup);

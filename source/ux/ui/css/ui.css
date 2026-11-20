@@ -117,7 +117,7 @@
 
 [data-ui='action-button'][data-ui-density='dense'] {
   --sa-action-button-icon-size: 1rem;
-  --sa-action-button-ring-size: calc(var(--sa-touch-target-sm) - var(--sa-space-md));
+  --sa-action-button-ring-size: var(--sa-action-button-ring-size-dense);
 }
 
 [data-ui='action-button'][data-ui-label-mode='visible'] {
