@@ -338,9 +338,11 @@ tone, not framed again, so the eye reads the content before the structure.
 
 The `tonal-light` and `tonal-dark` variants select the lighter and darker surface tones. Each theme
 owns both values, as `--sa-card-*` tokens, so adjacent regions remain distinct in light and dark
-themes alike. Where a window holds an Aside and a Main, the Aside takes the dark tone and Main the
-light, and the two attach: the corners at their shared seam are square, so the pair reads as one
-rounded surface divided by tone.
+themes alike. In the dark theme, tonal light uses 32.8% OKLCH lightness and tonal dark uses 27%,
+lifting both from the backdrop while preserving hue and chroma. These values apply to every
+consumer of those tokens. Where a window holds an Aside and a Main, the Aside takes the dark
+tone and Main the light. Their shared corners are square, forming one rounded surface divided
+by tone.
 
 A dialog's own surface is `--sa-dialog-bg`, a step from the panes it holds, so the window reads as
 the frame around them. Work surfaces are opaque; backdrop blur belongs to thin chrome over moving
@@ -350,6 +352,20 @@ makes every interaction beneath it repaint. Compact dialogs and popovers may opt
 translucent tint of `--sa-dialog-bg` with shared blur, or an opaque fill without blur.
 `UiConfirmDialog` selects this treatment internally; Helm popups and attachment Rename opt in.
 Other dialogs and popovers retain their standard surface, and dialog overlays remain unchanged.
+
+A dialog may select `surface='frameless'` when its panels supply the visible surfaces. The host
+has no fill, border, or padding, while retaining modal focus containment, overlay, sizing, and
+dismissal policy. `--sa-dialog-frameless-shadow` supplies floating elevation in dark mode and no
+shadow in light mode. The host matches the cards' outer radius; full-screen phone dialogs are
+square and shadowless. This treatment is independent of the liquid surface.
+
+Panel context is uppercase, semibold, and text-primary, with line height 1.
+`--sa-panel-header-context-size` defaults to 90% of xs. Context and title use `UiLayout gap='none'`.
+`--sa-panel-header-title-height` defines the title row's minimum height. Shared alignment uses
+these same metrics.
+
+Workbench height is `calc(clamp(32rem, 85dvh, 42rem) - 50px)` and sheet height is
+`calc(clamp(32rem, 85dvh, 42rem) - 75px)`. Both retain `100dvh` height at phone widths.
 
 **Sections divide a region.** Inside a region, a form's sections are divided by a rule, not boxed:
 each section is an unframed fieldset whose legend is a small uppercase label, and a hairline

@@ -13,6 +13,7 @@ PUBLIC
 WizardContract  Provider contract for a guided sequence.
 ├ formTitle     Title of the complete workflow.
 ├ steps         Composed sequence of reusable steps.
+├ stepsTitle    Optional title for the stepflow panel; defaults to Steps.
 ├ draft         Current aggregate draft projection.
 ├ commit        Persist the aggregate once, at Finish.
 └ feedback      Optional workflow feedback.
@@ -31,6 +32,7 @@ import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
 export type WizardContract<Draft> = {
   formTitle: string
   steps: PanelSequence
+  stepsTitle?: string
   draft: () => Draft
   commit: () => void | Promise<void>
   feedback?: () => PanelFeedback | null

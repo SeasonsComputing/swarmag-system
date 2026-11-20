@@ -7,7 +7,7 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Declares the container, header, and feedback shapes shared by the panel family.
-PanelContainer contributes chrome only — landmark structure, the feature CSS
+PanelContainer contributes geometry and landmarks — the feature CSS
 namespace, and an optional mode attribute callers style against — while callers
 supply the content of every panel. It stays neutral to what a surface presents:
 the abstraction manager fills its two panels with a collection and an editor,
@@ -18,26 +18,20 @@ implements them.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 PanelContainerProps  Slots for a panel container composition.
-PanelHeaderProps     Leading and trailing content for a panel header.
-PanelSheetProps      Title, Close, and content of a full-device dialog.
+PanelHeaderProps     Context, leading, and trailing content for a panel header.
+├ contextTitle       Optional context above the leading title.
+├ leading            Panel title and leading controls.
+└ trailing           Panel action content.
 PanelFeedback        Feedback shown beneath a form header.
 */
 
 import type { UiAlertVariant, UiComponent } from '@ux/ui'
 
-/** Leading and trailing content for a panel header. */
+/** Optional context above the leading content, with trailing panel actions. */
 export type PanelHeaderProps = {
+  contextTitle?: string
   leading?: UiComponent
   trailing?: UiComponent
-}
-
-/** Title, Close, and content of a full-device dialog. */
-export type PanelSheetProps = {
-  title: string
-  onCancel: () => void
-  /** Disables Close while work is in flight. */
-  busy?: boolean
-  children: UiComponent
 }
 
 /** Feedback displayed beneath a panel form header. */
@@ -49,9 +43,7 @@ export type PanelFeedback = {
 /** Slots for a panel container composition. */
 export type PanelContainerProps = {
   feature: string
-  header: UiComponent
   main: UiComponent
-  accessory?: UiComponent
   aside?: UiComponent
   mode?: string
   /** Declares the collapsed layout at any width; without it, the layout follows the container. */

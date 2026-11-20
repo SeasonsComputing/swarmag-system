@@ -25,7 +25,7 @@ import type { CollectionContract } from '@ux/shell/workbench/collection-contract
 import { Lister } from '@ux/shell/workbench/lister.tsx'
 import { UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { FieldBinderSources } from './field-binder-source.tsx'
+import { FieldBinderSourceBadge } from './field-binder-source.tsx'
 
 /** Reader route input; no editable-reader mode exists. */
 export type FieldBinderDialogProps = { onCancel: () => void }
@@ -52,10 +52,8 @@ export const FieldBinderDialog = (props: FieldBinderDialogProps): UiComponent =>
       label: 'Document',
       render: entry => (
         <PanelRowIdentity
+          pill={<FieldBinderSourceBadge source={entry.upload.source} />}
           title={entry.description}
-          subtitle={entry.upload.url
-            ? new URL(entry.upload.url).host
-            : FieldBinderSources[entry.upload.source].label}
           annotation={binder.store.syncedAt
             ? `Copied ${new Date(binder.store.syncedAt).toLocaleString()}`
             : undefined}

@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Presents a Collection alone in a PanelSheet. Activations run one at a time,
+Presents a Collection alone with panel-owned context and Close. Activations run one at a time,
 with failures reported in the Collection, and Close waits for the one in
 flight. Hosts route their Lister through Routes.sheet and decide what
 activating an Item does.
@@ -22,7 +22,7 @@ Lister       Standalone Collection sheet.
 
 import type { Instance } from '@core/std'
 import { createSignal } from '@solid-js'
-import { PanelSheet } from '@ux/shell/panel/panel-sheet.tsx'
+import { UiActionButton } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { CollectionContract } from './collection-contract.ts'
 import { CollectionTable } from './collection-table.tsx'
@@ -55,13 +55,25 @@ export const Lister = <T extends Instance>(props: ListerProps<T>): UiComponent =
   }
 
   return (
-    <PanelSheet title={props.provider.formTitle} onCancel={props.onCancel} busy={pending()}>
-      <CollectionTable
-        variant='tonal-dark'
-        provider={props.provider}
-        activate={item => void activate(item)}
-        error={error()}
-      />
-    </PanelSheet>
+    <CollectionTable
+      variant='tonal-dark'
+      contextTitle={props.provider.formTitle}
+      provider={props.provider}
+      activate={item => void activate(item)}
+      error={error()}
+      headingActions={
+        <UiActionButton
+          disabled={pending()}
+          icon='cross-1'
+          label='Close'
+          labelMode='hidden'
+          decoration='ring'
+          density='dense'
+          onClick={() => {
+            if (!pending()) props.onCancel()
+          }}
+        />
+      }
+    />
   )
 }

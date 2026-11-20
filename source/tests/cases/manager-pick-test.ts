@@ -81,7 +81,7 @@ try {
         .count(),
       1
     )
-    await button('Cancel').click()
+    await button('Close').click()
     await page.getByRole('checkbox', { name: 'Reject the returned Item' }).focus()
     await page.keyboard.press('Space')
     await button('Open to Add').click()
@@ -99,7 +99,7 @@ try {
     await button('Save').click()
     await page.getByText('Created Managed question.', { exact: true }).waitFor()
     assert.equal(await dialog.count(), 1)
-    await button('Cancel').click()
+    await button('Close').click()
     assert.deepEqual(errors, [])
     await page.close()
   }

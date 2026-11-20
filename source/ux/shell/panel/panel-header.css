@@ -5,9 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* Two zones only. A header is a grid item at container level and a flex item
-   inside a card, so item-level sizing belongs to whichever context places it —
-   never here. */
+/* Two zones only. The containing panel owns header placement and sizing. */
 [data-shell-panel='header'] {
   align-items: center;
   display: flex;
@@ -56,7 +54,7 @@
 /* The title line is as tall with its Back command as without, so drilling in shifts the title
    right by the command's width and never down. */
 [data-shell-panel='header-title'] {
-  min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
+  min-block-size: var(--sa-panel-header-title-height);
 }
 
 [data-shell-panel='header-leading'] > h1 {
@@ -96,4 +94,13 @@
      into that space to sit midway between glyph and title. */
   margin-inline-start: calc(var(--sa-space-sm) * -1);
   min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
+}
+
+[data-shell-panel='header-context'] {
+  color: var(--sa-text-primary);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-panel-header-context-size);
+  font-weight: var(--sa-font-weight-semibold);
+  line-height: 1;
+  text-transform: uppercase;
 }

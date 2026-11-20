@@ -38,7 +38,7 @@
   [data-shell='manager'] > [data-shell-panel='main'] {
     block-size: 100%;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
     min-block-size: 0;
     transition: var(--sa-transition-panel);
   }
@@ -88,6 +88,15 @@
 
 /* Only the shared seam changes the cards' own corners, while both panes show. */
 @container (width > 660px) {
+  /* Match the aside's context line plus title-row height, anchoring the main
+     title to the same bottom edge without adding context to main. */
+  [data-shell='manager']:not([data-shell-layout='collapsed'])
+    [data-shell='manager-expanded-title']
+    [data-shell-panel='header-leading'] {
+    align-items: flex-end;
+    min-block-size: calc(var(--sa-panel-header-context-size) + var(--sa-panel-header-title-height));
+  }
+
   [data-shell='manager']:not([data-shell-layout='collapsed'])
     > [data-shell-panel='aside']
     > [data-shell-panel]
@@ -115,7 +124,7 @@
 [data-shell='manager'][data-shell-layout='collapsed'] > [data-shell-panel='main'] {
   block-size: 100%;
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1;
   min-block-size: 0;
   transition: var(--sa-transition-panel);
 }
@@ -165,4 +174,19 @@
 
 [data-shell='manager'][data-shell-layout='collapsed'] [data-shell='manager-expanded-title'] {
   display: none;
+}
+
+/* Workbench actions are repeated on the Collection only while collapsed. */
+[data-shell='manager-collapsed-action'] {
+  display: none;
+}
+
+@container (max-width: 660px) {
+  [data-shell='manager-collapsed-action'] {
+    display: inline-flex;
+  }
+}
+
+[data-shell='manager'][data-shell-layout='collapsed'] [data-shell='manager-collapsed-action'] {
+  display: inline-flex;
 }

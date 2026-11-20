@@ -56,6 +56,44 @@ portaled content surface. The shared `--sa-liquid-surface-bg` and
 card elevation supplies its shadow. Confirmation dialogs opt in internally, independently
 of their content identity. An omitted surface emits no variant and preserves standard styling.
 
+`UiDialog.surface='frameless'` emits `data-ui-variant='frameless'`. The host has no fill, border,
+or padding, retains the card radius, and consumes `--sa-dialog-frameless-shadow`. Dark mode uses
+floating elevation; light mode uses none. Full-screen phone dialogs remain shadowless.
+Containment, responsive sizing, and modal behavior remain host responsibilities.
+
+`PanelHeader.contextTitle` renders above the leading content in `UiLayout gap='none'`.
+`--sa-panel-header-context-size` and `--sa-panel-header-title-height` supply the context font size
+and title-row minimum height. Manager's full-disclosure alignment consumes those same metrics.
+`PanelContainer` lays out main and optional aside in one bounded row. It has no outer header
+slot; each panel supplies its own header.
+
+`PanelSequenceHeader.hostActions` appends host-owned controls after sequence or drill controls;
+`trailingAction` supplies the nested Detail's own action. The header owns one inline layout with
+default gaps; callers supply action contents. `CollectionTable` uses `PanelHeaderTitle` when a
+context title is supplied, keeping title-row geometry consistent with the editor.
+
+Wizard providers may set `stepsTitle`; the stepflow header defaults to Steps. Onboarding supplies
+Onboarding steps. The tree's items and states derive from the composed sequence.
+
+`DrillNavigator` forwards `toolbar` to `PanelList.toolbar`. Its optional `contextTitle`,
+`hostActions`, and `feedback` supply panel chrome and operation feedback. Library applies tight
+rhythm above and below its launcher toolbar. Lister renders `CollectionTable` directly, retaining
+serialized activation, local error reporting, and a Close action disabled while activation runs.
+`DrillDialog` renders `DrillNavigator` directly in a frameless sheet, supplying panel context
+and a Close action through the existing navigator slots. The leaf-selection callback closes
+before activation. Outside interaction and Escape retain the existing dismissal behavior.
+
+`Routes.workbench` and `Routes.sheet` accept an optional surface override forwarded to `UiDialog`.
+Table body rows at rest consume `--sa-table-bg-row`, aliased to `--sa-card-tonal-light-bg`;
+section and interactive-hover treatments remain independent.
+
+Labelled action buttons have wider inline focus-ring spacing. Icon-only actions use equal 3px
+expansion on both axes for a compact circular ring.
+
+`PanelRowIdentity` separates its headline from its secondary group with `UiLayout gap='tight'`.
+Subtitle and annotation share an inner `UiLayout gap='none'`, omitted when neither is supplied.
+The optional badge remains inline with the title in the headline.
+
 ### 2.2 Common Component Structure
 
 ```text

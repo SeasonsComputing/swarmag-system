@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Library dialog                                                               ║
-║ Catalog manager launchers and Library documents in one sheet.                ║
+║ Catalog launchers and document browsing within one tonal panel.                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -20,10 +20,9 @@ import type { Attachment } from '@domain/abstractions/common.ts'
 import { api } from '@front/api/api.ts'
 import { DrillNavigator } from '@front/app/shell/retrieval/drill-navigator.tsx'
 import { LibraryLevels } from '@front/app/shell/retrieval/library-levels.ts'
-import { createSignal, Show } from '@solid-js'
-import { PanelSheet } from '@ux/shell/panel/panel-sheet.tsx'
+import { createSignal } from '@solid-js'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
-import { UiActionButton, UiAlert, UiLayout, UiWindow } from '@ux/ui'
+import { UiActionButton, UiLayout, UiWindow } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './library-dialog.css'
@@ -48,47 +47,60 @@ export const LibraryDialog = (props: LibraryDialogProps): UiComponent => {
   }
   const root = LibraryLevels.root(attachment => void open(attachment))
   return (
-    <PanelSheet title='Library' onCancel={props.onCancel}>
-      <UiLayout variant='block-fill'>
-        <UiLayout variant='cluster-wrap' data-app='library-toolbar'>
+    <UiLayout variant='block-fill' data-app='library'>
+      <DrillNavigator
+        variant='tonal-dark'
+        contextTitle='Library'
+        title='Documents'
+        root={root}
+        feedback={error() ? { message: error(), variant: 'danger' } : null}
+        toolbar={
+          <UiLayout variant='inline-fit' data-app='library-toolbar'>
+            <UiActionButton
+              align='start'
+              density='dense'
+              icon='layers'
+              label='Asset Types'
+              labelMode='visible'
+              onClick={() => void redirect('/asset-types')}
+            />
+            <UiActionButton
+              align='start'
+              density='dense'
+              icon='cube'
+              label='Assets'
+              labelMode='visible'
+              onClick={() => void redirect('/assets')}
+            />
+            <UiActionButton
+              align='start'
+              density='dense'
+              icon='opacity'
+              label='Chemicals'
+              labelMode='visible'
+              onClick={() => void redirect('/chemicals')}
+            />
+            <UiActionButton
+              align='start'
+              density='dense'
+              icon='target'
+              label='Services'
+              labelMode='visible'
+              onClick={() => void redirect('/services')}
+            />
+          </UiLayout>
+        }
+        hostActions={
           <UiActionButton
-            align='start'
+            icon='cross-1'
+            label='Close'
+            labelMode='hidden'
+            decoration='ring'
             density='dense'
-            icon='layers'
-            label='Asset Types'
-            labelMode='visible'
-            onClick={() => void redirect('/asset-types')}
+            onClick={props.onCancel}
           />
-          <UiActionButton
-            align='start'
-            density='dense'
-            icon='cube'
-            label='Assets'
-            labelMode='visible'
-            onClick={() => void redirect('/assets')}
-          />
-          <UiActionButton
-            align='start'
-            density='dense'
-            icon='opacity'
-            label='Chemicals'
-            labelMode='visible'
-            onClick={() => void redirect('/chemicals')}
-          />
-          <UiActionButton
-            align='start'
-            density='dense'
-            icon='target'
-            label='Services'
-            labelMode='visible'
-            onClick={() => void redirect('/services')}
-          />
-        </UiLayout>
-        <Show when={error()}>
-          <UiAlert variant='danger'>{error()}</UiAlert>
-        </Show>
-        <DrillNavigator variant='tonal-dark' title='Documents' root={root} />
-      </UiLayout>
-    </PanelSheet>
+        }
+      />
+    </UiLayout>
   )
 }

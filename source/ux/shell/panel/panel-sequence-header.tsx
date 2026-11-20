@@ -25,7 +25,7 @@ states, and transition motion are defined here once; no feature restates them.
 */
 
 import { Show } from '@solid-js'
-import { UiActionButton } from '@ux/ui'
+import { UiActionButton, UiLayout } from '@ux/ui'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 import type { DrillReturnControl } from './drill-contract.ts'
 import { PanelHeaderTitle } from './panel-header-title.tsx'
@@ -37,6 +37,9 @@ import './panel-sequence-header.css'
 export const PanelSequenceHeader = (props: {
   sequence: PanelSequenceControl
   title?: string
+  contextTitle?: string
+  /** Workbench-wide controls appended after the active Detail's action. */
+  hostActions?: UiComponent
   busy: boolean
   drillReturn: DrillReturnControl | null
   trailingAction?: UiActionButtonProps
@@ -70,6 +73,7 @@ export const PanelSequenceHeader = (props: {
   return (
     <div data-shell='sequence-header'>
       <PanelHeader
+        contextTitle={props.contextTitle}
         leading={
           <PanelHeaderTitle
             title={title()}
@@ -80,28 +84,31 @@ export const PanelSequenceHeader = (props: {
           />
         }
         trailing={
-          <Show
-            when={!props.drillReturn}
-            fallback={
-              <Show when={props.trailingAction}>{action => <UiActionButton {...action()} />}</Show>
-            }
-          >
+          <UiLayout variant='inline-fit'>
             <Show
-              when={props.sequence.isLast()}
+              when={!props.drillReturn}
               fallback={
-                <UiActionButton
-                  density='dense'
-                  disabled={props.busy}
-                  icon='arrow-right'
-                  label='Next'
-                  labelMode='visible'
-                  onClick={props.onNext}
-                />
+                <Show when={props.trailingAction}>{action => <UiActionButton {...action()} />}</Show>
               }
             >
-              <UiActionButton {...props.commit} />
+              <Show
+                when={props.sequence.isLast()}
+                fallback={
+                  <UiActionButton
+                    density='dense'
+                    disabled={props.busy}
+                    icon='arrow-right'
+                    label='Next'
+                    labelMode='visible'
+                    onClick={props.onNext}
+                  />
+                }
+              >
+                <UiActionButton {...props.commit} />
+              </Show>
             </Show>
-          </Show>
+            {props.hostActions}
+          </UiLayout>
         }
       />
     </div>

@@ -37,17 +37,19 @@ export type PanelRowIdentityProps = {
 export const PanelRowIdentity = (props: PanelRowIdentityProps): UiComponent => (
   <div data-shell-panel='row-identity'>
     <UiLayout variant='block-fit' gap='tight'>
-      <UiLayout variant='block-fit' gap='none'>
-        <span data-shell-panel='row-headline'>
-          <Show when={props.pill !== undefined}>{props.pill}</Show>
-          <span data-shell-panel='row-title'>{props.title}</span>
-        </span>
-        <Show when={props.subtitle !== undefined}>
-          <span data-shell-panel='row-subtitle'>{props.subtitle}</span>
-        </Show>
-      </UiLayout>
-      <Show when={props.annotation !== undefined}>
-        <span data-shell-panel='row-annotation'>{props.annotation}</span>
+      <span data-shell-panel='row-headline'>
+        <Show when={props.pill !== undefined}>{props.pill}</Show>
+        <span data-shell-panel='row-title'>{props.title}</span>
+      </span>
+      <Show when={props.subtitle !== undefined || props.annotation !== undefined}>
+        <UiLayout variant='block-fit' gap='none'>
+          <Show when={props.subtitle !== undefined}>
+            <span data-shell-panel='row-subtitle'>{props.subtitle}</span>
+          </Show>
+          <Show when={props.annotation !== undefined}>
+            <span data-shell-panel='row-annotation'>{props.annotation}</span>
+          </Show>
+        </UiLayout>
       </Show>
     </UiLayout>
   </div>

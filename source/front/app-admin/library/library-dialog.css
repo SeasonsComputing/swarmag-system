@@ -1,13 +1,14 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Library dialog styles                                                        ║
-║ The launcher toolbar above the Library's documents.                          ║
+║ Panel-local launcher spacing above the Library documents.                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* Full-bleed below 480px, the sheet's content loses the dialog pad; the toolbar keeps its own. */
-@media (max-width: 480px) {
-  [data-app='library-toolbar'] {
-    padding-inline: var(--sa-rhythm-pad);
-  }
+[data-app='library'] [data-shell-panel='header'] {
+  padding-block-end: var(--sa-rhythm-gap-tight);
+}
+
+[data-app='library-toolbar'] {
+  padding-block-end: var(--sa-rhythm-gap-tight);
 }

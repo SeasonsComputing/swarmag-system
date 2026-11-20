@@ -101,7 +101,7 @@ export const ManagerExample = (): UiComponent => {
       </UiButton>
       <p role='status'>{result()}</p>
       <Show when={open()}>
-        <UiDialog open size={choosing() ? 'sheet' : 'workbench'} dismissible={false}>
+        <UiDialog open size={choosing() ? 'sheet' : 'workbench'} surface='frameless' dismissible={false}>
           <Manager
             provider={provider}
             onCancel={() => setOpen(false)}

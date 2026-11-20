@@ -17,9 +17,16 @@ compileApplicationRoutes  Compile an application declaration into a route tree.
 
 import { onMount } from '@solid-js'
 import { type AnyRoute, createRootRoute, createRoute } from '@tanstack/solid-router'
-import { UiDialog, type UiDialogSize } from '@ux/ui'
+import { UiDialog } from '@ux/ui'
 import { ShellRedirect } from './shell-navigate.tsx'
-import type { Shell, ShellApplication, ShellOverlayView, ShellRoute, ShellTransition } from './shell.ts'
+import type {
+  Shell,
+  ShellApplication,
+  ShellOverlayOptions,
+  ShellOverlayView,
+  ShellRoute,
+  ShellTransition
+} from './shell.ts'
 import { type ShellNavigate, useShellNavigate } from './use-shell-navigate.ts'
 
 /** Compile an application declaration into a TanStack route tree. */
@@ -64,8 +71,7 @@ const routeComponent = (route: ShellRoute) => {
       return () => (
         <ShellOverlayRoute
           component={route.component}
-          dismissible={route.options.dismissible}
-          size={route.options.size}
+          options={route.options}
         />
       )
     }
@@ -81,8 +87,7 @@ const routeComponent = (route: ShellRoute) => {
 /** Route component that supplies shared close navigation to shell overlays. */
 const ShellOverlayRoute = (props: {
   component: ShellOverlayView
-  dismissible: boolean
-  size: UiDialogSize
+  options: ShellOverlayOptions
 }) => {
   const navigate = useShellNavigate()
   const OverlayComponent = props.component
@@ -100,8 +105,9 @@ const ShellOverlayRoute = (props: {
   return (
     <UiDialog
       open
-      size={props.size}
-      dismissible={props.dismissible}
+      size={props.options.size}
+      surface={props.options.surface}
+      dismissible={props.options.dismissible}
       onOpenChange={onOpenChange}
     >
       <OverlayComponent onCancel={close} />

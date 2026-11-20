@@ -61,6 +61,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps): UiComponent => {
   })
   const contract: WizardContract<CustomerDraft> = {
     formTitle: 'Customer Onboarding',
+    stepsTitle: 'Onboarding steps',
     steps: customerSteps(state, save.stage),
     draft: () => customerDraft(state),
     commit: async () => {

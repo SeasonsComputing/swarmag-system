@@ -46,7 +46,7 @@ Routes                    Route factory convenience container.
 └ transition              Create a work-then-redirect route.
 */
 
-import type { UiComponent, UiDialogSize } from '@ux/ui'
+import type { UiComponent, UiDialogProps, UiDialogSize } from '@ux/ui'
 import type { SessionCoordinatorContract } from './session-contracts.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -136,6 +136,7 @@ export type ShellOverlayView = (props: { onCancel: () => void }) => UiComponent
 export type ShellOverlayOptions = {
   size: UiDialogSize
   dismissible: boolean
+  surface?: UiDialogProps['surface']
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -160,23 +161,25 @@ const page = (
 /** Create a route that presents workbench content. */
 const workbench = (
   path: string,
-  component: ShellOverlayView
+  component: ShellOverlayView,
+  options?: Pick<ShellOverlayOptions, 'surface'>
 ): ShellOverlay => ({
   kind: 'overlay',
   path,
   component,
-  options: { size: 'workbench', dismissible: false }
+  options: { size: 'workbench', dismissible: false, ...options }
 })
 
 /** Create a route that presents one panel as a full-device dialog. */
 const sheet = (
   path: string,
-  component: ShellOverlayView
+  component: ShellOverlayView,
+  options?: Pick<ShellOverlayOptions, 'surface'>
 ): ShellOverlay => ({
   kind: 'overlay',
   path,
   component,
-  options: { size: 'sheet', dismissible: false }
+  options: { size: 'sheet', dismissible: false, ...options }
 })
 
 /** Create a route that presents dialog content over its owning shell. */

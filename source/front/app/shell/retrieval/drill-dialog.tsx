@@ -11,7 +11,7 @@ Opens a navigator in a sheet and closes before running a chosen leaf.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 DrillDialogProps  Trigger and navigation inputs.
-├ label           Trigger label and sheet title.
+├ label           Trigger label and panel context.
 ├ title           Navigator root heading.
 ├ disabled        Host busy state.
 ├ name            Form field identity.
@@ -21,7 +21,6 @@ DrillDialog       Trigger and sheet.
 */
 
 import { createSignal, Show } from '@solid-js'
-import { PanelSheet } from '@ux/shell/panel/panel-sheet.tsx'
 import { UiActionButton, UiDialog, UiLayout } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { DrillNavigator } from './drill-navigator.tsx'
@@ -57,10 +56,24 @@ export const DrillDialog = (props: DrillDialogProps): UiComponent => {
         onClick={() => setOpen(true)}
       />
       <Show when={open()}>
-        <UiDialog open size='sheet' onOpenChange={next => !next && close()}>
-          <PanelSheet title={props.label} onCancel={close}>
-            <DrillNavigator title={props.title} root={props.root} onChoose={close} />
-          </PanelSheet>
+        <UiDialog open size='sheet' surface='frameless' onOpenChange={next => !next && close()}>
+          <DrillNavigator
+            variant='tonal-dark'
+            contextTitle={props.label}
+            title={props.title}
+            root={props.root}
+            onChoose={close}
+            hostActions={
+              <UiActionButton
+                icon='cross-1'
+                label='Close'
+                labelMode='hidden'
+                decoration='ring'
+                density='dense'
+                onClick={close}
+              />
+            }
+          />
         </UiDialog>
       </Show>
     </UiLayout>

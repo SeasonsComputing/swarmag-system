@@ -50,16 +50,16 @@ void bootstrap(
           HelmWidget: makeHelmWidget(FieldBinderHelm)
         },
         [
-          Routes.workbench('/onboarding', OnboardingWizard),
-          Routes.workbench('/users', UserManager),
-          Routes.workbench('/customers', CustomerManager),
-          Routes.workbench('/asset-types', AssetTypeManager),
-          Routes.workbench('/assets', AssetManager),
-          Routes.workbench('/chemicals', ChemicalManager),
-          Routes.workbench('/services', ServiceManager),
-          Routes.workbench('/field-binder-manager', FieldBinderManager),
-          Routes.sheet('/field-binder', FieldBinderDialog),
-          Routes.sheet('/library', LibraryDialog)
+          Routes.workbench('/onboarding', OnboardingWizard, { surface: 'frameless' }),
+          Routes.workbench('/users', UserManager, { surface: 'frameless' }),
+          Routes.workbench('/customers', CustomerManager, { surface: 'frameless' }),
+          Routes.workbench('/asset-types', AssetTypeManager, { surface: 'frameless' }),
+          Routes.workbench('/assets', AssetManager, { surface: 'frameless' }),
+          Routes.workbench('/chemicals', ChemicalManager, { surface: 'frameless' }),
+          Routes.workbench('/services', ServiceManager, { surface: 'frameless' }),
+          Routes.workbench('/field-binder-manager', FieldBinderManager, { surface: 'frameless' }),
+          Routes.sheet('/field-binder', FieldBinderDialog, { surface: 'frameless' }),
+          Routes.sheet('/library', LibraryDialog, { surface: 'frameless' })
         ]
       )
     ],

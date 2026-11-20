@@ -41,9 +41,14 @@
   --sa-card-panel-pad: var(--sa-rhythm-pad);
   --sa-card-stripe-height: 3px;
 
+  /* Panel header */
+  --sa-panel-header-context-size: calc(var(--sa-font-size-xs) * 0.9);
+  --sa-panel-header-title-height: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
+
   /* Dialog */
   --sa-dialog-pad: var(--sa-rhythm-pad);
   --sa-dialog-bg: var(--sa-bg-popup);
+  --sa-dialog-frameless-shadow: none;
   --sa-liquid-surface-bg: color-mix(in oklch, var(--sa-dialog-bg) 25%, transparent);
   --sa-liquid-surface-filter: var(--sa-filter-blur);
 
@@ -53,6 +58,7 @@
   --sa-fieldset-shadow: var(--sa-shadow-sm);
 
   /* Table */
+  --sa-table-bg-row: var(--sa-card-tonal-light-bg);
   --sa-table-bg-row-hover: var(--sa-bg-hover);
   --sa-table-border: var(--sa-border-table);
 
@@ -215,10 +221,11 @@
 
   /* Dialog */
   --sa-dialog-bg: oklch(0.36 0.055 214.4);
+  --sa-dialog-frameless-shadow: var(--sa-card-elevation-floating-shadow);
 
   /* Card */
-  --sa-card-tonal-light-bg: oklch(28.5% 0.023 236);
-  --sa-card-tonal-dark-bg: oklch(23.3% 0.019 247);
+  --sa-card-tonal-light-bg: oklch(32.8% 0.023 236);
+  --sa-card-tonal-dark-bg: oklch(27% 0.019 247);
   --sa-card-panel-bg: oklch(17% 0.008 244 / 0.7);
   --sa-card-panel-border: 1px solid rgb(148 163 184 / 0.1);
   --sa-card-panel-shadow: none;
@@ -254,7 +261,7 @@
   --sa-bg-surface-3: oklch(91.8% 0.018 112);
   --sa-bg-progress-track: oklch(89.5% 0.018 110);
   --sa-bg-overlay: oklch(18% 0.022 236 / 0.08);
-  --sa-bg-popup: oklch(99.2% 0.008 100);
+  --sa-bg-popup: oklch(96% 0.008 100);
   --sa-bg-table: var(--sa-bg-popup);
   --sa-bg-hover: oklch(86% 0.062 185 / 0.38);
   --sa-bg-selected: oklch(80% 0.09 184 / 0.28);

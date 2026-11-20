@@ -88,9 +88,9 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
       render: entry => (
         <span data-app='field-binder-row' data-app-pending={documentOf(entry) ? undefined : ''}>
           <PanelRowIdentity
+            pill={<FieldBinderSourceBadge source={entry.upload.source} />}
             title={entry.description}
             subtitle={documentOf(entry)?.name ?? 'Pending'}
-            annotation={<FieldBinderSourceBadge source={entry.upload.source} />}
           />
         </span>
       )
@@ -104,13 +104,6 @@ export const FieldBinderManager = (props: FieldBinderManagerProps): UiComponent 
     },
     create: draft => editor.save(draft),
     update: (_entry, draft) => editor.save(draft),
-    collectionActions: [{
-      name: 'open-inventory',
-      label: 'Inventory',
-      icon: 'external-link',
-      handler: () =>
-        openSourceWindow('Open Binder inventory', async () => (await source.inventoryLink()).url)
-    }],
     actions: [{
       name: 'open',
       label: 'Open source',

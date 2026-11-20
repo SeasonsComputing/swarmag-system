@@ -15,6 +15,7 @@ PUBLIC
 CollectionTableProps  Props for the shared Collection presentation.
 ├ provider            Collection projection and loading provider.
 ├ activate            Handles row activation.
+├ contextTitle        Optional context above the collection title.
 ├ headingActions      Optional controls beside the heading.
 ├ renderActions       Optional Actions column content for each Item.
 ├ error               Optional host action failure copy.
@@ -24,6 +25,7 @@ CollectionTable       Collection heading, feedback, and table.
 
 import type { Instance } from '@core/std'
 import { For, Show } from '@solid-js'
+import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
 import {
   UiAlert,
@@ -46,6 +48,7 @@ export type CollectionTableProps<T extends Instance> =
   & {
     provider: CollectionContract<T>
     activate: (item: T) => void
+    contextTitle?: string
     headingActions?: UiComponent
     renderActions?: (item: T) => UiComponent
     error?: string | null
@@ -64,7 +67,12 @@ export const CollectionTable = <T extends Instance>(props: CollectionTableProps<
     <PanelList
       variant={props.variant}
       header={{
-        leading: <h2>{props.provider.entityLabel}s</h2>,
+        contextTitle: props.contextTitle,
+        leading: (
+          <Show when={props.contextTitle} fallback={<h2>{props.provider.entityLabel}s</h2>}>
+            <PanelHeaderTitle title={`${props.provider.entityLabel}s`} />
+          </Show>
+        ),
         trailing: <UiLayout variant='inline-fit'>{props.headingActions}</UiLayout>
       }}
     >

@@ -82,7 +82,7 @@ export const UiConfirmDialog = (props: UiConfirmDialogProps): UiComponent => {
           {message => <UiAlert variant='danger'>{message()}</UiAlert>}
         </Show>
         <UiFormActions>
-          <UiButton variant='ghost' disabled={busy()} onClick={props.onCancel}>Close</UiButton>
+          <UiButton variant='ghost' disabled={busy()} onClick={props.onCancel}>Cancel</UiButton>
           <UiButton
             variant={props.action.variant ?? 'danger'}
             loading={busy()}

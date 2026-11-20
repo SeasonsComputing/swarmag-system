@@ -18,7 +18,7 @@ COMPONENT PROPERTIES
 UiDialogProps     Dialog control props; extends UiComponentProps.
 ├ trigger         Content of the built-in trigger button.
 ├ triggerVariant  Visual variant of the trigger button.
-├ surface         Optional liquid surface treatment.
+├ surface         Optional liquid or frameless surface treatment.
 ├ size            Dialog size treatment.
 ├ open            Controlled open state.
 ├ defaultOpen     Initial uncontrolled open state.
@@ -43,7 +43,7 @@ export type UiDialogSize = 'content' | 'panel' | 'workbench' | 'sheet'
 export type UiDialogProps = UiComponentProps & {
   trigger?: UiComponent
   triggerVariant?: UiButtonVariant
-  surface?: 'liquid'
+  surface?: 'liquid' | 'frameless'
   size?: UiDialogSize
   open?: boolean
   defaultOpen?: boolean

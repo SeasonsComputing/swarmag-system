@@ -15,22 +15,13 @@ against itself. */
   block-size: 100%;
   display: grid;
   gap: var(--sa-rhythm-gap);
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   min-block-size: 0;
 }
 
 /* Surface collapse rules override this shared default without relying on load order. */
 [data-shell-panel='container']:where(:has(> [data-shell-panel='aside'])) {
   grid-template-columns: minmax(var(--sa-size-wrap), 1fr) minmax(var(--sa-size-min), 1fr);
-}
-
-[data-shell-panel='container']:has(> [data-shell-panel='accessory']) {
-  grid-template-rows: auto auto minmax(0, 1fr);
-}
-
-[data-shell-panel='container'] > [data-shell-panel='header'],
-[data-shell-panel='container'] > [data-shell-panel='accessory'] {
-  grid-column: 1 / -1;
 }
 
 [data-shell-panel='container'] > [data-shell-panel='aside'],
@@ -40,19 +31,4 @@ against itself. */
   min-block-size: 0;
   min-inline-size: 0;
   position: relative;
-}
-
-@media (max-width: 480px) {
-  [data-shell-panel='container'] {
-    block-size: 100%;
-  }
-
-  [data-shell-panel='container'] > [data-shell-panel='header'],
-  [data-shell-panel='container'] > [data-shell-panel='accessory'] {
-    padding-inline: var(--sa-rhythm-pad);
-  }
-
-  [data-shell-panel='container'] > [data-shell-panel='header'] {
-    padding-block-start: var(--sa-rhythm-pad);
-  }
 }

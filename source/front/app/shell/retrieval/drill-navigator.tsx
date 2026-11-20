@@ -26,6 +26,10 @@ DrillLeaf            Activates an item; extends DrillRowBase.
 └ choose             Run the consumer's action.
 DrillNavigatorProps  Navigation inputs.
 ├ title              Root heading and path title.
+├ contextTitle       Optional workbench context above the title.
+├ hostActions        Host-owned actions beside navigation.
+├ toolbar            Optional panel-local controls above the document body.
+├ feedback           Host operation feedback.
 ├ root               First level.
 └ onChoose           Run before a leaf's action.
 DrillNavigator       Navigate levels within the host's surface.
@@ -38,9 +42,20 @@ import type {
   DrillReturnControl
 } from '@ux/shell/panel/drill-contract.ts'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
-import { UiIcon, UiSpinner, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow } from '@ux/ui'
+import {
+  UiAlert,
+  UiIcon,
+  UiLayout,
+  UiSpinner,
+  UiTable,
+  UiTableBody,
+  UiTableCell,
+  UiTableHeader,
+  UiTableRow
+} from '@ux/ui'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 import type { UiCardProps } from '@ux/ui/components/ui-card.tsx'
 
@@ -69,6 +84,10 @@ export type DrillLeaf = DrillRowBase & { choose: () => void }
 /** Navigation inputs and the optional action before a leaf chooses. */
 export type DrillNavigatorProps = {
   title: string
+  contextTitle?: string
+  hostActions?: UiComponent
+  toolbar?: UiComponent
+  feedback?: PanelFeedback | null
   root: DrillLevel
   onChoose?: () => void
   variant?: UiCardProps['variant']
@@ -93,10 +112,16 @@ export const DrillNavigator = (props: DrillNavigatorProps): UiComponent => {
   return (
     <PanelList
       variant={props.variant}
+      toolbar={props.toolbar}
       header={{
-        leading: <PanelHeaderTitle title={props.title} path={path()} command={command()} />
+        contextTitle: props.contextTitle,
+        leading: <PanelHeaderTitle title={props.title} path={path()} command={command()} />,
+        trailing: <UiLayout variant='inline-fit'>{props.hostActions}</UiLayout>
       }}
     >
+      <Show when={props.feedback}>
+        {feedback => <UiAlert variant={feedback().variant}>{feedback().message}</UiAlert>}
+      </Show>
       <DrillDown
         axis='inline'
         rootTitle={props.title}

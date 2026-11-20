@@ -188,8 +188,8 @@
   color: var(--sa-button-bg-danger-hover);
 }
 
-/* The ring stands off the control, so the surface beneath shows between them; it reaches
-   further along the inline axis than the block axis. */
+/* Labelled actions get extra inline room. Icon-only actions keep equal space
+   on both axes so their focus ring stays circular. */
 [data-ui='action-button']:focus-visible {
   box-shadow: none;
 }
@@ -201,6 +201,10 @@
   inset: -3px calc(var(--sa-space-sm) * -1);
   pointer-events: none;
   position: absolute;
+}
+
+[data-ui='action-button'][data-ui-label-mode='hidden']:focus-visible::after {
+  inset: -3px;
 }
 
 [data-ui='action-button']:not([data-ui-state='disabled']):hover [data-ui='action-button-frame'],
@@ -637,14 +641,23 @@
   z-index: var(--sa-z-raised);
 }
 
-/* Hover advertises activation, so only an interactive row earns it. */
-[data-ui='table-row'][data-ui-interactive]:hover {
-  background: var(--sa-bg-hover);
+[data-ui='table-body'] [data-ui='table-row'] {
+  background: var(--sa-table-bg-row);
 }
 
-[data-ui='table-head'] [data-ui='table-row']:hover,
-[data-ui='table-row'][data-ui-variant='section']:hover {
+/* Hover advertises activation, so only an interactive row earns it. The tint layers over the
+   resting fill rather than replacing it. */
+[data-ui='table-row'][data-ui-interactive]:hover {
+  background: linear-gradient(var(--sa-bg-hover), var(--sa-bg-hover)), var(--sa-table-bg-row);
+}
+
+[data-ui='table-head'] [data-ui='table-row']:hover {
   background: transparent;
+}
+
+/* A section row keeps its resting fill under the pointer. */
+[data-ui='table-row'][data-ui-variant='section']:hover {
+  background: var(--sa-table-bg-row);
 }
 
 [data-ui='table-row'][data-ui-interactive]:focus-visible {
@@ -1173,7 +1186,7 @@
   font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-ui-font-weight-strong);
   gap: var(--sa-space-xs);
-  padding-block: calc(var(--sa-space-xs) / 2);
+  padding-block: calc(var(--sa-space-xs) / 4);
   padding-inline: var(--sa-space-sm);
   white-space: nowrap;
 }
@@ -1433,6 +1446,15 @@
   z-index: var(--sa-z-overlay);
 }
 
+/* A panel-owned workbench retains the modal host without a second visual frame. */
+[data-ui='dialog'][data-ui-variant='frameless'] {
+  background: transparent;
+  border: none;
+  border-radius: var(--sa-card-border-radius);
+  box-shadow: var(--sa-dialog-frameless-shadow);
+  padding: 0;
+}
+
 [data-ui='dialog'][data-ui-size='content'] {
   max-inline-size: min(32rem, calc(100vw - var(--sa-rhythm-pad) * 2));
   min-inline-size: min(20rem, calc(100vw - var(--sa-rhythm-pad) * 2));
@@ -1446,7 +1468,6 @@
    minimum, so a content-sized dialog must not declare it. */
 [data-ui='dialog'][data-ui-size='workbench'],
 [data-ui='dialog'][data-ui-size='sheet'] {
-  block-size: clamp(32rem, 85dvh, 42rem);
   container-type: inline-size;
   display: grid;
   grid-template-rows: minmax(0, 1fr);
@@ -1454,6 +1475,7 @@
 }
 
 [data-ui='dialog'][data-ui-size='workbench'] {
+  block-size: calc(clamp(32rem, 85dvh, 42rem) - 50px);
   inline-size: min(var(--sa-size-md), calc(100vw - var(--sa-rhythm-pad) * 2));
   max-inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
 }
@@ -1461,6 +1483,7 @@
 /* A sheet holds one panel at its own width, independent of the workbench. The pad
    is added because the panel container fills the content box. */
 [data-ui='dialog'][data-ui-size='sheet'] {
+  block-size: calc(clamp(32rem, 85dvh, 42rem) - 75px);
   inline-size: min(
     calc(var(--sa-size-xx) + var(--sa-dialog-pad) * 6),
     calc(100vw - var(--sa-rhythm-pad) * 2)

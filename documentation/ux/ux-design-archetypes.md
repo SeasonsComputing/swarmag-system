@@ -141,6 +141,12 @@ below the threshold — becomes Index-Detail
 
 **Known uses.** The Users manager in Admin, above its container threshold.
 
+**Manager presentation.** Every Manager uses panel-owned chrome inside a frameless dialog host.
+Context appears only above the aside collection title. During full disclosure, collection and
+editor titles align at their bottom edges. Close belongs to main, with a collection copy when
+collapsed, and retains busy and dirty-draft protection. Picker Managers use the same composition,
+collapsed at every width, and retain their caller-labelled persisted-Item action.
+
 ### 3.3 Index-Detail
 
 **Purpose.** Present a Collection and open one Item's Detail, at any depth, without the Detail competing with the Collection for the screen. Use it when Items nest — a customer has sites, a site has notes, a note has attachments — and the nesting has no fixed bottom.
@@ -288,6 +294,10 @@ Rules for the composition:
 
 **Known uses.** The customer onboarding wizard in Admin; its job-sites Step hosts the sites and notes Index-Detail.
 
+**Wizard progress.** Above the collapse threshold, a titled steps panel presents the stepflow
+tree. Below the threshold the aside is absent. Context, navigation, and guarded Close belong to
+main. The step title and Next or Finish orient the user when the tree is absent.
+
 ### 4.3 Chassis-Part
 
 **Purpose.** Present one subject's facets together, drawn from a catalog and arranged per context. Use it when the right content differs by application, role, or user, and no single fixed layout serves all of them.
@@ -373,6 +383,18 @@ A form's sections are divided by a rule, never boxed. `PanelSections` holds them
 direct child, and draws a hairline between each and the next; a section is a `UiFieldset` or a
 section component such as a notes editor. A group inside a section is a framed `UiFieldset`.
 
+### 5.5 Panel-Owned Sheet Chrome
+
+A panel-owned sheet uses a frameless modal host. Context, navigation, and Close belong to its
+panel header; feature controls belong inside the panel. Library places catalog-manager launchers
+in the document panel's toolbar. Field Binder's read-only Lister places context and Close in the
+collection header. Feedback from activating a document stays inside that panel.
+
+`DrillDialog` uses the same frameless sheet host. Its trigger label supplies panel context,
+while the navigator owns the title/path and Back control. A dense, ringed Close sits in the
+panel header. Choosing a leaf closes the sheet before running its action. Sheet remains the
+host sizing variant; no separate outer sheet-header wrapper is involved.
+
 ## 6. Supporting Library
 
 The machinery this repository already builds for the common cases. Reach for the row before designing a surface. Where no row fits, the work is the special case the Pareto split exists to protect — say so and escalate rather than bending a row to cover it.
@@ -381,7 +403,7 @@ The machinery this repository already builds for the common cases. Reach for the
 | ------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------- |
 | Edit one item from a set                         | `AbstractionManager` for records; `Manager` for other items | Collection-Detail <--> Index-Detail |
 | Present a standalone list and activate its Items | `Lister`                                                    | Collection                          |
-| Present one panel as a full-device dialog        | `Routes.sheet` + `PanelSheet`                               | —                                   |
+| Present one panel as a full-device dialog        | `Routes.sheet` + panel-owned content                        | —                                   |
 | Present a nested Collection at any depth         | `DrillDown` + `CollectionPanel`                             | Index-Detail                        |
 | Divide a form into sections                      | `PanelSections` + `UiFieldset`                              | —                                   |
 | Walk nested levels to one Item and activate it   | `DrillNavigator`; `DrillDialog` from a field                | Index                               |

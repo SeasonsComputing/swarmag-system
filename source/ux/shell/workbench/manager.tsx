@@ -35,6 +35,11 @@ changed draft asks first: another Item, New, the collapsed return, and Cancel.
 Hosted in a non-dismissible dialog, it exits only through these explicit
 controls and their dirty checks.
 
+Panel-owned chrome places context only on the Collection at every width.
+Workbench actions stay on Detail,
+with Collection copies when collapsed. The host selects a frameless dialog.
+Close is a dense, ringed icon with its accessible label.
+
 Given pick, it is collapsed at any width and its header offers the caller's
 action for the selected Item: it returns the persisted Item, then closes.
 */
@@ -44,11 +49,10 @@ import { createEffect, createSignal, For, onCleanup, Show, untrack } from '@soli
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
-import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
 import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
-import { UiActionButton, UiConfirmDialog, UiLayout } from '@ux/ui'
+import { UiActionButton, UiConfirmDialog } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { CollectionTable } from './collection-table.tsx'
 import type {
@@ -290,6 +294,34 @@ export const Manager = <T extends Instance, Draft>(
     }
   }
 
+  /** Workbench-wide actions follow the host's dirty-exit and busy contracts. */
+  const managerActions = (collapsedOnly = false): UiComponent => (
+    <>
+      <Show when={props.pick}>
+        {pick => (
+          <UiActionButton
+            data-shell={collapsedOnly ? 'manager-collapsed-action' : undefined}
+            disabled={!selected() || savePending() || actionPending()}
+            icon='check'
+            label={pick().label}
+            labelMode='visible'
+            onClick={pickSelected}
+          />
+        )}
+      </Show>
+      <UiActionButton
+        data-shell={collapsedOnly ? 'manager-collapsed-action' : undefined}
+        disabled={savePending() || actionPending()}
+        icon='cross-1'
+        label='Close'
+        labelMode='hidden'
+        decoration='ring'
+        density='dense'
+        onClick={cancelDialog}
+      />
+    </>
+  )
+
   /** Editor title copy for new and existing items. */
   const editorTitle = (): string =>
     selected()
@@ -326,6 +358,7 @@ export const Manager = <T extends Instance, Draft>(
     const header = (collapsed: boolean): UiComponent => (
       <PanelSequenceHeader
         sequence={sequence}
+        hostActions={managerActions()}
         title={detail.steps.length === 1 ? editorTitle() : undefined}
         busy={savePending() || actionPending()}
         drillReturn={workbench.drillReturn()}
@@ -376,36 +409,10 @@ export const Manager = <T extends Instance, Draft>(
         feature='manager'
         layout={props.pick ? 'collapsed' : undefined}
         mode={mode()}
-        header={
-          <PanelHeader
-            leading={<h1>{props.provider.formTitle}</h1>}
-            trailing={
-              <UiLayout variant='inline-fit'>
-                <Show when={props.pick}>
-                  {pick => (
-                    <UiActionButton
-                      disabled={!selected() || savePending() || actionPending()}
-                      icon='check'
-                      label={pick().label}
-                      labelMode='visible'
-                      onClick={pickSelected}
-                    />
-                  )}
-                </Show>
-                <UiActionButton
-                  disabled={savePending() || actionPending()}
-                  icon='cross-1'
-                  label='Close'
-                  labelMode='visible'
-                  onClick={cancelDialog}
-                />
-              </UiLayout>
-            }
-          />
-        }
         aside={
           <CollectionTable
             variant='tonal-dark'
+            contextTitle={props.provider.formTitle}
             provider={props.provider}
             activate={onSelect}
             error={collectionError()}
@@ -432,6 +439,7 @@ export const Manager = <T extends Instance, Draft>(
                   labelMode='visible'
                   onClick={onNew}
                 />
+                {managerActions(true)}
               </>
             }
             renderActions={item => (

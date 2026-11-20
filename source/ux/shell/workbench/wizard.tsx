@@ -19,9 +19,10 @@ WizardProps  Props for the wizard host.
 SEMANTICS
 ───────────────────────────────────────────────────────────────────────────────
 Commits once, at Finish; the commit may write one abstraction, several, or
-none. Presents progress with PanelSequenceProgress when its sequence has more
-than one step. Above its container threshold it also lays the sequence out as a
-tree in its aside (PanelStepflow); that tree is Wizard chrome.
+none. Above its container threshold, it presents a titled stepflow tree in its
+aside (PanelStepflow). Below the threshold, the aside is absent. Context,
+navigation, and guarded Close belong to the main panel; there is no horizontal
+progress display or outer dialog header.
 
 Snapshots the aggregate draft on mount. Cancel checks that aggregate and all
 registered local drafts, asking once before discarding changes. Back/Next
@@ -32,9 +33,8 @@ import { createMemo, createSignal, Show } from '@solid-js'
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
-import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
+import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
-import { PanelSequenceProgress } from '@ux/shell/panel/panel-sequence-progress.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
 import { PanelStepflow } from '@ux/shell/panel/panel-stepflow.tsx'
@@ -99,27 +99,11 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
       <PanelContainer
         feature='wizard'
         mode={props.contract.steps.length === 1 ? 'single' : 'sequence'}
-        header={
-          <PanelHeader
-            leading={<h1>{props.contract.formTitle}</h1>}
-            trailing={
-              <UiActionButton
-                disabled={committing()}
-                icon='cross-1'
-                label='Cancel'
-                labelMode='visible'
-                onClick={cancel}
-              />
-            }
-          />
-        }
-        accessory={props.contract.steps.length > 1
-          ? <PanelSequenceProgress sequence={sequence} />
-          : undefined}
         aside={props.contract.steps.length > 1
           ? (
             <PanelStepflow
               variant='tonal-dark'
+              header={{ leading: <PanelHeaderTitle title={props.contract.stepsTitle ?? 'Steps'} /> }}
               items={props.contract.steps.map((step, index) => ({
                 title: step.title,
                 state: index < sequence.index()
@@ -138,6 +122,18 @@ export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComp
             header={
               <PanelSequenceHeader
                 sequence={sequence}
+                contextTitle={props.contract.formTitle}
+                hostActions={
+                  <UiActionButton
+                    disabled={committing()}
+                    icon='cross-1'
+                    label='Close'
+                    labelMode='hidden'
+                    decoration='ring'
+                    density='dense'
+                    onClick={cancel}
+                  />
+                }
                 busy={committing()}
                 drillReturn={workbench.drillReturn()}
                 trailingAction={workbench.trailingAction()}

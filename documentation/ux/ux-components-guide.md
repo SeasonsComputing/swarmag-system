@@ -661,7 +661,7 @@ externally.
 | ---------------- | ------------------------------------------------ | -------- | ------------- | ---------------------------------------------------------------- |
 | `trigger`        | `UiComponent`                                    | no       | unset         | Opener button content. Omit for controlled mode.                 |
 | `triggerVariant` | `UiButtonVariant`                                | no       | `'secondary'` | Trigger button variant.                                          |
-| `surface`        | `'liquid'`                                       | no       | unset         | Opt-in theme-controlled liquid surface.                          |
+| `surface`        | `'liquid' \| 'frameless'`                        | no       | unset         | Liquid surface, or a frameless host for child panels.            |
 | `size`           | `'content' \| 'panel' \| 'workbench' \| 'sheet'` | no       | `'panel'`     | Dialog width treatment.                                          |
 | `children`       | `UiComponent`                                    | no       | unset         | Dialog content.                                                  |
 | `open`           | `boolean`                                        | no       | unset         | Controlled open state.                                           |

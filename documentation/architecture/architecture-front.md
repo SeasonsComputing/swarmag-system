@@ -316,7 +316,10 @@ a `DrillDialog` over their documents. Chemicals walks three numbered steps: sele
 SDS or label link, which becomes the source URL; open it and save the file; upload that file.
 The step shows the document's name and kind and edits its description and source URL. Edit
 renames the document and never replaces it. A row is pending until its document is on the
-server. `/field-binder` uses the read-only Lister over local bytes.
+server. `/field-binder` uses the read-only Lister over local bytes. Reader and Manager rows show
+the shared upload-source badge beside the title. Rows have two identity lines: the source pill
+and description, followed by copy time in the reader's annotation style with no subtitle, or
+filename/delivery state in the Manager's subtitle style.
 Its app-root Helm binding supplies Manage, Open, and Synchronize, with the status line, through the
 existing widget maker. Sync is explicit and reports its preparation state through BackgroundTasks; saving
 a source entry does not implicitly prepare the local reader. Binder consumes its own Uploads
@@ -658,6 +661,17 @@ widening later costs a move, and generalizing early costs an abstraction nobody 
 Workbench steps, the shared panel sequence, the Wizard, the Manager, the Lister, and drill-down
 are built as CONVENTIONS §17 describes; their behavior is in their module headers.
 
+All seven Admin Managers — Users, Customers, Asset Types, Assets, Chemicals, Services, and
+Field Binder — use panel-owned chrome in frameless workbench hosts. The style-guide Manager
+specimen uses the same host treatment in management and picker modes. Picker callbacks,
+modal dismissal policy, and dirty-exit behavior retain their existing contracts.
+
+`Routes.workbench` and `Routes.sheet` forward an optional surface override to `UiDialog`.
+Onboarding, Library, and the read-only Field Binder sheet also select frameless hosts. Their
+panel compositions are specified in UX Design Archetypes §§3.2, 4.2, and 5.5. `DrillDialog`
+also uses a frameless sheet and supplies context and Close to its navigator panel. The `sheet`
+size variant retains its responsive behavior independently of panel-header composition.
+
 **Features: `source/front/app-admin/`.**
 
 - `customers/` supplies the Customer steps and nothing about their host.
@@ -671,10 +685,14 @@ are built as CONVENTIONS §17 describes; their behavior is in their module heade
   seeds state from the opened Customer, or blank for New.
 - `OnboardingWizard` is the only composer of Onboarding's sequence. It builds that sequence from
   `customers/` and from Initial Job Assessment's steps. Its `commit` writes the aggregate once, at
-  Finish. Both of the Wizard's progress presentations derive from the composed sequence.
+  Finish. Its Onboarding steps tree derives from that sequence and is absent below the
+  collapse threshold.
 - `UserManager` returns the single `user-step-detail` step; `user-state.ts` owns the state,
   `UserDraft`, and the `userDraft(state)` projection.
-- `library/` supplies `LibraryDialog`, the Library sheet (§7.2.4).
+- `library/` supplies `LibraryDialog`, the Library sheet (§7.2.4). Catalog launchers occupy the
+  document panel toolbar inside the tonal card; Library context and Close belong to its header,
+  with operation failures shown inside the panel. Field Binder's read-only Lister owns its
+  context and Close in the collection header. Both sheet hosts remain modal and frameless.
 - Steps follow the naming in CONVENTIONS §4.2.
 
 The Customer workbench declares contact, identity, status, account-manager assignment, address,
