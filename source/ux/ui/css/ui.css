@@ -195,7 +195,7 @@
 }
 
 [data-ui='action-button']:focus-visible::after {
-  border: 2px solid var(--sa-focus-ring-color);
+  border: var(--sa-focus-ring-border);
   border-radius: var(--sa-radius-full);
   content: '';
   inset: -3px calc(var(--sa-space-sm) * -1);
