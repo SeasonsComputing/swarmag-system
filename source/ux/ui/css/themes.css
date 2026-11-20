@@ -443,7 +443,11 @@
 
   /* Dialog */
   --sa-dialog-bg: oklch(88.5% 0.012 100);
-  --sa-liquid-surface-bg: var(--sa-dialog-bg);
+  --sa-liquid-surface-bg: linear-gradient(
+    135deg,
+    oklch(96% 0.018 170),
+    oklch(92% 0.03 190)
+  );
   --sa-liquid-surface-filter: none;
 
   /* Card */
