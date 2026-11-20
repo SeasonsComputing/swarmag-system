@@ -648,7 +648,9 @@
 /* Hover advertises activation, so only an interactive row earns it. The tint layers over the
    resting fill rather than replacing it. */
 [data-ui='table-row'][data-ui-interactive]:hover {
-  background: linear-gradient(var(--sa-bg-hover), var(--sa-bg-hover)), var(--sa-table-bg-row);
+  background:
+    linear-gradient(var(--sa-bg-hover), var(--sa-bg-hover)),
+    var(--sa-table-bg-row);
 }
 
 [data-ui='table-head'] [data-ui='table-row']:hover {
