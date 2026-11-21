@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Effort Methodology (1.5)
+# Effort Methodology (1.6)
 
 - Source: [EFFORT.md](EFFORT.md)
-- Version: 1.5
-- Published: 2026 November 15th
+- Version: 1.6
+- Published: 2026 November 21st
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -19,15 +19,16 @@ It applies to every reasoning system, human or artificial, that captures, tracks
 
 ## 2. The Effort Namespace
 
-Tracked work lives in `effort/`, in five namespaces:
+Tracked work lives in `effort/`, in six namespaces:
 
-| Namespace   | Purpose                                                                                |
-| ----------- | -------------------------------------------------------------------------------------- |
-| `pending`   | Captured briefs not yet chosen as current work.                                        |
-| `active`    | In-flight project records: production briefs and their handoffs.                       |
-| `completed` | Closed work. A permanent historical record, not a staging area.                        |
-| `project`   | Project work definitions organized into backlog, parking lot, roadmap or user-stories. |
-| `genesis`   | Regenerable scaffolding prompt contracts, a separate lifecycle.                        |
+| Namespace   | Purpose                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| `pending`   | Captured briefs not yet chosen as current work.                                             |
+| `discovery` | Discovery briefs: open research into the business, the domain, or the rules it works under. |
+| `active`    | In-flight project records: production briefs and their handoffs.                            |
+| `completed` | Closed work. A permanent historical record, not a staging area.                             |
+| `project`   | Project work definitions organized into backlog, parking lot, roadmap or user-stories.      |
+| `genesis`   | Regenerable scaffolding prompt contracts, a separate lifecycle.                             |
 
 Status-bearing records come in two kinds, the brief (§4 The Brief) and the handoff (§5 The Handoff). Each is named `{yyyy-mm-dd}-{topic}-{kind}.md`, where the date is the day the record was written and `{kind}` is `brief` or `handoff`.
 
@@ -62,6 +63,8 @@ A brief is a written design record for one unit of work.
 
 **Place it by whether its effort is current work.** A newly captured brief begins in `effort/pending/`. It goes directly to `effort/active/` only when dispatched immediately — for example, a repair brief taken straight to production. A pending brief moves to `effort/active/` when its effort is chosen from the roadmap, and no work on it begins before then. The move happens at selection, not at the production gate: a chosen effort's first step is an exploration review, which is already in-flight work. Handoffs never enter `effort/pending/`; a handoff records in-flight work by definition (§5 The Handoff).
 
+**A discovery brief finds out rather than builds.** Its work settles knowledge, about the business, the domain, or the rules the business works under, that production briefs build on. It begins in `effort/discovery/` and stays there while its research is open. It keeps its findings, each with its source, apart from the model that follows from them, and names where each settled finding lands: a governing document or a production brief. Landing a finding is a production in its target, gated there. It closes when every finding has landed.
+
 When a brief is created for work that already has a `project-backlog.md` entry, the entry's text is replaced by a link to the brief, so the work is described in one place. When the brief moves, the link is updated to its new path.
 
 **Edit a draft; amend a dispatched brief.** Until a brief is dispatched for review or production, it is edited in place, and a direction it overturns is recorded in its Design history. Once dispatched, it accumulates dated, named amendments as understanding deepens or a conclusion reverses: state what changed and why, and mark what it overturns. Either way, preserve the reasoning trail — a decision that took several turns to reach is worth being able to see again, including the turns that were wrong.
@@ -79,7 +82,7 @@ A brief carries the decision. Carrying an unfinished session's working state to 
 
 ## 5. The Handoff
 
-A handoff is a session-end snapshot: what a resuming session — any reasoning system, on any provider, with no memory of how the work got to this point — needs to pick up an in-flight effort. It is the operational analog of an architecture document: an architecture document lets any session reconstruct the settled shape of the system; a handoff lets any session reconstruct the current state of one effort in progress. This is what makes the Three-Role Model (`CONSTITUTION.md` §3 Roles) actually workable across a session boundary, a provider switch, or both — neither is possible from memory alone.
+A handoff is a in-progress session snapshot: what a resuming session — any reasoning system, on any provider, with no memory of how the work got to this point — needs to pick up an in-flight effort. A handoff lets any session reconstruct the current state of one effort in progress. This is what makes the Three-Role Model (`CONSTITUTION.md` §3 Roles) actually workable across a session boundary, a provider switch, or both — neither is possible from memory alone.
 
 Write a new handoff at the close of any session that leaves work unfinished, whether or not a brief already exists for that effort. A handoff does not replace or restate a brief's design record — it captures what was tried, what changed, what remains, and any open thread not yet substantial enough to be its own brief entry.
 
@@ -121,6 +124,7 @@ Each published version supersedes the one before it. Amendments reference sectio
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.6     | 2026 November 21st  | §2 The Effort Namespace gains a sixth namespace, `discovery`. §4 The Brief names the discovery brief: findings with their sources, apart from the model; where each finding lands; it closes when every finding has landed.                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.5     | 2026 November 15th  | §2 The Effort Namespace and §4 The Brief: a closed record is filed in `effort/completed/{yyyy-mm}/`, the month its file name carries.                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 1.4     | 2026 November 6th   | §7 Milestones: a closed milestone's ID is permanent; one not yet closed is a position, renumbered as milestones are added, with live references updated in the same change.                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.3     | 2026 October 21st   | §4 The Brief: no work on a pending brief begins before it moves to `effort/active/`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
