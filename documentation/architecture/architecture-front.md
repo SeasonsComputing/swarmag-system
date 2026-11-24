@@ -448,7 +448,7 @@ application-owned session coordinator.
 #### 9.1.1 UX Metaphors
 
 Feature work starts from an existing archetype and its supporting library
-(`ux-design-archetypes.md` §6).
+(`ux-design-archetypes.md` §7).
 
 #### 9.1.2 Auth Guard
 
