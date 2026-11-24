@@ -200,7 +200,7 @@ sites, per the existing free-text-field pattern in each.
 in `project-roadmap.md` §5 from a bigger idea the theme's "Maintenance" name was standing in
 for.
 
-**What it is:** `project-user-stories.md` §3/§4 name their themes "Asset Maintenance" and
+**What it is:** `project-user-stories.md` §3/§4 named their themes "Asset Maintenance" and
 "Chemical Maintenance," but the near-term roadmap work under those themes is an ordinary
 `AbstractionManager` — the same stock CRUD shape as Users/Customers. "Maintenance" was a
 placeholder for something larger: schedules, inventories, and parts specialized to the needs
@@ -231,6 +231,35 @@ a machine-cleaning tool is a delivery asset of a maintenance service. Assets nee
 purpose attribute: the same chain narrows them for customer and internal work. Whether an internal
 service is a `Service` with a flag or a category such as `maintenance-services` is an opening
 question.
+
+**Stories (CA and AI Architect, 2026-11-20):** moved here from `project-user-stories.md` §3/§4.
+
+- **Vehicle maintenance**
+  1. **Scheduled service** — Trucks, trailers, the skidsteer, and the toolcat come due for
+     service by hours or miles; what is coming due surfaces before it is overdue.
+  2. **Out of service** — A vehicle in service is in `maintenance`; planning cannot assign it
+     until it returns to `active`.
+  3. **Service procedure** — Service follows a maintenance procedure, run and logged like any
+     workflow, so the vehicle's history records what was done and by whom.
+- **Tool and machine maintenance**
+  1. **After each job** — Spray tanks, nozzles, and hoppers are cleaned and inspected after
+     chemical use, following a procedure.
+  2. **Drones** — Battery cycles, motor hours, and firmware are tracked; a drone due for service
+     goes to `maintenance`.
+  3. **Attachments** — Vehicle tool attachments are inspected and serviced on their own schedule.
+  4. **Retire** — An asset at the end of its life is `retired`; its history stays.
+- **Chemical maintenance**
+  1. **Inventory** — The office knows what is on hand for each chemical, and where it is stored;
+     a job's planned and applied amounts draw it down.
+  2. **Receiving** — New stock is recorded on arrival, and its labels and SDS are current in the
+     field binder.
+  3. **Reorder** — Stock running low for the jobs ahead surfaces before it runs out.
+  4. **Disposal** — Empty containers are rinsed and disposed of following a procedure, and the
+     disposal is recorded.
+
+Maintenance procedures are workflow templates, authored in the Workflow Template Builder; recurring
+internal Jobs would assemble and assign them in the Job Builder
+(`effort/discovery/2026-11-20-workflows-jobs-brief.md`).
 
 **Why parked:** Its shape is known (internal workflows); its scope, its archetype, and whether it
 needs a dedicated workbench are undecided. The prudent near-term move is the stock Manager
@@ -392,5 +421,23 @@ dashboard as the primary navigation (UX design archetypes §4.3).
 **Picking this up:** Foundation Mode: `ux/shell` is locked, and nested windows amend the route
 grammar and archetypes §4.3. Decide it beside P-5, since both concern where navigation lives;
 the Library's Helm button is app-specific navigation that P-5 would move out of the Helm.
+
+## P-16 · Should Digests be authored in a Report Builder, selecting their content by facet?
+
+**Parked:** 2026-11-20 — CA and AI Architect, naming the Work Page archetypes
+(`ux-design-archetypes.md` §5).
+
+**What it is:** A third Builder, whose product is a Digest. Its body is the report's sections or
+widgets in order; its info panel shows the selected section's source and filter. Facets are its
+selection language: a section selects answers by meaning (every answer under a facet, for a job or
+a season), not by naming workflows, so it keeps working as new workflows carrying the same facets
+are authored, as seeding selects Workflows by Services' facets. The dashboard's JSON configuration
+is the same kind of artifact, so the Report Builder is also the dashboard's authoring surface.
+
+**Why parked:** The Workflow Template Builder (M-7) and Job Builder (M-8) come first, and facets
+must first prove themselves in seeding.
+
+**Picking this up:** After the Job Builder, as its own design conversation: what a section is, how
+a facet query reads, and whether the dashboard and report share one configuration.
 
 _End of Feature Parking Lot Document_

@@ -125,6 +125,25 @@ schema generation beyond the three approved test administrator rows.
 parameter rename fails (`user_has_access`, `email` to `p_email`, in `43a4780`). `schema.sql` gained
 `DROP FUNCTION IF EXISTS user_has_access(text)` by hand; the genesis rules should produce it.
 
+### B-55 · `EFFORT.md` has no path from a design that outgrows its feature brief
+
+**Observed:** 2026-11-20 · normal
+
+The Workflow Builder brief's design session reached past the feature: the life of a workflow
+from template to crew, a Job Builder, per-workflow crew assignment, and clone semantics. A
+feature brief cannot hold that, and `EFFORT.md` names no path for it. The session settled one:
+
+1. **A story** sets the context: who does what, end to end.
+2. **An architecture document** records the design that follows, in present tense.
+3. **A Foundation brief** carries the amendments that bring the domain and types to that design,
+   and the questions still open.
+4. **Feature briefs** build against it and point to it rather than restating it.
+
+Where stories live, and their form, is not yet decided.
+
+**Picking this up:** codify the formulation in `EFFORT.md`, a governance document, in its own
+authorized production and commit.
+
 ## Controls
 
 ### B-4 · Shared UI controls do not use one state model

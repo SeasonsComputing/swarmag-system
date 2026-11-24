@@ -286,11 +286,11 @@ unreferenced documents stays backlog B-42, the document store CLI B-44, and load
 
 ## M-7 · Workflow, Task, Question & Service
 
-`project-user-stories.md` §5, currently unwritten. `Service` shipped with its manager
-(`effort/completed/2026-10/2026-10-28-service-manager-brief.md`). Needs the Workflow Builder — named
-in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme
-with no existing archetype to extend at all, and the most depended-upon: Job Definition's workflow
-seeding can't be built until this exists.
+`project-user-stories.md` §3. `Service` shipped with its manager
+(`effort/completed/2026-10/2026-10-28-service-manager-brief.md`). Needs the Workflow Template
+Builder, the first Builder Work Page (`ux-design-archetypes.md` §5.3), and the most
+depended-upon: Job Definition's workflow seeding can't be built until this exists. The design
+across templates and jobs is `effort/discovery/2026-11-20-workflows-jobs-brief.md`.
 
 **Enablers:**
 
@@ -306,8 +306,8 @@ seeding can't be built until this exists.
 
 **Features:**
 
-- **Workflow Builder** — active, `effort/active/2026-11-15-workflow-builder-brief.md`. Depends on
-  both enablers.
+- **Workflow Template Builder** — active, `effort/active/2026-11-15-workflow-builder-brief.md`.
+  Depends on both enablers.
 
 **Rides along:** facets on Workflow, edited in the Builder
 (`effort/active/2026-10-06-facets-workflow-seeding-brief.md`); seeding itself is M-8's.
@@ -315,9 +315,8 @@ seeding can't be built until this exists.
 Seeding filters the Workflow library by the selected Services' facets, and the rep chooses from the
 result. Design input: `effort/active/2026-10-06-facets-workflow-seeding-brief.md`.
 
-Assessment and planning edit job-specific Workflow clones with the Workflow builder
-(`architecture-front.md` §11.2.3), so this milestone is expected to produce the job assessment and
-job planning briefs that §8 builds.
+Assessment and planning specialize a job's Workflow clones in the Job Builder (M-8), not in the
+Template Builder.
 
 ## M-8 · Job Definition
 
@@ -326,6 +325,12 @@ planning, finalization, and followup. Backlog: B-25 "Onboarding has no Initial J
 (`normal`) covers §2.1 specifically, and completes the Onboarding Wizard (moved from §1). Needs
 `api.Jobs` wired (currently commented out in `api.ts` — not itself a backlog entry, a real gap)
 and depends on §7 above for Service/Workflow seeding.
+
+**Job Builder** — the second Builder Work Page: assessment and planning pick a job's workflows from
+the templates, specialize them by clone, and assign each to a crew member and role
+(`project-user-stories.md` §2.2–2.3). Design: `effort/discovery/2026-11-20-workflows-jobs-brief.md`,
+including `JobPlanAssignment.jobWorkflowId` and the open question of clone depth. As the Builder's
+second consumer, it moves the Builder and the stack into `ux/shell`.
 
 Rides with it: backlog B-27 "A Customer with Jobs can be deleted" (`normal`) — the first Job that
 references a Customer is where the delete guard lands. Also the **Hub widget** (B-30, `normal`),
