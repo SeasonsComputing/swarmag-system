@@ -19,14 +19,14 @@ Reinvention is the failure this document prevents. A surface built without refer
 
 **The components guide is a catalog and must not prescribe composition.** A catalog entry says which control to reach for. An archetype rule says how controls assemble into a surface. The test: if a design decision can falsify an entry in the catalog, that entry was an archetype rule in the wrong document, and it belongs here.
 
-**Archetypes are grouped into families by what they present.** A **Collection** (§3) is a set of peers; the user selects one. A **Decomposition** (§4) is one subject presented in parts. Each family carries its own vocabulary, because the words that make a Collection precise say nothing useful about a Decomposition.
+**Archetypes are grouped into families by what they present.** A **Collection** (§3) is a set of peers; the user selects one. A **Decomposition** (§4) is one subject presented in parts. A **Work Page** (§5) is a whole page given to one activity, reading or making. Each family carries its own vocabulary, because the words that make a Collection precise say nothing useful about a Decomposition.
 
 ### 1.2 Two Layers
 
 | Layer                       | Answers                            | Serves                        |
 | --------------------------- | ---------------------------------- | ----------------------------- |
-| **Archetypes** (§3, §4)     | What pattern is this surface?      | reasoning about a surface     |
-| **Supporting library** (§6) | What does this repo already build? | making the common case common |
+| **Archetypes** (§3–§5)      | What pattern is this surface?      | reasoning about a surface     |
+| **Supporting library** (§7) | What does this repo already build? | making the common case common |
 
 An archetype is a named pattern. The name is the point: a pattern nobody can say by name gets reinvented. The supporting library is the machinery that implements the common cases — managers, wizards, the drill-down host, the cursor, widgets — so feature work writes only what is genuinely particular to it.
 
@@ -183,7 +183,7 @@ collapsed at every width, and retain their caller-labelled persisted-Item action
 └──────────────────────────────────────────────────────┘
 ```
 
-The sketch shows an Index embedded in a form, where a Detail commits into its parent's draft (§5.3). A standalone Index, such as the Users manager's, presents differently and commits its own record — the same archetype on a different surface (§2.2).
+The sketch shows an Index embedded in a form, where a Detail commits into its parent's draft (§6.3). A standalone Index, such as the Users manager's, presents differently and commits its own record — the same archetype on a different surface (§2.2).
 
 **Rules**
 
@@ -331,19 +331,99 @@ position and does not adapt.
    which Parts appear, and where, is configuration
 ```
 
-**Known uses.** The Admin, Customer, and Ops dashboards, composed from the shared widget catalog. Each application supplies only its dashboard JSON — the catalog is the kit, the dashboard is the chassis. In each application the dashboard is also the primary navigation: a page opens from it, and closing the page returns to it.
+**Known uses.** The Admin, Customer, and Ops dashboards, composed from the shared widget catalog. Each application supplies only its dashboard JSON — the catalog is the kit, the dashboard is the chassis. In each application the dashboard is also the primary navigation: a page opens from it, and closing the page returns to it. The dashboard is a Digest (§5.2) whose body is this Chassis.
 
-## 5. Composition Rules
+## 5. Work Page Archetypes
+
+A Work Page is a whole page given to one activity. It is a route, not an overlay: a fixed header, a body that scrolls beneath it, and a footer that follows the body. What the page asks of the user — to read or to make — is its archetype, and its body composes archetypes from the other families (§2.3).
+
+### 5.1 Vocabulary
+
+| Term           | Kind | Meaning                                                                          |
+| -------------- | ---- | -------------------------------------------------------------------------------- |
+| **Work Page**  | noun | A whole page given to one activity: header, body, footer                         |
+| **Header**     | noun | The page's fixed band: its identity and its actions                              |
+| **Body**       | noun | What the page presents; it scrolls beneath the header                            |
+| **Footer**     | noun | Follows the body in flow, and rests at the bottom when the body is short         |
+| **Info panel** | noun | A Builder's region beside the body, at the header's layer, showing the selection |
+| **Structure**  | noun | A Builder's arrangement of parts: which parts, in what order, under which parent |
+
+**Reading is not making.** That is what divides this family. A Digest is read: nothing on it is edited. A Builder is made: its body is structure, and its info panel is the selected part's detail. Ask which the user is doing before asking anything else about the page.
+
+| Archetype   | Disclosure | The user | Body                                                |
+| ----------- | ---------- | -------- | --------------------------------------------------- |
+| **Digest**  | full       | reads    | drawn from the whole domain                         |
+| **Builder** | selective  | makes    | a structure; the info panel discloses the selection |
+
+### 5.2 Digest
+
+**Purpose.** Present what the domain holds about one subject — the business, or one job — for reading. Use it when the user needs to know, not to change.
+
+**Disclosure.** Full. Everything the Digest says is on the page; the user reads or scans, and acts elsewhere.
+
+**One archetype, two visualizations.** A dashboard is a grid of widgets for glancing; a report is one document read in order. Both are read-only and both draw on the whole domain, so they differ only visually, and neither name is the archetype (§2.2). A dashboard's body is a Chassis-Part (§4.3); a report's body is the subject's sections in reading order.
+
+**Sketch**
+
+```
+┌─ Job report · Smith Ranch ─────────────────────────┐
+│  Assessment   site, hazards, notes                 │
+│  Plan         schedule, crew, assets, chemicals    │
+│  Work         each workflow's answers, by whom     │
+│  Deviations   notes and photos                     │
+├────────────────────────────────────────────────────┤
+│  footer                                            │
+└────────────────────────────────────────────────────┘
+   one subject, read in order, drawn from the domain
+```
+
+**Known uses.** The Admin, Customer, and Ops dashboards; the job report.
+
+### 5.3 Builder
+
+**Purpose.** Make one structured subject: a whole assembled from parts, where arranging the parts is as much the work as their content. Use it when the user builds a structure; a single record is a Collection's Detail.
+
+**Disclosure.** Selective. The body shows every part partially — enough to recognize and arrange it. Selecting a part discloses its detail in the info panel. The structure stays in view while one part is examined.
+
+**The body arranges.** Adding, moving, and removing a part are structural changes and take effect at once. Selection opens the parts it contains and closes the rest, so the structure's depth follows the user's attention.
+
+**The info panel discloses.** It shows the selection's detail, read-only, and opens the Manager that owns the part. A Builder edits structure, never content: each part keeps the one editor it has everywhere else, and an edit there reads as what it is.
+
+**Placement.** The info panel sits beside the body at the header's layer, and the body scrolls beside it. Below the collapse threshold the info panel stacks after the body.
+
+**Sketch**
+
+```
+┌─ Drone Obstacle Preflight · v4.2 ───────────────────────────────┐
+├─────────────────────────────────────────┬───────────────────────┤
+│  ┌─ Workflow ────────────────────────┐  │  Task                 │
+│  └───────────────────────────────────┘  │  Site Hazards         │
+│     ┌─ 1 · Site Hazards ◂ selected ─┐   │  description, notes   │
+│     │  Power lines nearby?          │   │                       │
+│     │  People in the area?          │   │  (Edit) → Manager     │
+│     └───────────────────────────────┘   │                       │
+│     ┌─ 2 · Weather ─────────────────┐   │                       │
+│     └───────────────────────────────┘   │                       │
+├─────────────────────────────────────────┤                       │
+│  footer                                 │                       │
+└─────────────────────────────────────────┴───────────────────────┘
+   the body arranges the structure;    the info panel discloses
+   the selection opens its parts       the selection
+```
+
+**Known uses.** The Workflow Template Builder, which authors a Workflow from Tasks and Questions; the Job Builder, which assembles a Job's Workflows, specializes them, and assigns them.
+
+## 6. Composition Rules
 
 Rules that govern how a surface is assembled, independent of archetype.
 
-### 5.1 Form Actions
+### 6.1 Form Actions
 
 Form actions sit at the top of a form, never trailing it. Controls belong where the
 eye already is. A user who has finished a form is looking at the field they just
 completed, not hunting the bottom of a scroll region for the commit.
 
-### 5.2 Address Fields
+### 6.2 Address Fields
 
 Address fields are a form composition pattern, not a single compound field.
 
@@ -369,7 +449,7 @@ Address fields are a form composition pattern, not a single compound field.
 └──────────────────────────────────┘
 ```
 
-### 5.3 Form State Management
+### 6.3 Form State Management
 
 **An archetype that stages editable content does not decide when that content is written.** A Sequence's Steps and an Index-Detail's Items are both places a user edits state before it is real; neither archetype has an opinion about when "before" ends. That choice belongs to the instance, and it takes one of two shapes:
 
@@ -380,13 +460,13 @@ Address fields are a form composition pattern, not a single compound field.
 
 **Leaving a changed draft asks.** Any act that would discard a draft differing from the value it opened with asks before discarding. That includes selecting another Item, creating one, drilling back, and cancelling the surface. An unchanged draft is left in one act. This holds wherever a draft is held, at every depth.
 
-### 5.4 Form Sections
+### 6.4 Form Sections
 
 A form's sections are divided by a rule, never boxed. `PanelSections` holds them, one section per
 direct child, and draws a hairline between each and the next; a section is a `UiFieldset` or a
 section component such as a notes editor. A group inside a section is a framed `UiFieldset`.
 
-### 5.5 Panel-Owned Sheet Chrome
+### 6.5 Panel-Owned Sheet Chrome
 
 A panel-owned sheet uses a frameless modal host. Context, navigation, and Close belong to its
 panel header; feature controls belong inside the panel. Library places catalog-manager launchers
@@ -398,7 +478,7 @@ while the navigator owns the title/path and Back control. `PanelClose` sits in t
 panel header. Choosing a leaf closes the sheet before running its action. Sheet remains the
 host sizing variant; no separate outer sheet-header wrapper is involved.
 
-## 6. Supporting Library
+## 7. Supporting Library
 
 The machinery this repository already builds for the common cases. Reach for the row before designing a surface. Where no row fits, the work is the special case the Pareto split exists to protect — say so and escalate rather than bending a row to cover it.
 
@@ -414,6 +494,7 @@ The machinery this repository already builds for the common cases. Reach for the
 | Decompose a complex subject into steps           | `Wizard` + `PanelStep`                                      | Sequence                            |
 | Gate steps in order, in any workbench            | `createPanelSequence`                                       | Sequence                            |
 | A per-application configurable surface           | dashboard + widget catalog                                  | Chassis-Part                        |
+| Frame a whole page: header, body, footer         | `ShellFrame` on a `Routes.page` route                       | Work Page                           |
 
 A caller-hosted `Manager` may offer an optional `pick` action whose label belongs to the caller
 (for example, Add). It returns the persisted Item, never an unsaved draft. Existing dirty-exit
