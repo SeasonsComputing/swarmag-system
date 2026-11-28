@@ -62,7 +62,7 @@ const Workflows: RegistryDeclaration = { id: toId('…'), name: 'Workflows' }
   seeded abstractions that carry facets, hold the same verbose paths, resolved from the seed's
   names in the same pass. An ambiguous or missing path fails the seed.
 - **A write against a stale catalog is refused.** Two curators editing at once: the second write
-  fails rather than overwrites (Open 5).
+  fails rather than overwrites (Open 4).
 - **Renaming** a bucket or facet rewrites its name in the catalog. Records keep their verbose
   paths; their ids still match, and the stale name is only the stored label.
 - **Retiring** a facet removes it from the catalog. Pickers stop offering it; a record that carries
@@ -113,9 +113,7 @@ brief.
 3. **Moving a facet.** A facet's id form is its lineage, so moving it to another bucket changes
    its canonical form, and records that carry the old path no longer match it. Whether a facet
    moves, and what becomes of references when it does.
-4. **Service or Service Category?** Facets bind per Service; `domain-model.md` §2.1 binds per
-   category. Which holds.
-5. **Stale writes.** How the catalog record is versioned so a stale write is refused: its
+4. **Stale writes.** How the catalog record is versioned so a stale write is refused: its
    `updatedAt`, or a version of its own.
 
 ## Design history
@@ -131,6 +129,8 @@ brief.
   declarations are the closed set, as in the document store.
 - Relationship fields on the from side (`{relationship}{Scheme}Facets`) were dropped: the from side
   never stores facets.
+- Facets per Service Category were dropped: a category is a const-enum value that classifies a
+  Service; facets are carried by the Service.
 - A `ServiceRequiredMaterialKind` junction was not needed: facets on Material filter the material
   picker.
 
