@@ -147,5 +147,5 @@ const customerAddress = (customer: Customer): string =>
 const CustomerStatusColors: Record<CustomerStatus, UiBadgeColor> = {
   active: 'green',
   inactive: 'gray',
-  prospect: 'blue'
+  prospect: 'yellow'
 }
