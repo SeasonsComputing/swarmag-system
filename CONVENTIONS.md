@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.20)
+# Software Construction Conventions (1.21)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.20
-- Published: 2026 November 14th
+- Version: 1.21
+- Published: 2026 November 27th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -886,12 +886,19 @@ const Media = new DocumentStore(new IndexedDbDocumentProvider('MEDIA_DB_NAME'), 
   address, and store it as a reference, before the node exists. Creating at an existing lineage
   returns the node already there; a name is a label, checked only for its format, and need not be
   unique.
-- An address is `{namespace}/{bucket}/{document}`, one to three segments, each a name or
-  `id:{id}`. Names are for people and the CLI, `document-store {noun} {verb}`; ids are for code.
-- A stored reference is an address in id form. Never store a name address, which a rename breaks.
-- `DocumentAddresses.id` turns a stored reference into a `DocumentId` with no lookup. `resolve` is
-  for names, and each level resolves at its own: a document's address goes to `document.resolve`.
-  An ambiguous name does not resolve.
+- An address is a Registry path (`@core/std/registry-grammar.ts`),
+  `{namespace}/{bucket}/{document}`: one to three segments, each a name, `id:{id}`, or both,
+  `id:{id}:{name}`. Names are for people and the CLI, `document-store {noun} {verb}`; ids are for
+  code. `Registry` builds, parses, and formats paths, in name, id, or verbose form. A level fixed
+  in code is a `RegistryDeclaration`.
+- The id form is canonical, and matching compares canonical forms. Store a reference in id or
+  verbose form, which survive a rename; a name path does not.
+- `toDocumentId` turns a stored reference into a `DocumentId` with no lookup. `resolve` is for
+  names, and each level resolves at its own: a document's address goes to `document.resolve`. An
+  ambiguous name does not resolve.
+- Each level's contract extends `RegistryCatalogContract`
+  (`@core/std/registry-catalog-contract.ts`): get, find, list, resolve, rename, and delete. Create
+  is the level's own.
 - `read` returns a document's bytes to code; `link` returns a short-lived URL the browser fetches
   itself. Never store a link; mint it when it is displayed.
 - Documents are immutable. Replace one by add, repoint, remove: the only shared state is the
@@ -905,7 +912,7 @@ const Media = new DocumentStore(new IndexedDbDocumentProvider('MEDIA_DB_NAME'), 
 
 ```typescript
 const manual = await store.document.resolve('manuals/pumps/install.pdf')
-const link = await store.document.link(DocumentAddresses.id(reference))
+const link = await store.document.link(toDocumentId(reference))
 ```
 
 ## 11. Runtime Configuration
@@ -1651,6 +1658,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.21    | 2026 November 27th  | §10.8: an address is a Registry path (`registry-grammar.ts`), whose segment may carry both its id and its name (`id:{id}:{name}`); the id form is canonical and matching compares canonical forms; a reference is stored in id or verbose form, never as a name path; `toDocumentId` replaces `DocumentAddresses.id`; each level's contract extends `RegistryCatalogContract`; a level fixed in code is a `RegistryDeclaration`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.20    | 2026 November 14th  | New §4.4 Subject and kind, family and role: a finished thing is named subject then kind, `Dialog` included; a piece built with is named family then role, and a family has siblings; folder layout is the leaf guard's. §16.1 and §17.7 name the About and sheet examples by that rule, and §17.7's example no longer cites application code.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.19    | 2026 November 13th  | §17.7: a sheet is the one-panel dialog; its size and its full-device behavior on a phone belong to the design language, which the section already cites, and are no longer restated here. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | 1.18    | 2026 November 13th  | §10.8: a supplied id lets a caller write and store a node's address before the node exists; the nominal identity still comes only from the store or a stored reference. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
