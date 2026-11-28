@@ -118,65 +118,80 @@ export const api = {
   BackgroundTasks,
 
   /** Domain clients. */
-
   AssetTypes: makeCrudSupabaseClient<AssetType>({
     table: 'asset_types',
     adapter: AssetTypeAdapter,
-    validator: { validateCreate: validateAssetTypeCreate, validateUpdate: validateAssetTypeUpdate }
+    validator: {
+      validateCreate: validateAssetTypeCreate,
+      validateUpdate: validateAssetTypeUpdate
+    }
   }),
-
   Assets: makeCrudSupabaseClient<Asset>({
     table: 'assets',
     adapter: AssetAdapter,
-    validator: { validateCreate: validateAssetCreate, validateUpdate: validateAssetUpdate }
+    validator: {
+      validateCreate: validateAssetCreate,
+      validateUpdate: validateAssetUpdate
+    }
   }),
-
   Chemicals: makeCrudSupabaseClient<Chemical>({
     table: 'chemicals',
     adapter: ChemicalAdapter,
-    validator: { validateCreate: validateChemicalCreate, validateUpdate: validateChemicalUpdate }
+    validator: {
+      validateCreate: validateChemicalCreate,
+      validateUpdate: validateChemicalUpdate
+    }
   }),
-
   Customers: makeCrudSupabaseClient<Customer>({
     table: 'customers',
     adapter: CustomerAdapter,
-    validator: { validateCreate: validateCustomerCreate, validateUpdate: validateCustomerUpdate }
+    validator: {
+      validateCreate: validateCustomerCreate,
+      validateUpdate: validateCustomerUpdate
+    }
   }),
-
   Facets: makeCrudSupabaseClient<Facet>({
     table: 'facets',
     adapter: FacetAdapter,
-    validator: { validateCreate: validateFacetCreate, validateUpdate: validateFacetUpdate }
+    validator: {
+      validateCreate: validateFacetCreate,
+      validateUpdate: validateFacetUpdate
+    }
   }),
-
   // Jobs: makeCrudSupabaseClient<Job>({ table: 'jobs', adapter: JobAdapter }),
-
   Questions: makeCrudSupabaseClient<Question>({
     table: 'questions',
     adapter: QuestionAdapter,
-    validator: { validateCreate: validateQuestionCreate, validateUpdate: validateQuestionUpdate }
+    validator: {
+      validateCreate: validateQuestionCreate,
+      validateUpdate: validateQuestionUpdate
+    }
   }),
-
   Services: makeCrudSupabaseClient<Service>({
     table: 'services',
     adapter: ServiceAdapter,
-    validator: { validateCreate: validateServiceCreate, validateUpdate: validateServiceUpdate }
+    validator: {
+      validateCreate: validateServiceCreate,
+      validateUpdate: validateServiceUpdate
+    }
   }),
-
   ServiceRequiredAssetTypes: makeJunctionSupabaseClient<ServiceRequiredAssetType>({
     table: 'service_required_asset_types',
     adapter: ServiceRequiredAssetTypeAdapter,
-    validator: { validateCreate: validateServiceRequiredAssetTypeCreate },
+    validator: {
+      validateCreate: validateServiceRequiredAssetTypeCreate
+    },
     owner: 'serviceId',
     partner: 'assetTypeId'
   }),
-
   Tasks: makeCrudSupabaseClient<Task>({
     table: 'tasks',
     adapter: TaskAdapter,
-    validator: { validateCreate: validateTaskCreate, validateUpdate: validateTaskUpdate }
+    validator: {
+      validateCreate: validateTaskCreate,
+      validateUpdate: validateTaskUpdate
+    }
   }),
-
   TaskQuestions: makeJunctionSupabaseClient<TaskQuestion>({
     table: 'task_questions',
     adapter: TaskQuestionAdapter,
@@ -189,13 +204,14 @@ export const api = {
     sequence: 'sequence'
   }),
   Users: makeAuthUsers(),
-
   Workflows: makeCrudSupabaseClient<Workflow>({
     table: 'workflows',
     adapter: WorkflowAdapter,
-    validator: { validateCreate: validateWorkflowCreate, validateUpdate: validateWorkflowUpdate }
+    validator: {
+      validateCreate: validateWorkflowCreate,
+      validateUpdate: validateWorkflowUpdate
+    }
   }),
-
   WorkflowTasks: makeJunctionSupabaseClient<WorkflowTask>({
     table: 'workflow_tasks',
     adapter: WorkflowTaskAdapter,
