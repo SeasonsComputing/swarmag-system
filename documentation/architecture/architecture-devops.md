@@ -1011,8 +1011,8 @@ settings come only from the target contract.
 `back/storage/storage-policies.sql` supplies role predicates and operations, using named root
 inputs. db-genesis reads the same target contract through the storage configuration reader and
 materializes referenced roots as validated, SQL-quoted literals before applying policies. A policy
-cannot refer to an undeclared binding. Logical namespace restrictions use the feature catalog's
-fixed identities and are checked against that catalog in policy integration tests. Physical
+cannot refer to an undeclared binding. Logical namespace restrictions use the feature placement's
+fixed identities and are checked against that placement in policy integration tests. Physical
 native-bucket ids have no independent copy in handwritten SQL.
 
 Runtime code creates logical namespace/bucket markers under authorized roots; it never provisions

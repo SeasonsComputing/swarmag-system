@@ -10,11 +10,11 @@ This document defines the foundational abstractions, contracts, and APIs of the 
 
 ### 2.1 Service
 
-A Service is a listed product representing work swarmAg sells, identified by an SKU. Services belong to a category (for example, aerial or ground), have a description, and define the kinds of assets required to execute the work (equipment, tools, supplies).
+A Service is a listed product representing work swarmAg sells, identified by an SKU. Services belong to a Service Category, a class of service swarmAg offers (for example, aerial-drone-services or ground-machinery-services). A Service has a description and defines the kinds of assets required to execute the work (equipment, tools, supplies).
 
 Many services require the use of regulated chemicals. The acquisition, storage, mixing, and application of chemicals must be managed to maintain licensing and regulatory compliance.
 
-A Service Category represents a class of service swarmAg offers (e.g., aerial-drone-service, ground-machinery-service). Each Service Category has Workflows suitable for performing services within that category.
+Services, Workflows, asset types, and chemicals carry facets: curated classifications that narrow a list while a person chooses. The Services selected for a job filter the Workflow library by their facets, and people choose the Workflows that define the job. Facets help choose; the relationships the choice creates are ids.
 
 ### 2.2 Workflow, Tasks & Questions
 
@@ -142,12 +142,12 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 The following abstractions are shared within the model: used across domain topics and owned by
 none of them.
 
-| Abstraction  | Description                                                                       |
-| ------------ | --------------------------------------------------------------------------------- |
-| `Location`   | Geographic coordinates with optional address information; composed into its owner |
-| `Note`       | Freeform text with author and timestamp; composed into its owner                  |
-| `Attachment` | Metadata describing an uploaded file or artifact; composed into a Note            |
-| `Facet`      | Curated classification catalog entry; Instantiable, referenced by `scheme:code`   |
+| Abstraction    | Description                                                                             |
+| -------------- | --------------------------------------------------------------------------------------- |
+| `Location`     | Geographic coordinates with optional address information; composed into its owner       |
+| `Note`         | Freeform text with author and timestamp; composed into its owner                        |
+| `Attachment`   | Metadata describing an uploaded file or artifact; composed into a Note                  |
+| `FacetCatalog` | Curated classification catalog; one Instantiable record of facets, each a Registry path |
 
 ### 3.7 Supporting domain relationships and junctions
 

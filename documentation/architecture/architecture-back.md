@@ -284,7 +284,7 @@ not restore an Auth identity. Restoring access requires a future
 A remote docstore instance binds a caller-session client and one provisioned Supabase Storage
 bucket root. AttachmentsServer and FieldBinderServer have independent roots; their clients can
 use the same project and caller session. The concrete SupabaseDocumentProvider interprets that
-binding; the kernel and address grammar express namespace → bucket → document lineage.
+binding; the kernel and the Registry grammar express namespace → bucket → document lineage.
 
 Within the bound native bucket, objects have these keys:
 

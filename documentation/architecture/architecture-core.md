@@ -531,7 +531,8 @@ Netlify, a local static file server, or any other static host.
 
 ### 6.3 Environment Files
 
-See `architecture-devops.md §4` for environment file naming conventions, the `__SECRET__` placeholder contract, and security rules.
+See `architecture-devops.md §4` for environment file naming conventions, the `__SECRET__`
+placeholder contract, and security rules.
 
 ## 7. Dependency Direction
 
@@ -734,8 +735,8 @@ boundary; log upload meets the live record.
 
 The system keeps images and documents (photos, signed forms, manuals, orders, and survey maps) in
 document stores: the `core/cli` kernel composed over a provider per purpose (CONVENTIONS §10.8).
-The store knows nothing of the domain; a record refers to a stored document by its address, and
-what the document means belongs to the field that refers to it.
+The store knows nothing of the domain; a record refers to a stored document by its address, a
+Registry path, and what the document means belongs to the field that refers to it.
 
 ### 10.1 Attachments and URLs
 
@@ -754,7 +755,7 @@ A record refers to a document in one of two ways, told apart by where the docume
 ### 10.2 Stores
 
 Each docstore instance binds the common namespace → bucket → document hierarchy to one provider
-and storage root. The root belongs to the concrete provider, not the address grammar. Consumers
+and storage root. The root belongs to the concrete provider, not the Registry grammar. Consumers
 operate on injected docstores without knowing their physical mapping.
 
 #### 10.2.1 Lifecycle
@@ -762,15 +763,15 @@ operate on injected docstores without knowing their physical mapping.
 | Instance            | Binding                       | Lifecycle                                                             |
 | ------------------- | ----------------------------- | --------------------------------------------------------------------- |
 | `AttachmentsInbox`  | IndexedDB database            | attachment staging, recovery copies, and pending delivery             |
-| `AttachmentsServer` | remote docstore root          | shared attachment documents organized by the attachment catalog       |
+| `AttachmentsServer` | remote docstore root          | shared attachment documents organized by the attachment placement     |
 | `FieldBinderInbox`  | separate IndexedDB database   | binder staging, recovery copies, and pending delivery                 |
 | `FieldBinderServer` | separate remote docstore root | authoritative binder source documents and inventory, managed in Admin |
 | `FieldBinderStore`  | separate IndexedDB database   | complete local Binder mirror for offline reading                      |
 
 Each remote instance binds a provisioned native Supabase Storage bucket. The provider maps logical
 namespaces and buckets to marker-backed prefixes beneath that root (architecture-back §4.7).
-Separate roots can share one Supabase project and caller session. The attachment catalog and the
-binder's organization are independent.
+Separate roots can share one Supabase project and caller session. The attachment placement and the
+binder's placement are independent.
 
 #### 10.2.2 Context
 
@@ -803,10 +804,10 @@ not itself register routes or commands; each app supplies its own registration a
 - **The reader uses local bytes.** Each app's Binder reader opens only FieldBinderStore. Ops
   operates offline; a missing local file does not trigger a remote read. Sync requires connectivity
   and is separate from opening a document or delivering an upload.
-- **Local stores have independent lifecycles.** Each local docstore occupies its own IndexedDB
-  database, containing its own Nodes and Content object stores. App origins and browser profiles
-  separate their databases (architecture-front §9.5.1). The reader is read-only; preparation writes
-  its mirror.
+  - **Local stores have independent life-cycles.** Each local docstore occupies its own IndexedDB
+    database, containing its own Nodes and Content object stores. App origins and browser profiles
+    separate their databases (architecture-front §9.5.1). The reader is read-only; preparation writes
+    its mirror.
 - **Server policies authorize remote access.** Physical roots provide storage organization;
   Storage policies enforce grants. Application registration is not an authorization boundary
   (architecture-back §4.7).
@@ -865,18 +866,19 @@ physical root mappings.
     the data plan is the worker's.
   - **Customer Portal:** a drain of its own.
 
-### 10.4 The Catalog
+### 10.4 Placement
 
 `Attachments`, composed with AttachmentsUploads and AttachmentsInbox in `front/api/api.ts`, owns
-attachment recognition, metadata, catalog destinations, and note-reference rewriting. Its private
-placement catalog uses fixed logical ids shared by the attachment stores on every device. A placed
-attachment has the same logical address in its inbox and server. Physical root configuration is
-owned by the per-target storage contract (architecture-devops §14), not the attachment catalog.
+attachment recognition, metadata, placement, and note-reference rewriting. Its private placement
+declares the fixed namespaces and Library buckets as Registry declarations, whose ids are shared by
+the attachment stores on every device. A placed attachment has the same logical address in its
+inbox and server. Physical root configuration is owned by the per-target storage contract
+(architecture-devops §14), not the attachment placement.
 
 - **Recognition belongs to Attachments.** Its format catalog recognizes a file by extension,
   validates the accepted kind, and supplies the content type stored through Uploads. Its returned
   Attachment carries the filename, kind, content type, chosen-file timestamp, and id-form address.
-- **A topic per type that carries notes** creates its catalog bucket and places staged documents
+- **A topic per type that carries notes** creates its bucket and places staged documents
   through Uploads. A composition without an id (a `Note`, a `CustomerSite`, an `Answer`) uses its
   owning record's bucket. Names are labels at every level, for people and the CLI.
 - **Attachment Save writes placed addresses once.** Choosing a file adds its row at once and starts
@@ -887,7 +889,7 @@ owned by the per-target storage contract (architecture-devops §14), not the att
   editor's staging; after an attempted write, staging remains.
   Removing an attachment drops its reference rather than deleting possibly referenced bytes.
 - **Attachment access delegates to Uploads.** Links and sizes follow the document between inbox
-  and server. The attachment catalog selects destinations; it does not own delivery scheduling.
+  and server. The attachment placement selects destinations; it does not own delivery scheduling.
 - **A bucket per owner, its id the owner's.** The owner's bucket is created on first placement,
   and creating it again returns it, so placing never checks first.
 - **Namespaces organize attachment placement and access.** Namespaces are logical containers

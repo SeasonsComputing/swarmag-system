@@ -18,7 +18,7 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | ContactPreferredChannel  |
 |           |                                    | Attachment               |
 |           |                                    | Note                     |
-|           |                                    | Facet                    |
+|           |                                    | FacetCatalog             |
 | Assets    | `@domain/abstractions/asset.ts`    | AssetType                |
 |           |                                    | AssetStatus              |
 |           |                                    | Asset                    |
@@ -63,11 +63,11 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 A string attribute may carry a **Domain**: the kind of string it holds, from a closed set. A table
 shows the Domain column only when one of its attributes has one.
 
-| **Domain**         | **Format**                            |
-| ------------------ | ------------------------------------- |
-| `email`            | An email address                      |
-| `url (schemes)`    | A URL, with one of the listed schemes |
-| `document-address` | A document store address              |
+| **Domain**         | **Format**                                |
+| ------------------ | ----------------------------------------- |
+| `email`            | An email address                          |
+| `url (schemes)`    | A URL, with one of the listed schemes     |
+| `document-address` | A document store address, a Registry path |
 
 ## 4. Core Standard
 
@@ -175,29 +175,29 @@ Attributes: **State**
 | `createdAt`   | When     |
 | `content?`    | string   |
 
-### 5.5 Facet
+### 5.5 FacetCatalog
 
-Purpose: **Curated classification catalog entry: one code within a scheme**
+Purpose: **Curated classification catalog: every facet, as a Registry path**
 
 Type: **Instantiable**
 
 Attributes: **State**
 
-| **Attribute**  | **Type** |
-| -------------- | -------- |
-| `scheme`       | string   |
-| `code`         | string   |
-| `label`        | string   |
-| `description?` | string   |
-| `active`       | boolean  |
+| **Attribute** | **Type**                                          |
+| ------------- | ------------------------------------------------- |
+| `facets`      | CompositionMany\<string\> (verbose Registry path) |
 
-Consumers reference a facet by the string `scheme:code`, never by `id`. `:` is reserved: neither
-`scheme` nor `code` may contain it; `code` may contain `/`, with no hierarchy semantics yet.
-`(scheme, code)` is unique. Retiring a facet sets `active` to false: the row stays readable and
-still resolves the label of existing references. Once a facet is referenced, its `scheme` and
-`code` never change and it is never soft-deleted; soft delete is for a facet created by mistake
-and never referenced. Those are curation obligations, enforced by the curation surface, not by
-the database.
+One record holds the whole catalog, read and written whole. A facet is a Registry path,
+`namespace/bucket/facet`, and the path explains it: `services/Application/Aerial`. Each segment
+of a stored path carries its id and its name. Namespaces are a closed set declared in code, one
+for each abstraction that carries facets; buckets and facets are curated, and a bucket exists while
+a facet is in it.
+
+An abstraction that carries facets stores their verbose paths. Matching compares ids; a display
+prefers the catalog's current name. Renaming a bucket or facet rewrites its name in the catalog,
+and a record's stored name is only its label. Retiring a facet removes it from the catalog: pickers
+no longer offer it, and a record that carries it still shows its stored name. A write against a
+stale catalog is refused.
 
 ## 6. Assets
 
@@ -211,10 +211,11 @@ Type: **Instantiable**
 
 Attributes: **State**
 
-| **Attribute** | **Type** |
-| ------------- | -------- |
-| `label`       | string   |
-| `active`      | boolean  |
+| **Attribute** | **Type**                                          |
+| ------------- | ------------------------------------------------- |
+| `label`       | string                                            |
+| `active`      | boolean                                           |
+| `facets`      | CompositionMany\<string\> (verbose Registry path) |
 
 ### 6.2 AssetStatus
 
@@ -307,6 +308,7 @@ Attributes: **State**
 | `reEntryIntervalHours?` | number                                                                   |                     |
 | `storageLocation?`      | string                                                                   |                     |
 | `sdsUrl?`               | string                                                                   | `url (https, http)` |
+| `facets`                | CompositionMany\<string\> (verbose Registry path)                        |                     |
 
 ## 8. Customers
 
@@ -417,13 +419,13 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                                  |
-| -------------- | ----------------------------------------- |
-| `name`         | string                                    |
-| `sku`          | string                                    |
-| `description?` | string                                    |
-| `category`     | ServiceCategory                           |
-| `facets`       | CompositionMany\<string\> (`scheme:code`) |
+| **Attribute**  | **Type**                                          |
+| -------------- | ------------------------------------------------- |
+| `name`         | string                                            |
+| `sku`          | string                                            |
+| `description?` | string                                            |
+| `category`     | ServiceCategory                                   |
+| `facets`       | CompositionMany\<string\> (verbose Registry path) |
 
 ### 9.3 ServiceRequiredAssetType
 
@@ -661,12 +663,12 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                                  |
-| -------------- | ----------------------------------------- |
-| `name`         | string                                    |
-| `description?` | string                                    |
-| `version`      | string                                    |
-| `facets`       | CompositionMany\<string\> (`scheme:code`) |
+| **Attribute**  | **Type**                                          |
+| -------------- | ------------------------------------------------- |
+| `name`         | string                                            |
+| `description?` | string                                            |
+| `version`      | string                                            |
+| `facets`       | CompositionMany\<string\> (verbose Registry path) |
 
 ### 11.12 WorkflowTask
 

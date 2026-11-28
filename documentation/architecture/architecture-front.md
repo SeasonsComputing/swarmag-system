@@ -36,7 +36,7 @@ source/
     ├── config/
     ├── app/                         — swarmAg-suite-wide, shared across all three apps, not generic
     │   ├── assets/                  — swarmAg brand assets (logo files, flat — one asset kind today)
-    │   ├── stores/                  — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
+    │   ├── stores/                  — swarmAg-suite state beyond the toolkit baseline (asset-types-state.ts, facets-state.ts)
     │   ├── views/                   — swarmAg domain projections (job-views.ts)
     │   ├── widgets/                 — swarmAg-suite widgets (e.g. BrandWidget)
     │   │   └── widget-registry.ts   — exports AppWidgetRegistry; app-tier catalog only
@@ -269,24 +269,24 @@ Returns a display title derived from the job's current status and available phas
 
 #### 7.2.4 Document Storage
 
-| Binding                  | Purpose                                                        |
-| ------------------------ | -------------------------------------------------------------- |
-| `api.AttachmentsInbox`   | Device attachment staging and pending delivery                 |
-| `api.AttachmentsServer`  | Remote attachment docstore root                                |
-| `api.AttachmentsUploads` | Uploads instance over the attachment pair                      |
-| `api.Attachments`        | Attachment recognition, catalog placement, and note references |
-| `api.FieldBinderInbox`   | Independent device binder upload inbox                         |
-| `api.FieldBinderServer`  | Independent remote binder source docstore root                 |
-| `api.FieldBinderUploads` | Uploads instance over the binder pair                          |
-| `api.FieldBinderStore`   | Complete local Binder mirror                                   |
-| `api.FieldBinder`        | Local reader access, status, and explicit preparation          |
-| `api.FieldBinderSource`  | Remote inventory access and Manager mutations                  |
+| Binding                  | Purpose                                                |
+| ------------------------ | ------------------------------------------------------ |
+| `api.AttachmentsInbox`   | Device attachment staging and pending delivery         |
+| `api.AttachmentsServer`  | Remote attachment docstore root                        |
+| `api.AttachmentsUploads` | Uploads instance over the attachment pair              |
+| `api.Attachments`        | Attachment recognition, placement, and note references |
+| `api.FieldBinderInbox`   | Independent device binder upload inbox                 |
+| `api.FieldBinderServer`  | Independent remote binder source docstore root         |
+| `api.FieldBinderUploads` | Uploads instance over the binder pair                  |
+| `api.FieldBinderStore`   | Complete local Binder mirror                           |
+| `api.FieldBinder`        | Local reader access, status, and explicit preparation  |
+| `api.FieldBinderSource`  | Remote inventory access and Manager mutations          |
 
 The reusable Uploads class is imported directly from `@core/cli/docstore-uploads.ts`.
 `front/api/api.ts` composes each instance over its own inbox/server pair. Attachments receives
 AttachmentsUploads and AttachmentsInbox. The binder source uses FieldBinderUploads; its reader
 uses FieldBinderStore. All store bindings implement the common docstore contract. Application code
-consumes the composed instances; lifecycle mechanics belong to core/cli, while catalogs, metadata,
+consumes the composed instances; lifecycle mechanics belong to core/cli, while placement, metadata,
 references, and invocation policy belong to their application consumers.
 Upload lifecycle and feature ownership are defined in architecture-core §§10.2–10.4.
 
@@ -369,10 +369,10 @@ build a readonly query and pass it as `api.Users.list({ query, limit, cursor })`
 filters roles and status, searches display name, primary email, and phone number, and orders by
 display name. It supplies the User picker contract; the picker itself is a separate feature.
 
-Managers and the facet catalog collect `listAll(client)` through `Array.fromAsync`; paging stays
-inside the shared iterator until the cursor is null. The list contract,
-operator set, cursor rejection, search bounds, and store-specific ordering are stated in the
-`@core/std/make-query.ts` and `@core/std/api-contracts.ts` headers. Changing a filter requires starting without a cursor.
+Managers collect `listAll(client)` through `Array.fromAsync`; paging stays inside the shared
+iterator until the cursor is null. The list contract, operator set, cursor rejection, search
+bounds, and store-specific ordering are stated in the `@core/std/make-query.ts` and
+`@core/std/api-contracts.ts` headers. Changing a filter requires starting without a cursor.
 
 ## 8. Architectural Boundaries
 
@@ -415,8 +415,10 @@ Reactive state modules follow the reactive store module pattern (CONVENTIONS §1
 
 ### 8.4 Query State Pattern
 
-Shared, read-mostly server data follows the query state module pattern (CONVENTIONS §16.3);
-`front/app/stores/facets-state.ts` is swarmAg's instance.
+Shared, read-mostly server data follows the query state module pattern (CONVENTIONS §16.3).
+swarmAg's instances are in `front/app/stores/`: `asset-types-state.ts` reads the asset type
+catalog, and `facets-state.ts` reads the facet catalog's one record whole, for pickers to filter
+from.
 
 ## 9. Application Runtime Patterns
 
@@ -617,7 +619,7 @@ app/
 │   ├── field-binder/
 │   ├── display/
 │   └── retrieval/
-├── stores/     — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
+├── stores/     — swarmAg-suite state beyond the toolkit baseline (asset-types-state.ts, facets-state.ts)
 ├── views/      — swarmAg domain projections (job-views.ts)
 └── widgets/    — swarmAg-suite widget catalog (e.g. BrandWidget)
 ```

@@ -40,7 +40,8 @@
 
 1. **Service selection** — Choose a Service SKU and category (aerial/ground) for the prospect’s need.
 2. **Assessment scheduling** — Schedule an initial onsite assessment window and assign assessor/crew.
-3. **Workflow seeding** — Preload an assessment workflow based on the Service type (default workflow per category/SKU).
+3. **Workflow seeding** — The selected Services' facets filter the Workflow library, and the rep
+   chooses the assessment workflows from the filtered set.
 
 ### 2.2 Onsite Job Assessment
 

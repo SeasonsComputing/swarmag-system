@@ -562,18 +562,14 @@ No adapter restates lifecycle mappings inline. These constants are `Adapt<T>` me
 
 ```typescript
 import { InstantiableAdapt, InstantiableOnlyAdapt, makeAdapter } from '@core/stdx'
-import type { Facet } from '@domain/abstractions/common.ts'
+import type { FacetCatalog } from '@domain/abstractions/common.ts'
 import type { JobWorkLogEntry } from '@domain/abstractions/job.ts'
 import { AnswerAdapter } from '@domain/adapters/workflow-adapter.ts'
 
-/** Deserialize/Serialize Facet. */
-export const FacetAdapter = makeAdapter<Facet>({
+/** Deserialize/Serialize FacetCatalog. */
+export const FacetCatalogAdapter = makeAdapter<FacetCatalog>({
   ...InstantiableAdapt,
-  scheme: ['scheme'],
-  code: ['code'],
-  label: ['label'],
-  description: ['description'],
-  active: ['active']
+  facets: ['facets']
 })
 
 /** Deserialize/Serialize JobWorkLogEntry. */
